@@ -150,10 +150,11 @@ def cvioutput( input, cvfxlimits, counterflowexcess, cvfxoptions, nullsignals, f
 	calibrated[5] = opc_flow*(calibrated[10]/1013.23)*(294.26/(cvfxtemp[1]+273.15)) #cvfxtemp[i] corresponds to cvfx6temp (user input)
 		
 		
-	'''TEMPORARY'''
+	#'''TEMPORARY'''
 	#For nulling a few of the signals
 	for i in range(0,16):
-		if NullSignal[i] == 1:
+		#if NullSignal[i] == 1:
+		if nullsignals[i] == 1:
 			calibrated[i] = 0
 	
 	#Needs to be removed?
@@ -242,6 +243,7 @@ def cvioutput( input, cvfxlimits, counterflowexcess, cvfxoptions, nullsignals, f
 		cvri=(cvrad/10)*10**(-4)
 		rei= 2 * cvtascc * cvri * rhoa/gnu
 		#index 18 is rhod, index 22 is LTip
+		if rei <= 0 : rei = 0.0001
 		cvsi=cvri*14.6969*calcoeffs[18] * ((0.408248*rei**(1/3)) + math.atan(2.44949*rei**(-1/3)) - 0.5*math.pi)/(3*rhoa)
 		cvli=cvsi-calcoeffs[22]
 		if cvli >= cvl: #or cvrad/10 == cutsizelooplimit:
@@ -323,7 +325,7 @@ def cvioutput( input, cvfxlimits, counterflowexcess, cvfxoptions, nullsignals, f
 	#If lower <= flow <= Upper, flow set point from before.
 	#	Otherwise, recalculate
 	if flowonoff:
-		print(zerocorrectedflows)
+		#print(zerocorrectedflows)
 		if (zerocorrectedflows[1] <= (cvfxlimits[0] + 0.05)) and (zerocorrectedflows[1] >= (cvfxlimits[0] - 0.05)) :
 			cvfxwr[0] = 0.0
 		else:

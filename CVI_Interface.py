@@ -584,7 +584,7 @@ class Ui_MainWindow(object):
 		#self.tabLayout_3.addWidget(self.devinstructlabel, 4, 0, 1, 20)
 		self.devinstruct = QtWidgets.QLabel(self.tab_3)#MainWindow)
 		self.devinstruct.setObjectName("devinstruct")
-		self.tabLayout_3.addWidget(self.devinstruct, 4, 0, 15, 20)
+		self.tabLayout_3.addWidget(self.devinstruct, 4, 0, 14, 20)
 		self.devinstruct.setWordWrap(True)
 		self.devinstruct.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")
 		self.devinstruct.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -709,7 +709,7 @@ class Ui_MainWindow(object):
 
 		self.auxoptions = QtWidgets.QLabel(self.tab_3)#MainWindow)
 		self.auxoptions.setObjectName("auxoptions")
-		self.tabLayout_3.addWidget(self.auxoptions, 7, 50, 11, 40)
+		self.tabLayout_3.addWidget(self.auxoptions, 8, 50, 10, 40)
 		self.auxoptions.setWordWrap(True)
 		self.auxoptions.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")
 		self.auxoptions.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -841,13 +841,13 @@ class Ui_MainWindow(object):
 		self.ylabels = ['Concentration (g/m^3)','Pressure (mbar)','Temperature (C)','y','y','y','y','y','y','y']
 		self.dropdownlist.addItems(self.plottitles)
 		
-		self.dropdownlistline2.addItem("")
-		self.dropdownlistline2.addItems(self.plottitles)
+		#self.dropdownlistline2.addItem("")
+		self.dropdownlistline2.addItems([""]+self.plottitles)
 		
 		self.dropdownlist2.addItems(self.plottitles)
 		
-		self.dropdownlist2line2.addItem("")
-		self.dropdownlist2line2.addItems(self.plottitles)
+		#self.dropdownlist2line2.addItem("")
+		self.dropdownlist2line2.addItems([""]+self.plottitles)
 		
 		
 		#Labeling Tabs on screen
@@ -1029,8 +1029,8 @@ class Ui_MainWindow(object):
 	def addinstruments(self, MainWindow):		
 		self.devconnect.hide()
 		self.devdisconnect.hide()
-		self.tabWidget.setTabEnabled(0, False)
-		self.tabWidget.setTabEnabled(1, False)
+		#self.tabWidget.setTabEnabled(0, False)
+		#self.tabWidget.setTabEnabled(1, False)
 		
 		self.auxdev1.setChecked(self.v1.isChecked())
 		self.auxdev2.setChecked(self.v2.isChecked())
@@ -1060,8 +1060,8 @@ class Ui_MainWindow(object):
 	def removeinstruments(self, MainWindow):
 		self.devconnect.hide()
 		self.devdisconnect.hide()
-		self.tabWidget.setTabEnabled(0, False)
-		self.tabWidget.setTabEnabled(1, False)
+		#self.tabWidget.setTabEnabled(0, False)
+		#self.tabWidget.setTabEnabled(1, False)
 		
 		self.auxdev1.setChecked(self.v1.isChecked())
 		self.auxdev2.setChecked(self.v2.isChecked())
@@ -1403,8 +1403,8 @@ class Ui_MainWindow(object):
 		#self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem([0,1,2,3],[10,2,1,0],pen='b'))
 		self.CVIplotline2.clear()
 		self.CVIplot2line2.clear()
-		if (self.dropdownlistline2.currentIndex() != 0) : self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlistline2.currentIndex()+2,:],pen='b',clear=True))
-		if (self.dropdownlist2line2.currentIndex() != 0) : self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex()+2,:],pen='b',clear=True))
+		if (self.dropdownlistline2.currentIndex() != 0) : self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlistline2.currentIndex(),:],pen='b',clear=True))
+		if (self.dropdownlist2line2.currentIndex() != 0) : self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex(),:],pen='b',clear=True))
 
 		self.CVIplot.setTitle(self.plottitles[self.dropdownlist.currentIndex()])
 		self.CVIplot.setLabel('left',text = self.ylabels[self.dropdownlist.currentIndex()])
@@ -1450,8 +1450,8 @@ class IncomingServer(asyncio.Protocol):
 		
 		#Now that the DSM has connected, a client can be established
 		#to send data back to the DSM
-		#self.client_sock = socket.socket()
-		#self.client_sock.connect((ui.ipaddress.text(), int(ui.portout.text())))	
+		self.client_sock = socket.socket()
+		self.client_sock.connect((ui.ipaddress.text(), int(ui.portout.text())))	
 
 		
 	def data_received(self, data):
@@ -1616,7 +1616,8 @@ class IncomingServer(asyncio.Protocol):
 			#Taking the null signals from the instrument panel.....
 			nullsignals = [0]*16
 			for i in range(0,len(ui.signalnulls)):
-				nullsignals[i] = ui.MainWindow.findChild(QtWidgets.QPushButton,"Null"+str(0)).isChecked()
+				nullsignals[i] = int(ui.MainWindow.findChild(QtWidgets.QPushButton,"Null"+str(i)).isChecked())
+			#print(nullsignals)
 				
 			#flowedit ===== ['cvfx0','cvfx2','cvfx3','cvfx4']	
 			#flowlimits = [0,2,5,2]
@@ -1647,19 +1648,13 @@ class IncomingServer(asyncio.Protocol):
 
 			'''
 				PRIMARY COMPUTATION
-			'''						
-#			dataout, extra, calibrated, zerocorrectedflows = cvioutput( input , ui.flowio.isChecked(), valvepositions, ui.cvimode.isChecked() )
+			'''				
 			output, calibrated = cvioutput( input , ui.flowlimits, ui.counterflowexcess, ui.cvfxoptions, nullsignals, ui.flowio.isChecked(), ui.cvimode.isChecked(), C0, C1, C2, more, tdl_cals, opc_cals)
 			
 			#if( input[34] != -99.99 ) : input[34] = calibrated[10]/(calibrated[14]+273.15) * 0.000217 * input[34]
 			output[3] = ui.numchanges
-			#output[2] = (2*valvepositions[0])**3+(2*valvepositions[1])**2+(2*valvepositions[2])**1+valvepositions[3]
-						
-			#cvl is at index 36?
-			#cvf3 is at index 41
-			#cvfxwr0 is at index 49
-			#opcc_Pcor is at index 69
-			
+
+			#cvl is at index 36?, #cvf3 is at index 41, #cvfxwr0 is at index 49, #opcc_Pcor is at index 69
 			flowbyte = (2*int(ui.v1.isChecked()))**3+(2*int(ui.v2.isChecked()))**2+(2*int(ui.v3.isChecked()))**1+int(ui.v4.isChecked())
 			output[2] = flowbyte
 			
@@ -1694,25 +1689,23 @@ class IncomingServer(asyncio.Protocol):
 			#Checked to see if user input or calculated mode is selected
 			#and proceed to populate output array accordingly
 			#IF FLOW IS CHECKED, THEN EVERYTHING IS CALCULATED!!!!
-			if not ui.flowsource.isChecked():
-				if ui.cvfx0wr.text() != "" : dataout[1] = float(ui.cvfx0wr.text())
-				else: dataout[1] = 0.00
-				if ui.cvfx2wr.text() != "" : dataout[2] = float(ui.cvfx2wr.text())
-				else: dataout[2] = 0.00
-				if ui.cvfx3wr.text() != "" : dataout[3] = float(ui.cvfx3wr.text())
-				else: dataout[3] = 0.00
-				if ui.cvfx4wr.text() != "" : dataout[4] = float(ui.cvfx4wr.text())
-				else: dataout[4] = 0.00
-				if ui.cvf1wr.text() != "" : dataout[5] = float(ui.cvf1wr.text())
-				else: dataout[5] = 0.00		
-			else:
-				#If the flowsource is set to calculated, the selectable inputs are grayed output
-				#so that they can be updated by the calculations....
-				ui.cvfx0wr.setText(str(output[1]))
-				ui.cvfx2wr.setText(str(output[2]))
-				ui.cvfx3wr.setText(str(output[3]))
-				ui.cvfx4wr.setText(str(output[4]))
-				ui.cvf1wr.setText(str(output[5]))
+			if ui.flowsource.isChecked():
+				ui.cvfx0wr.setText(str(dataout[1]))
+				ui.cvfx2wr.setText(str(dataout[2]))
+				ui.cvfx3wr.setText(str(dataout[3]))
+				ui.cvfx4wr.setText(str(dataout[4]))
+				ui.cvf1wr.setText(str(dataout[5]))
+				
+			if ui.cvfx0wr.text() != "" : dataout[1] = float(ui.cvfx0wr.text())
+			else: dataout[1] = 0.00
+			if ui.cvfx2wr.text() != "" : dataout[2] = float(ui.cvfx2wr.text())
+			else: dataout[2] = 0.00
+			if ui.cvfx3wr.text() != "" : dataout[3] = float(ui.cvfx3wr.text())
+			else: dataout[3] = 0.00
+			if ui.cvfx4wr.text() != "" : dataout[4] = float(ui.cvfx4wr.text())
+			else: dataout[4] = 0.00
+			if ui.cvf1wr.text() != "" : dataout[5] = float(ui.cvf1wr.text())
+			else: dataout[5] = 0.00		
 				
 			#if not ui.valvesource.isChecked():
 			#	dataout[6] = int(ui.v1.isChecked())
@@ -1758,7 +1751,7 @@ class IncomingServer(asyncio.Protocol):
 			'''
 			
 			#Send off the new data to the DSM
-			#self.client_sock.send(dataout)	
+			self.client_sock.send(dataout)	
 			
 			#Update front panel with data sent to dsm
 			ui.datatodsm.setText(str(dataout).replace(",", ", "))	
@@ -1822,9 +1815,9 @@ class IncomingServer(asyncio.Protocol):
 			
 		#Kept for testing purposes; however, unecessary with DSM
 		#Removed because CVI does not need an echo.
-		self.transport.write(data)
+		#self.transport.write(data)
 		#print('Close the client socket')
-		self.transport.close()
+		#self.transport.close()
 			
 	def connection_lost(self, exc): #Added after CVI test worked 11-2-16
 		'''
