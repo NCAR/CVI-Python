@@ -45,7 +45,7 @@ class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
 		MainWindow.setObjectName("MainWindow")
 		self.MainWindow = MainWindow
-				
+						
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
 		self.centralwidget.setObjectName("centralwidget")
 		self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -152,24 +152,31 @@ class Ui_MainWindow(object):
 		self.currentfile.setObjectName("currentfile")
 		self.tabLayout_1.addWidget(self.currentfile, 24, 0, 1, 50)
 		self.currentfile.setDisabled(True)		
+					
 				
-				
-		self.mainstatus = QtWidgets.QLabel(self.tab)#MainWindow)
+		self.mainstatus = QtWidgets.QTextEdit()#Label()#self.tab)#MainWindow)
 		self.mainstatus.setObjectName("mainstatus")
-		self.tabLayout_1.addWidget(self.mainstatus, 3, 15, 20, 30)
-		self.mainstatus.setWordWrap(True)
-		self.mainstatus.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")		
-		self.mainstatus.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+		#self.tabLayout_1.addWidget(self.mainstatus, 3, 15, 20, 30)
+		#self.mainstatus.setWordWrap(True)
+		#self.mainstatus.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")		
+		#self.mainstatus.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.mainstatus.setAlignment(Qt.AlignTop)
 		self.mainstatus.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))	
 
+		self.scrollArea = QtWidgets.QScrollArea(self.tab)
+		self.scrollArea.setWidgetResizable(True)
+		self.scrollArea.setWidget(self.mainstatus)
+		self.scrollArea.setObjectName("scrollArea")
+		#self.scrollArea.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")		
+		self.scrollArea.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+		self.tabLayout_1.addWidget(self.scrollArea, 3, 15, 20, 30)
+		
 		#self.Voltage_Label[i].setFont(QtGui.QFont("Times", 8, QtGui.QFont.Bold))		
 		'''
 		QFont font;
 		font.setPointSize(32);
 		font.setBold(true);
 		'''		
-		self.mainstatus.setText("Please press Start to begin communications")
 		###############################################################################
 		###############################################################################
 		
@@ -199,6 +206,29 @@ class Ui_MainWindow(object):
 		self.CVIplot.getAxis('right').linkToView(self.CVIplotline2)
 		self.CVIplotline2.setXLink(self.CVIplot)
 		self.CVIplot.getAxis('right').setLabel('axis2', color = '#0000ff')
+		
+		self.CVIplot.getAxis('left').setPen(pyqtgraph.mkPen(color=(255,255,255), width=2))#, size=10))
+		self.CVIplot.getAxis('bottom').setPen(pyqtgraph.mkPen(color=(255,255,255), width=2))
+		self.CVIplot.getAxis('right').setPen(pyqtgraph.mkPen(color=(0,0,255), width=2))
+		#self.CVIplot.AxisItem('title').setPen(pyqtgraph.mkPen(color=(255,255,0), width=2))
+		
+		#a=window.getAxis('bottom')
+		#a.font.setPixelSize(10)
+		#but a.font.pixelSize() doesn't change and the font size on the plot doesn't change
+
+		#I then tried 
+		#b=QtGui.QFont()
+		#b.setPixelSize(10)
+		#a.setFont(b)
+		
+		
+		#b=QtGui.QFont().setPixelSize(20)
+		#b.setPixelSize(20)
+		#x_axisitem.tickFont = b
+		
+		#self.CVIplot.getAxis('left').tickFont = QtGui.QFont().setPixelSize(200)
+		#self.CVIplot.getAxis('left').setFont(QtGui.QFont("Times",100,QtGui.QFont.Bold))
+		#self.CVIplot.setFont(QtGui.QFont("Times",100,QtGui.QFont.Bold))	
 		
 		'''
 		p1.setLabels(left='axis 1')
@@ -333,7 +363,7 @@ class Ui_MainWindow(object):
 
 		self.valvesourcelabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
 		
-		#Label and checkboxes for the four controllable valves
+		#Label and checkboxes for the four controllable valves!
 		self.v1 = QtWidgets.QPushButton(self.tab_2)#MainWindow)
 		self.v1.setObjectName("valve1")
 		self.tabLayout_2.addWidget(self.v1, 27, 0, 2, 10)
@@ -483,11 +513,9 @@ class Ui_MainWindow(object):
 
 		self.tablerowlabels = ['cvf1','cvfx0','cvfx1','cvfx2','cvfx3','cvfx4','cvfx5','cvfx6','cvfx7','cvfx8','cvpcn','cvtt','cvtp','cvts','cvtcn','cvtai']
 		self.tablecolumnlabels = ['raw','calibrated','crunched']
-
 		
 		self.tableWidget.setColumnCount(len(self.tablecolumnlabels))
 		self.tableWidget.setRowCount(len(self.tablerowlabels))
-		
 		for i in range(0,len(self.tablerowlabels)):
 			item = QtWidgets.QTableWidgetItem()
 			self.tableWidget.setVerticalHeaderItem(i,item)
@@ -503,6 +531,32 @@ class Ui_MainWindow(object):
 			for j in range(0, len(self.tablecolumnlabels)):
 				item = QtWidgets.QTableWidgetItem()
 				self.tableWidget.setItem(i, j, item)
+				
+				
+				
+		#table for raw input output parameters
+		#self.rawtablerowlabels = ['cvf1','cvfx0','cvfx1','cvfx2','cvfx3','cvfx4','cvfx5','cvfx6','cvfx7','cvfx8','cvpcn','cvtt','cvtp','cvts','cvtcn','cvtai']
+		self.rawtablecolumnlabels = ['Input','Output']
+		
+		self.rawtableWidget.setColumnCount(len(self.rawtablecolumnlabels))
+		self.rawtableWidget.setRowCount(100)#len(self.tablerowlabels))
+		for i in range(0,100):#len(self.rawtablerowlabels)):
+			item = QtWidgets.QTableWidgetItem()
+			self.rawtableWidget.setVerticalHeaderItem(i,item)
+		#item = QtWidgets.QTableWidgetItem()
+		#self.tableWidget.setVerticalHeaderItem(0, item)
+		for i in range(0,len(self.rawtablecolumnlabels)):
+			item = QtWidgets.QTableWidgetItem()
+			self.rawtableWidget.setHorizontalHeaderItem(i, item)
+		#item = QtWidgets.QTableWidgetItem()
+		#self.tableWidget.setHorizontalHeaderItem(1, item)
+		for i in range(0,100):#len(self.tablerowlabels)):
+			for j in range(0, len(self.rawtablecolumnlabels)):
+				item = QtWidgets.QTableWidgetItem()
+				self.rawtableWidget.setItem(i, j, item)	
+
+		self.rawtableWidget.verticalHeader().setVisible(False)					
+				
 				
 		
 		#Create Table for Calibration Coefficients
@@ -948,7 +1002,7 @@ class Ui_MainWindow(object):
 		#self.connect.click()
 		
 		#Counterflow excess to always be referenced to
-		self.counterflowexcess = 0.5
+		self.cfexcess = 0.5
 		
 		self.devconnect.clicked.connect(self.addinstruments)
 		self.devdisconnect.clicked.connect(self.removeinstruments)	
@@ -1003,6 +1057,41 @@ class Ui_MainWindow(object):
 		self.cvfxoptions = [[0]*4,[0]*4,[0]*4,[0]*4,[0]*4,[0]*4]
 		#First index is the option, second index is the instrument
 		#mode,modeval,datatype,tmpsource,tempval,i/o
+		self.internalflowsetpts = [0.00]*4
+		
+		self.mainstatuslist = ['Please read instructions before proceeding\n\n'
+			+'This program provides full feedback control of the CVI. '
+			+'Upon pressing start, a TCP server is established that waits for the DSM to establish a connection. '
+			+'Once connected, the DSM will begin transmitting data for this program to process.\n\n'
+			+'The Tabs provide functionality as follows: \n'
+			+'1. The Operations tab will serve to provide primary visualization and data inputs and outputs.\n '
+			+'2. The Configurations tab allows modification of calibration and startup parameters with manual valve and flow control. \n'
+			+'3. The Connect Auxiliary Instruments tab provides control of external channel isntrumentation including interpretation of incoming voltages and an interface for connecting and disconnecting instruments with flow compensation.\n'
+			+'\n'
+			+'The general procedures for operation of the instrument are as follows:\n'
+			+'1. Verify configurations are as desired and fields are populated.\n'
+			+'2. Verify that the DSM has been turned on and is connected via Ethernet to the NCAR server for DSM DHCP assignment\n'
+			+'3. Turn on rack mount instrumentation and CVI heaters.\n'
+			+'4. Press START to allow communication with DSM.\n'
+			+'5. Once valid data begins populating tables and once ready for feedback control, turn on the flow from the front panel\n'
+			+'\n'
+			+'At this point, the instrument should run autonomously; however, to add or remove auxiliary instrumentation, '
+			+'go to the "Connect Auxiliary Instruments" tab, and use the connect or disconnect buttons to begin the connection/disconnection routine.'
+			+'\n\n'
+			+'Once the Start button is pressed, this instructional display will disappear and this indicator will serve as a operational status display with suggested operation instructions'
+			,
+			'Instructional message 2'
+			,
+			'Instructional message 3'
+			,
+			'Instructional message 4'
+			,
+			'Instructional message 5']
+		self.mainstatus.setText(self.mainstatuslist[0])
+
+			
+			
+			#'To begin operations, press the START button at the upper portion of the screen and ]
 		
 		# creates a server and starts listening to TCP connections
 		self.runconnection = False
@@ -1038,9 +1127,9 @@ class Ui_MainWindow(object):
 		self.auxdev4.setChecked(self.v4.isChecked())
 		
 		
-		self.initialcounterflowexcess = float(self.cvf3cw.text())
-		self.counterflowexcess = self.initialcounterflowexcess + float(self.offset.text())
-		#The above should allow the other thread to begin updating counterflowexcess
+		self.initialcfexcess = float(self.cvf3cw.text())
+		self.cfexcess = self.initialcfexcess + float(self.offset.text())
+		#The above should allow the other thread to begin updating cfexcess
 		time.sleep(float(self.delay.text()))
 
 		self.devinstruct.setText("The Counterflow has been increased... \nPlease select the instruments that are to be connected and press continue")
@@ -1068,9 +1157,9 @@ class Ui_MainWindow(object):
 		self.auxdev3.setChecked(self.v3.isChecked())
 		self.auxdev4.setChecked(self.v4.isChecked())
 		
-		self.initialcounterflowexcess = float(self.cvf3cw.text())
-		self.counterflowexcess = self.initialcounterflowexcess + float(self.offset.text())
-		#The above should allow the other thread to begin updating counterflowexcess
+		self.initialcfexcess = float(self.cvf3cw.text())
+		self.cfexcess = self.initialcfexcess + float(self.offset.text())
+		#The above should allow the other thread to begin updating cfexcess
 		time.sleep(float(self.delay.text()))
 
 		self.devinstruct.setText("The Counterflow has been increased!\n\nOperators may now begin performing operations. \n\nPress continue once completed")
@@ -1123,15 +1212,15 @@ class Ui_MainWindow(object):
 			time.sleep(3)
 		
 		
-		while self.counterflowexcess > self.initialcounterflowexcess:
-			self.counterflowexcess = self.counterflowexcess - 0.5
-			self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+str(self.counterflowexcess)+"\n  Goal: "+str(self.initialcounterflowexcess))
+		while self.cfexcess > self.initialcfexcess:
+			self.cfexcess = self.cfexcess - 0.5
+			self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+str(self.cfexcess)+"\n  Goal: "+str(self.initialcfexcess))
 			app.processEvents()
 			time.sleep(2)
 		
-		if self.counterflowexcess != self.initialcounterflowexcess:
-			self.counterflowexcess = self.initialcounterflowexcess	
-			self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+str(self.counterflowexcess)+"\n  Goal: "+str(self.initialcounterflowexcess))
+		if self.cfexcess != self.initialcfexcess:
+			self.cfexcess = self.initialcfexcess	
+			self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+str(self.cfexcess)+"\n  Goal: "+str(self.initialcfexcess))
 			app.processEvents()
 			time.sleep(2)		
 		
@@ -1403,14 +1492,20 @@ class Ui_MainWindow(object):
 		#self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem([0,1,2,3],[10,2,1,0],pen='b'))
 		self.CVIplotline2.clear()
 		self.CVIplot2line2.clear()
-		if (self.dropdownlistline2.currentIndex() != 0) : self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlistline2.currentIndex(),:],pen='b',clear=True))
-		if (self.dropdownlist2line2.currentIndex() != 0) : self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex(),:],pen='b',clear=True))
-
+		
 		self.CVIplot.setTitle(self.plottitles[self.dropdownlist.currentIndex()])
 		self.CVIplot.setLabel('left',text = self.ylabels[self.dropdownlist.currentIndex()])
 		
 		self.CVIplot2.setTitle(self.plottitles[self.dropdownlist2.currentIndex()])
 		self.CVIplot2.setLabel('left',text = self.ylabels[self.dropdownlist2.currentIndex()])
+
+		if (self.dropdownlistline2.currentIndex() != 0) : 
+			self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlistline2.currentIndex(),:],pen='b',clear=True))
+			self.CVIplot.setTitle(self.plottitles[self.dropdownlist.currentIndex()]+' & '+self.plottitles[self.dropdownlistline2.currentIndex()-1])
+			self.CVIplot.getAxis('right').setLabel(self.ylabels[self.dropdownlistline2.currentIndex()-1], color = '#0000ff')
+			#self.CVIplot.setLabel('right',text = self.ylabels[self.dropdownlistline2.currentIndex()])
+		if (self.dropdownlist2line2.currentIndex() != 0) : 
+			self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex(),:],pen='b',clear=True))
 		
 		#if(self.dropdownlist.currentIndex() != self.dropdownlistline2.currentIndex()):
 		#	self.CVIplot2.setLabel('right',text = self.ylabels[self.dropdownlistline2.currentIndex()])
@@ -1648,8 +1743,268 @@ class IncomingServer(asyncio.Protocol):
 
 			'''
 				PRIMARY COMPUTATION
-			'''				
-			output, calibrated = cvioutput( input , ui.flowlimits, ui.counterflowexcess, ui.cvfxoptions, nullsignals, ui.flowio.isChecked(), ui.cvimode.isChecked(), C0, C1, C2, more, tdl_cals, opc_cals)
+			'''
+
+			#############################################################################
+			#############################################################################
+			#############################################################################
+			#########################BEGIN COMPUTATION ROUTINE###########################
+			#############################################################################
+			#############################################################################
+			#############################################################################
+			
+			#output, calibrated = cvioutput( input , ui.flowlimits, ui.cfexcess, ui.cvfxoptions, nullsignals, ui.flowio.isChecked(), ui.cvimode.isChecked(), C0, C1, C2, more, tdl_cals, opc_cals)
+			
+			#def cvioutput( input, ui.flowlimits, cfexcess, cvfxoptions, nullsignals, flowonoff, cvimode, C0, C1, C2, more, tdl_cals, opc_cal):
+			
+			#input = input
+			#ui.flowlimits = ui.flowlimits
+			#cfexcess = ui.cfexcess
+			#nullsignals = nullsignals
+			#flowonoff = ui.flowio.isChecked()
+			#cvimode = ui.cvimode.isChecked()
+			#C0 = C0; C1 = C1; C2 = C2
+			#more = more; tdl_cals = tdl_cals; opc_cal = opc_cals
+			
+			
+			'''
+			#INPUT array is of the form
+			#	time, cvtas, counts, cvf1, cvfx0, cvfx1, cvfx2, cvfx3, cvfx4, 
+			#	cvfx5, cvfx6, cvfx7, cvfx8, cvpcn, cvtt, cvtp, cvts, cvtcn, cvtai, 
+			#	H2OR, ptdlR, ttdlR, TDLsignal, TDLlaser, TDLline, TDLzero, TTDLencl, 
+			#	TTDLtec, TDLtrans, opc_cnts, opc_flow_raw, opc_pres_raw, ext1, ext2, 
+			#	H2O-PIC, 18O, HDO
+	
+	
+			#"data" and "calibrated" arrays are of the form:
+			#	cvf1, cvfx0, cvfx1, cvfx2, cvfx3, cvfx4, 
+			#	cvfx5, cvfx6, cvfx7, cvfx8, cvpcn, cvtt, 
+			#	cvtp, cvts, cvtcn, cvtai
+
+	
+			#calcoeffs array is of the form (23 elements), parenthesis denote separate naming
+			#	C0cvf1, C1cvf1, C2cvf1, C0cvfx0, C1cvfx0, C2cvfx0, 
+			#	C0cvfx1, C1cvfx1, C2cvfx1, C0cvfx2, C1cvfx2, C2cvfx2, 
+			#	C0cvfx3, C1cvfx3, C2cvfx3, C0cvfx4, C1cvfx4, C2cvfx4, 
+			#	RHOD (rhod), CVTBL (cvtbl), CVTBR (cvtbr), CVOFF1 (cvoff1), CVOFF2 (LTip)	
+	
+			#tdl_data is as follows
+			#	H2OR, ptdlR, ttdlR, TDLsignal, TDLlaser, TDLline, TDLzero, TTDLencl, TTDLtec, TDLtrans
+	
+			#opc_data is as follows:
+			#	opc_cnts, opc_flow_raw, opc_pres_raw, ext1
+	
+			#zerocorrectedflows are the pressure and temperature corrected flows of the form.
+			#	cvfx0c, cvfx1c, cvfx2c, cvfx3c, cvfx4c, 
+			#	cvfx5c, cvfx6c, cvfx7c, cvfx8c, cvf1Z
+			'''
+
+			#Input values 3 -> 18 is composed of the "data" values above
+			data = input[3:19] ; tdl_data = input[19:29] ; opc_data = input[29:33]
+	
+			#opc_cal input from files
+			#NEEDS TO BE ADDED TO CALIBRATION SPACE, #opc_cal = [10.55600, 22.22200]
+	
+			opc_press = opc_cals[0] + opc_cals[1]*opc_data[2] #opc_data[2] corresponds to opc_pres_raw	
+	
+			#Array to hold calibration coefficients for flows from inputs
+			calcoeffs = [0]*23
+			for i in range(0,6):
+				calcoeffs[i*3] = C0[i]; calcoeffs[(i*3)+1] = C1[i]; calcoeffs[(i*3)+2] = C2[i]
+				#clusters of three are, #c0cvf1...c2cvf1, #c0cvfx0..c2cvfx0, #.............., #c0cvfx4..c2cvfx4
+		
+			#Append "more" calibration coefficients to array
+			for i in range(18,23): calcoeffs[i] = more[i-18]
+		
+			#Perform default calibration of flows, pressures, temps, etc., #based on calibtraion arrays
+			calibrated = [0]*16	
+			for i in range(0,16): calibrated[i] = C0[i] + C1[i]*data[i] + C2[i]*data[i]**2
+		
+			#cvfxtemp ~ default temps; #cvfxtempsource ~ 1 is cnt1, 0 usrinput; #cvfsw ~ is instrument connected
+			#cvfxmode ~ 1 is calculated, 0 is usrinput;  #cvfxdatatype ~ 0 is Mass, 1 is Volume; #cvfxalt ~ USER INPUT FLOWS	
+							
+			cvfxtemp = cvfxoptions[5][:]; cvfxtempsource = cvfxoptions[4][:]; cvfxsw = cvfxoptions[0][:]
+			cvfxmode = cvfxoptions[1][:]; cvfxalt = cvfxoptions[2][:]; cvfxdatatype = cvfxoptions[3][:]	
+	
+			#Modifications to the flow based on if there are data,
+			#	mass vs. volume input, etc.
+			for i in range(0,4):
+				if cvfxtempsource[i] == 1 : cvfxtemp[i] = calibrated[14]
+				else: cvfxtemp[i] = cvfxtemp[i]
+				if cvfxsw[i] == 0 : calibrated[i+6] = 0
+				else:
+					if cvfxmode[i] == 1 : calibrated[i+6] = C0[i+6] + C1[i+6]*data[i+6] + C2[i+6]*data[i+6]**2
+					else: calibrated[i+6] = cvfxalt[i] #USER ENTERED FLOW
+					if cvfxdatatype[i] == 1 : calibrated[i+6] = calibrated[i+6]*(calibrated[10]/1013.23)*(294.26/(cvfxtemp[i]+273.15)) #calibrated[10] is cvpcn				
+
+			#Calibration of opc_data parameters and cvfx4
+			opc_flow = C0[5] + opc_data[1]*C1[5] #opc_data[1] corresponds to opc_flow_raw	
+			calibrated[5] = opc_flow*(calibrated[10]/1013.23)*(294.26/(cvfxtemp[1]+273.15)) #cvfxtemp[i] corresponds to cvfx6temp (user input)
+
+			#For nulling a few of the signals
+			for i in range(0,16):
+				if nullsignals[i] == 1: calibrated[i] = 0
+	
+			#Needs to be removed?, #H is the upper limit of airspeed, L is the lower limit
+			shroud = 1; H = 300; L = 4; location = 1
+	
+			#Pull windspeed from dsm string
+			wspd = input[1]
+	
+			#cvtascc appears to be the corrected total airspeed
+			cvtascc = 0
+	
+			#If the wspd adjusted for the shroud is within the bounds of H and L
+			#	then proceed with corrected total airspeed (TAS) calculation
+			if shroud*location*wspd >= L and shroud*location*wspd <= H : cvtascc = shroud*location*wspd*100
+		
+			#Added to prevent dividing by zero
+			#	NEEDS MODIFICATION TO JUST USE DEFAULT
+			if cvtascc <= 0 : cvtascc = 0.0001
+	
+			#Zero Corrected Flows are the flows that have been corrected for
+			#	Temp and Pres AND have been filtered for values less than 0.
+			zerocorrectedflows = [0]*10
+	
+			#Initialization of flow summing parameters
+			summedzerocorrectedflow = 0; summedflow = 0
+	
+			#Iteration of flows to correct for pressure and temperature
+			#	IF the pressure is reported correctly.
+			#	ALSO performs the flow summations.
+			for i in range(1,10):
+				if calibrated[10] > 0 : zerocorrectedflows[i] = ( calibrated[i]*(1013.25/calibrated[10])*((calibrated[14]+273.15)/294.26))
+				else : zerocorrectedflows[i] = ( calibrated[i]*(1013.25/0.0001)*((calibrated[14]+273.15)/294.26))
+				if zerocorrectedflows[i] < 0 : zerocorrectedflows[i] = 0.0001
+				summedflow = summedflow + calibrated[i]
+				summedzerocorrectedflow = summedzerocorrectedflow + zerocorrectedflows[i]	
+		
+			#Shift in index to place cvf1c at the beginning
+			#	DOES NOT REQUIRE PRESSURE AND TEMP CORRECTION
+			zerocorrectedflows[0] = calibrated[0]#calibrated[i]
+			if zerocorrectedflows[0] < 0 : zerocorrectedflows[0] = 0.0001
+
+			#IF the pressure is greater than 0,
+			#	THEN perform calculation of cvftc, otherwise use 0.0001 for pressure
+			if calibrated[10] > 0 : cvftc = summedzerocorrectedflow - ( calcoeffs[21]*(1013.25/calibrated[10])*((calibrated[14]+273.15)/294.26))
+			else : cvftc = summedzerocorrectedflow - ( calcoeffs[21]*(1013.25/0.0001)*((calibrated[14]+273.15)/294.26))
+	
+			#Calculation of the enhancement factor?
+			cvcfact=(cvtascc*math.pi*(calcoeffs[20]**2))/(cvftc*1000.0/60) #calcoeffs[20] corresponds to cvtbr;
+			if cvcfact<1 : cvcfact=1
+		
+			#cutsize (NOT SURE IF NECESSARY))
+			cutsize = 0#5	
+		
+			#Miscellaneous calculations, #NEEDS DEFINITIONS
+			rhoa=calibrated[10]/(2870.12*(calibrated[11]+273.15)) #calibrated[10 & 11] correspond to cvpcn and cvtt respectively
+			gnu=(0.0049*calibrated[11]+1.718)*0.0001
+			cvrNw=cutsize*10**(-4)
+			reNw=(2*cvrNw*cvtascc*rhoa)/gnu
+	
+			#UNSURE OF PRIOR FUNCTION, LEFT TO ENSURE 
+			#cvl=CVTBL*cvf3/cvf1Z;
+			cvl = calcoeffs[19]*(zerocorrectedflows[0] - summedflow)/zerocorrectedflows[0]
+
+			#Prevent calculation of greater cut size radii
+			cutsizelooplimit = 10
+	
+			#Code for presumably calculating cut size radius
+			for cvrad in range(1,cutsizelooplimit*10+1):
+				cvri=(cvrad/10)*10**(-4); rei= 2 * cvtascc * cvri * rhoa/gnu
+				if rei <= 0 : rei = 0.0001
+				cvli=(cvri*14.6969*calcoeffs[18] * ((0.408248*rei**(1/3)) + math.atan(2.44949*rei**(-1/3)) - 0.5*math.pi)/(3*rhoa))-calcoeffs[22]
+				if cvli >= cvl:
+					break
+			cvrad = cvrad/10
+			cvft=summedflow-calcoeffs[21]
+		
+			#tdl_data[1] corresponds to press, #tdl_data[2] corresponds to temp, #calcoeffs[20] corresponds to cvtbr;
+			cvcfact_tdl=(cvtascc*math.pi*(calcoeffs[20]**2))/((cvft*1000.0/60)*(1013.23/tdl_data[1])*((tdl_data[2]+273.15)/294.26))
+			if cvcfact_tdl<1 : cvcfact_tdl=1;
+
+			#calibration of tdl coefficients based on temperature and pressure
+			tdl_poly_coeffs = [0]*4
+			tdl_poly_coeffs[0]=tdl_cals[0][0]+tdl_cals[0][1]*tdl_data[1]+tdl_cals[0][2]*tdl_data[1]*tdl_data[1]+tdl_cals[0][3]*tdl_data[1]*tdl_data[1]*tdl_data[1]
+			tdl_poly_coeffs[1]=tdl_cals[1][0]+tdl_cals[1][1]*tdl_data[1]+tdl_cals[1][2]*tdl_data[1]*tdl_data[1]+tdl_cals[1][3]*tdl_data[1]*tdl_data[1]*tdl_data[1]
+			tdl_poly_coeffs[2]=tdl_cals[2][0]+tdl_cals[2][1]*tdl_data[1]+tdl_cals[2][2]*tdl_data[1]*tdl_data[1]+tdl_cals[2][3]*tdl_data[1]*tdl_data[1]*tdl_data[1]
+			tdl_poly_coeffs[3]=tdl_cals[3][0]+tdl_cals[3][1]*tdl_data[1]+tdl_cals[3][2]*tdl_data[1]*tdl_data[1]+tdl_cals[3][3]*tdl_data[1]*tdl_data[1]*tdl_data[1]
+	
+			#cvrho_tdl=C0+C1*TDL_H2O+C2*TDL_H2O*TDL_H2O+C3*TDL_H2O*TDL_H2O*TDL_H2O;
+			cvrho_tdl=tdl_poly_coeffs[0]+tdl_poly_coeffs[1]*tdl_data[0]+tdl_poly_coeffs[2]*tdl_data[0]*tdl_data[0]+tdl_poly_coeffs[3]*tdl_data[0]*tdl_data[0]*tdl_data[0]
+			RHOO_TDL=cvrho_tdl/cvcfact_tdl	
+	
+			#FIRST CALCULATION (CVRH just goes to output file) , #CVRH is CVI relative humidity in the TDL line   */
+			TTDLK=tdl_data[2]+273.15#;                                /*First, Correct temp in C to K */
+			#SATVP is saturation vapor pressure (g/m3) from Goff-Gratch and RAF Bull. 9 */
+			SATVP=10**(23.832241-5.02808*math.log10(TTDLK)-1.3816E-7*(10**(11.334-0.0303998*TTDLK))+0+8.1328E-2*(10**(3.49149-1302.8844/TTDLK))-2949.076/TTDLK)
+	
+			cvrh=100*cvrho_tdl*TTDLK/(SATVP*216.68)
+
+			if cvrho_tdl<=  0.0 : Z= -10
+			else : Z = math.log(((tdl_data[2]+273.15))*cvrho_tdl/1322.3)
+
+			cvdp = 273.0*Z/(22.51-Z) #/*CVDP is CVI Dew Point, Z is intermediate variable*/
+	
+			#Indicator in LabView
+			cvrhoo_tdl=cvrho_tdl/cvcfact_tdl
+			if cvrhoo_tdl>50  : cvrhoo_tdl=99
+			if cvrhoo_tdl<-50 : cvrhoo_tdl=-99
+	
+			opc_press_mb = (opc_press*10)
+			opcc = (opc_data[0]*60)/(opc_data[1]*1000); opcc_Pcor = opcc*calibrated[10]/opc_press
+			opcco = opcc/cvcfact; opcco_Pcor = opcco*calibrated[10]/opc_press
+
+			cvf3 = calibrated[0] - summedflow #Indicator in Labview Plot
+
+			cvcnc1 = (input[2]/(zerocorrectedflows[2]*1000/60))
+			cvcnc1 = cvcnc1*math.exp(cvcnc1*zerocorrectedflows[2]*4.167*10**(-6))
+	
+			cvcnc01 = cvcnc1/cvcfact
+	
+			#USER INPUTS
+			#cvfxwr = [0.00]*4
+			#cvfxwr array is replaced by ui.internalflowsetpts
+		
+			#If lower <= flow <= Upper, flow set point from before, #	Otherwise, recalculate
+			if ui.flowio.isChecked():
+				if (zerocorrectedflows[1] > (ui.flowlimits[0] + 0.05)) or (zerocorrectedflows[1] < (ui.flowlimits[0] - 0.05)) :
+					cvfxnw = ui.flowlimits[0]*(calibrated[10]/1013.25)*(294.26/(calibrated[14]+273.15))
+					ui.internalflowsetpts[0] = (cvfxnw-calcoeffs[3])/calcoeffs[4] #will be 6 and 7 on next iteration.
+				#else: #cvfxwr[0] = 0.0 #Needs to be left as older value. #Nothing is done so flow is as before.
+				#Starting at cvfx2 to cvfx4 (index 2 to 3 on calibrated)
+				for i in range(1,4) : # int i = 1 ; i < 4; i++ ) {
+					if (zerocorrectedflows[i+2] > ui.flowlimits[i] + 0.05) or (zerocorrectedflows[i+2] < ui.flowlimits[i] - 0.05) :
+						cvfxnw = ui.flowlimits[i] * (calibrated[10]/1013.25)*(294.26/(calibrated[14] + 273.15))
+						#cvfx0wr = ( cvfxnw – c0cvfx0) / c1cvfx0;
+						ui.internalflowsetpts[i] = ( cvfxnw - calcoeffs[(i+2)*3] ) / calcoeffs[(i+2)*3+1] #will be 9 (12) and 10 (13) on next iteration.			
+					#else : 	#cvfxwr[i] = 0.0; #REPLACE WITH OLDER VALUE
+			else: ui.internalflowsetpts = [0.00]*4
+	
+			if ui.flowio.isChecked() and not ui.cvimode.isChecked() :
+				cfexcess_cor=ui.cfexcess*(calibrated[10]/1013.25)*294.26/(calibrated[14]+273.15)
+				cfsummed=cfexcess_cor + summedflow + calcoeffs[21] - calibrated[5]  #cvoff1 is equivalent to calcoeffs[21]
+				cvf1wr=( cfsummed - calcoeffs[0])/calcoeffs[1]
+			else: cvf1wr = 0.0
+
+			if cvf1wr >= 5.0 : cvf1wr = 5.0
+			
+			if( input[34] != -99.99 ) : input[34] = calibrated[10]/(calibrated[14]+273.15) * 0.000217 * input[34]
+	
+			output = np.r_[input[0], 0, 0, 0, input[3:19], calibrated[10:16], zerocorrectedflows[:], #ENDS AT INDEX 35, next line is 36
+				cvl, cvrhoo_tdl, cvrho_tdl, cvrad, cvcfact_tdl,  #ENDS AT 40, next line 41
+				cvf3, input[1], cvcnc1, cvcnc01, cvcfact,  cvftc, cvrh, cvdp, #ENDS at 48, next line 49
+				cvfxwr[0:4], cvf1wr, input[2], tdl_data[:], opcc, opcco, opc_data[0:2], 
+				opcc_Pcor, opcco_Pcor, opc_press_mb, input[34:37]]		
+			
+			#############################################################################
+			#############################################################################
+			#############################################################################
+			###########################END COMPUTATION ROUTINE###########################
+			#############################################################################
+			#############################################################################
+			#############################################################################
+			
 			
 			#if( input[34] != -99.99 ) : input[34] = calibrated[10]/(calibrated[14]+273.15) * 0.000217 * input[34]
 			output[3] = ui.numchanges
@@ -1706,6 +2061,16 @@ class IncomingServer(asyncio.Protocol):
 			else: dataout[4] = 0.00
 			if ui.cvf1wr.text() != "" : dataout[5] = float(ui.cvf1wr.text())
 			else: dataout[5] = 0.00		
+			
+			
+			#Added for populating raw input/output data table
+			_translate = QtCore.QCoreApplication.translate
+			for i in range(0,len(input)):
+				item = ui.tableWidget.item(i, 0)
+				item.setText(_translate("MainWindow",str(self.input[i])))
+			for i in range(0,len(dataout)):
+				item = ui.tableWidget.item(i, 1)
+				item.setText(_translate("MainWindow",str(self.dataout[i])))
 				
 			#if not ui.valvesource.isChecked():
 			#	dataout[6] = int(ui.v1.isChecked())
