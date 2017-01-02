@@ -1,0 +1,19 @@
+#Program Defaults for Python Code
+Base Directory: C:CVI/
+Project Name: Testing
+Calibration Directory: Calibrations
+DSM IP Address: 192.168.184.145
+Incoming Port: 30005
+Outgoing Port: 30006
+Default Valves: 0, 0, 0, 0
+Default Flows: 0.0, 2.0, 5.0, 2.0
+Valve Source: 1
+Flow Source: 1
+counterflow excess: 0.5
+flow increase amount: 3.0
+pause after flow increase: 1
+cvfx5options: WIBS, 0, 1.00, 0, 1, 20.00
+cvfx6options: ????, 0, 3.00, 0, 1, 20.00
+cvfx7options: ????, 0, 3.00, 0, 1, 20.00
+cvfx8options: ????, 0, 3.00, 0, 1, 20.00
+nulls: 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
