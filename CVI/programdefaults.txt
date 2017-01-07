@@ -1,19 +1,57 @@
-#Program Defaults for Python Code
-Base Directory: C:CVI/
+#	Program Defaults for Python Code
+#		BE CAREFUL WITH SPACES, ENSURE ONE SPACE AFTER COLON
+#
+#	Directory for which all branching directories form
+Base Directory: ~/CVI/
+#
+#	A directory name which contains project data
 Project Name: Testing
+#
+#	A directory name which contains calibration data
 Calibration Directory: Calibrations
+#
+#	IP of DSM for communications FROM Laptop TO DSM
 DSM IP Address: 192.168.184.145
+#
+#	Network port for receiving data FROM DSM TO Laptop
 Incoming Port: 30005
+#
+#	Network port for sending data FROM Laptop TO DSM
 Outgoing Port: 30006
+#
+#	Default valve positions (0: closed, 1: open)
 Default Valves: 0, 0, 0, 0
+#
+#	Default flows for cvfx0, cvfx2, cvfx3, cvfx4
 Default Flows: 0.0, 2.0, 5.0, 2.0
+#
+#	Valve source (0: User controlled (testing), 1: Program controlled)
 Valve Source: 1
+#
+#	Flow source (0: User controlled (testing), 1: Program controlled)
 Flow Source: 1
-counterflow excess: 0.5
+#
+#	Excess flow amount to avoid pulling cabin air
+counterflow excess: 0.6
+#
+#	Flow offset amount before beginning instrument add/remove routine
 flow increase amount: 3.0
+#
+#	Delay (in seconds) after flow increase to allow system to settle
 pause after flow increase: 1
+#
+#	Flow options written in the form of: 
+#		label (name of instrument)
+#		mode (0: User input flow, 1: calculated), 
+#		User Input Flow, Data Type (0: Mass, 1: Volume), 
+#		Temperature Source (0: User Input Temp, 1: cnt1), 
+#		User Input Temperature
 cvfx5options: WIBS, 0, 1.00, 0, 1, 20.00
-cvfx6options: ????, 0, 3.00, 0, 1, 20.00
-cvfx7options: ????, 0, 3.00, 0, 1, 20.00
-cvfx8options: ????, 0, 3.00, 0, 1, 20.00
-nulls: 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+cvfx6options: cvfx6, 0, 3.00, 0, 1, 20.00
+cvfx7options: cvfx7, 0, 3.00, 0, 1, 20.00
+cvfx8options: cvfx8, 0, 3.00, 0, 1, 20.00
+#
+#	Default nulls for voiding channels from flow (or other calculations) in the order:
+#		cvf1, cvfx0, cvfx1, cvfx2, cvfx3, cvfx4, cvfx5, cvfx6, cvfx7, cvfx8
+#		ccvpcn, cvtt, cvtp, cvts, cvtcn, cvtai
+nulls: 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0
