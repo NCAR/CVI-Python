@@ -408,7 +408,12 @@ class Ui_MainWindow(object):
 		#Button for updating saved calibrations based on populated tables
 		self.updatecals = QtWidgets.QPushButton(self.tab_2)
 		self.updatecals.setObjectName("updatecals")
-		self.tabLayout_2.addWidget(self.updatecals, 0, 50, 2, 50)
+		self.tabLayout_2.addWidget(self.updatecals, 0, 50, 1, 50)
+		
+		#Dropdown menu for selecting which calibration version to use
+		self.calversionlist = QtWidgets.QComboBox(self.tab_2)
+		self.calversionlist.setObjectName("calversionlist")
+		self.tabLayout_2.addWidget(self.calversionlist, 1, 50, 1, 50)
 		
 		#Create Table for OPC Calibration Coefficients
 		self.opccaltableWidget = QtWidgets.QTableWidget(self.tab_2)
@@ -834,6 +839,10 @@ class Ui_MainWindow(object):
 		self.dropdownlistline2.currentIndexChanged.connect(self.CVIreplot)#selectionchange)
 		self.dropdownlist2.currentIndexChanged.connect(self.CVIreplot)#selectionchange)
 		self.dropdownlist2line2.currentIndexChanged.connect(self.CVIreplot)#selectionchange)
+		
+		
+		self.calversionlist.currentIndexChanged.connect(self.calVersionChange)#self.selectionchange)
+
 
 		#connect the signal 'clicked' to the slot 'connecting'
 		self.connect.clicked.connect(self.connecting)
@@ -1174,53 +1183,87 @@ class Ui_MainWindow(object):
 
 		try:
 			for i in range(0,len(self.calarray)):
-				with open(self.calpath + self.calarray[i]+'.dat', "rb") as f:
-					first = f.readline()      # Read the first line.
-					f.seek(-2, 2)             # Jump to the second last byte.
-					while f.read(1) != b"\n": # Until EOL is found...
-						f.seek(-2, 1)         # ...jump back the read byte plus one more.
-					last = f.readline() 
-					f.close()
-				calinput = last.decode('utf-8').split()#('\t')
-				calinput = [float(i) for i in calinput[-4:]]
-				for j in range(0,4):
-					self.calvalues[i,j] = calinput[j]
-
-			for i in range(0,len(self.caltablerowlabels)):
-				for j in range(0, len(self.caltablecolumnlabels)):
-					item = self.caltableWidget.item(i,j)
-					try:
-						item.setText(_translate("MainWindow",str(self.calvalues[i,j])))# = float(item.text())
-					except ValueError:
-						item.setText(_translate("MainWindow",str(0.0)))
-		
-			for i in range(0,len(self.morecaltablecolumnlabels)):
-				item = self.morecaltableWidget.item(0,i)
-				try:
-					item.setText(_translate("MainWindow",str(self.calvalues[len(self.caltablerowlabels)+i,0])))# = float(item.text())
-				except ValueError:
-					item.setText(_translate("MainWindow",str(0.0)))
+				with open(self.calpath + self.calarray[i]+'.dat',"rb") as f:
+					tmpcounter = 0
+					calcounter = 0
+					for lines in f:
+						lines = lines.decode('utf-8')
+						if (lines[0] != '#' and len(lines[0].replace(" ","").replace("\n","").replace("\r","")) != 0) :
+							try:
+								tmparray.extend([lines])
+							except:
+								tmparray = [lines]
+							finally:
+								calinput = lines.split()#('\t')
+								calinput = [float(i) for i in calinput[-4:]]
+								for j in range(0,4):
+									try:
+										self.calvalues[i,:,calcounter] = calinput
+									except:
+										self.calvalues = np.repeat(self.calvalues[:, :, None], 2, axis=2)
+										self.calvalues[i,:,calcounter] = calinput
+							calcounter+=1
+							if (i == 0):
+								try:
+									desclist.extend([''])
+								except:
+									desclist = ['']
+						elif (tmpcounter>3 and i == 0):
+							try:
+								desclist[-1] = desclist[-1]+lines.replace("#","").replace("\r",".").replace("\n",".")
+							except:
+								desclist = [lines.replace("#","").replace("\r",".").replace("\n",".")]
+						tmpcounter += 1
 				
-			for i in range(0, len(self.tdlcaltablerowlabels)):
-				for j in range(0,len(self.tdlcaltablecolumnlabels)):
-					item = self.tdlcaltableWidget.item(i,j)
-					try:
-						item.setText(_translate("MainWindow",str(self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels),j])))# = float(item.text())
-					except ValueError:
-						item.setText(_translate("MainWindow",str(0.0)))
-			
-			for i in range(0, len(self.opccaltablerowlabels)):
-				for j in range(0,len(self.opccaltablecolumnlabels)):
-					item = self.opccaltableWidget.item(i,j)
-					try:
-						item.setText(_translate("MainWindow",str(self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels)+len(self.tdlcaltablecolumnlabels),j])))# = float(item.text())
-					except ValueError:
-						item.setText(_translate("MainWindow",str(0.0)))
+				try:
+					tmptwo.append(tmparray)
+				except:
+					tmptwo = [tmparray]
+				tmparray = None
+
+			#First element is which variable, second element is which calibration to use
+			for i in range(0,len(tmptwo[0][:])):
+				self.calversionlist.addItem(('Calibration Version: '+tmptwo[0][i].split('\t')[0]+': '+desclist[i]))
+				
+			self.calversionlist.setCurrentIndex(self.calversionlist.count()-1)
 		except:
 			if self.mainerrorlist[0] in self.errorstatus.toPlainText():
 				self.errorstatus.setText(self.mainerrorlist[1])
 			elif not self.mainerrorlist[1] in self.errorstatus.toPlainText():
 				self.errorstatus.append(self.mainerrorlist[1])
+			
+	def calVersionChange(self, MainWindow):
+		_translate = QtCore.QCoreApplication.translate
+		for i in range(0,len(self.caltablerowlabels)):
+			for j in range(0, len(self.caltablecolumnlabels)):
+				item = self.caltableWidget.item(i,j)
+				try:
+					item.setText(_translate("MainWindow",str(self.calvalues[i,j,self.calversionlist.currentIndex()])))# = float(item.text())
+				except ValueError:
+					item.setText(_translate("MainWindow",str(0.0)))
+		
+		for i in range(0,len(self.morecaltablecolumnlabels)):
+			item = self.morecaltableWidget.item(0,i)
+			try:
+				item.setText(_translate("MainWindow",str(self.calvalues[len(self.caltablerowlabels)+i,0,self.calversionlist.currentIndex()])))# = float(item.text())
+			except ValueError:
+				item.setText(_translate("MainWindow",str(0.0)))
+				
+		for i in range(0, len(self.tdlcaltablerowlabels)):
+			for j in range(0,len(self.tdlcaltablecolumnlabels)):
+				item = self.tdlcaltableWidget.item(i,j)
+				try:
+					item.setText(_translate("MainWindow",str(self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels),j,self.calversionlist.currentIndex()])))# = float(item.text())
+				except ValueError:
+					item.setText(_translate("MainWindow",str(0.0)))
+			
+		for i in range(0, len(self.opccaltablerowlabels)):
+			for j in range(0,len(self.opccaltablecolumnlabels)):
+				item = self.opccaltableWidget.item(i,j)
+				try:
+					item.setText(_translate("MainWindow",str(self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels)+len(self.tdlcaltablecolumnlabels),j,self.calversionlist.currentIndex()])))# = float(item.text())
+				except ValueError:
+					item.setText(_translate("MainWindow",str(0.0)))
 			
 	def savecalibrations(self, MainWindow):
 		_translate = QtCore.QCoreApplication.translate
@@ -1231,32 +1274,32 @@ class Ui_MainWindow(object):
 			for j in range(0, len(self.caltablecolumnlabels)):
 				item = self.caltableWidget.item(i,j)
 				try:
-					self.calvalues[i,j] = float(item.text())
+					self.calvalues[i,j,self.calversionlist.currentIndex()] = float(item.text())
 				except ValueError:
-					self.calvalues[i,j] = 0.0
+					self.calvalues[i,j,self.calversionlist.currentIndex()] = 0.0
 		
 		for i in range(0,len(self.morecaltablecolumnlabels)):
 			item = self.morecaltableWidget.item(0,i)
 			try:
-				self.calvalues[len(self.caltablerowlabels)+i,0] = float(item.text())
+				self.calvalues[len(self.caltablerowlabels)+i,0,self.calversionlist.currentIndex()] = float(item.text())
 			except ValueError:
-				self.calvalues[len(self.caltablerowlabels)+i,0] = 0.0
+				self.calvalues[len(self.caltablerowlabels)+i,0,self.calversionlist.currentIndex()] = 0.0
 				
 		for i in range(0, len(self.tdlcaltablerowlabels)):
 			for j in range(0,len(self.tdlcaltablecolumnlabels)):
 				item = self.tdlcaltableWidget.item(i,j)
 				try:
-					self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels),j] = float(item.text())
+					self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels),j,self.calversionlist.currentIndex()] = float(item.text())
 				except ValueError:
-					self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels),j] = 0
+					self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels),j,self.calversionlist.currentIndex()] = 0
 					
 		for i in range(0, len(self.opccaltablerowlabels)):
 			for j in range(0,len(self.opccaltablecolumnlabels)):
 				item = self.opccaltableWidget.item(i,j)
 				try:
-					self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels)+len(self.tdlcaltablecolumnlabels),j] = float(item.text())
+					self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels)+len(self.tdlcaltablecolumnlabels),j,self.calversionlist.currentIndex()] = float(item.text())
 				except ValueError:
-					self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels)+len(self.tdlcaltablecolumnlabels),j] = 0
+					self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels)+len(self.tdlcaltablecolumnlabels),j,self.calversionlist.currentIndex()] = 0
 		
 		calupdatetext, contupdate = QInputDialog.getText(MainWindow, 'Text Input MainWindow', 'Please provide update comment. Press cancel to abort update')		
 		#If cancel is clicked, ('', False)
@@ -1264,7 +1307,7 @@ class Ui_MainWindow(object):
 		if contupdate:
 			caltimestamp = 	time.strftime("%Y %b %d %H:%M:%S",time.gmtime())
 			for i in range(0,len(self.calarray)):
-				caloutput = [ "{:.6f}".format(x) for x in self.calvalues[i,:] ]
+				caloutput = [ "{:.6f}".format(x) for x in self.calvalues[i,:,self.calversionlist.currentIndex()] ]
 				caloutput = '\t'.join(caloutput)
 				caloutput = '\n\n# '+ str(calupdatetext) + '\n' + caltimestamp+'\t'+caloutput
 				if not os.path.isfile(self.calpath+self.calarray[i]+'.dat'):
@@ -1304,8 +1347,6 @@ class Ui_MainWindow(object):
 		#Naming toggles for external instruments
 		self.auxdevtoggleoptions = [['Input Below', 'Mass','Input Below'],['DSM Input','Volume','cnt1']]
 		for i in range(0,4):
-			#tmpobject = MainWindow.findChild(QtWidgets.QLineEdit,'cvfx'+str(i+5)+'title')
-			#tmpobject.setText('cvfx'+str(i+5))
 			for j in range(0,len(self.auxdevtoggles)):
 				tmpobject = MainWindow.findChild(QtWidgets.QPushButton,'cvfx'+str(i+5)+self.auxdevtoggles[j])
 				if not tmpobject.isChecked(): tmpobject.setText(self.auxdevtoggles[j]+' : '+self.auxdevtoggleoptions[0][j] )
@@ -1368,21 +1409,7 @@ class Ui_MainWindow(object):
 			self.statusindicatorlabel.setText("Disconnect Successful")
 			self.runconnection = False
 			
-			#Resets the connected? indicator to red
-			palette = QtGui.QPalette()
-			brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
-			palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
-			palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
-			palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
-			#palette.setColor(QtGui.QPalette.Background,QtGui.QColor(255,255,0))
-			self.graphicsView.setPalette(palette)
-		
-	#this is the function that is run when the plot data
-	#selection is changed. It then changes plot titles and axes
-	#and plots the new set of data.
-	#def selectionchange(self,i):
-
-	#program for replotting the data based on which data
+	#function for replotting the data based on which data
 	#selection has been chosen
 	def CVIreplot(self):#,plotnumber):		
 	
@@ -1400,20 +1427,9 @@ class Ui_MainWindow(object):
 			item.setText(_translate("MainWindow",str(self.tabledata[i,1])))
 			item = ui.tableWidget.item(i, 2)
 			item.setText(_translate("MainWindow",str(self.tabledata[i,2])))
-		
-		#derp = [x for x in range(0,10)]
-		#derpy = [x for x in range(100,110)]
-		#derpyy = [x for x in range(200,210)]
-		#derpyy = derpyy[::-1]
-		#derpyyy = [x for x in range(300,310)]
-
-		#self.plotdata = np.c_[derp,derpy,derpyy,derpyyy,derp,derpy,derpyy,derpyyy,derp,derpy]
-		#self.plotdata = np.transpose(self.plotdata)
 
 		self.CVIplot.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist.currentIndex()+1,:], clear = True)
 		self.CVIplot2.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist2.currentIndex()+1,:], clear = True)
-		#self.CVIplot.plot([0,1,2,3],[0,1,2,3])
-		#self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem([0,1,2,3],[10,2,1,0],pen='b'))
 		self.CVIplotline2.clear()
 		self.CVIplot2line2.clear()
 		
@@ -1423,32 +1439,15 @@ class Ui_MainWindow(object):
 		self.CVIplot2.setTitle(self.plottitles[self.dropdownlist2.currentIndex()])
 		self.CVIplot2.setLabel('left',text = self.ylabels[self.dropdownlist2.currentIndex()])
 
-		#self.CVIplot2.getAxis('left').setPen(pyqtgraph.mkPen(color=(255,255,255), width=3))#, size=10))
-		#self.CVIplot2.getAxis('bottom').setPen(pyqtgraph.mkPen(color=(255,255,255), width=3))
-		#self.CVIplot2.getAxis('right').setPen(pyqtgraph.mkPen(color=(150,150,255), width=3))
 		if (self.dropdownlistline2.currentIndex() != 0) : 
 			self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlistline2.currentIndex(),:],clear = True))#,pen=pyqtgraph.mkPen(color=(150,150,255), width=3)))#,clear=True))
 			self.CVIplot.setTitle(self.plottitles[self.dropdownlist.currentIndex()]+' & '+self.plottitles[self.dropdownlistline2.currentIndex()-1])
 			self.CVIplot.getAxis('right').setLabel(self.ylabels[self.dropdownlistline2.currentIndex()-1])#, color = (150,150,255))#'#0000ff')
-			#self.CVIplot.setLabel('right',text = self.ylabels[self.dropdownlistline2.currentIndex()])
 		if (self.dropdownlist2line2.currentIndex() != 0) : 
 			self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex(),:],clear=True))#,pen='b',clear=True))
 			self.CVIplot2.setTitle(self.plottitles[self.dropdownlist2.currentIndex()]+' & '+self.plottitles[self.dropdownlist2line2.currentIndex()-1])
 			self.CVIplot2.getAxis('right').setLabel(self.ylabels[self.dropdownlist2line2.currentIndex()-1])#, color = (150,150,255))#'#0000ff')
 		
-		#if(self.dropdownlist.currentIndex() != self.dropdownlistline2.currentIndex()):
-		#	self.CVIplot2.setLabel('right',text = self.ylabels[self.dropdownlistline2.currentIndex()])
-		'''
-		if plotnumber == 1 or plotnumber == 0:
-			self.CVIplot.plot(self.plotdata[0,:] , self.plotdata[self.dropdownindex+1,:], clear = True)
-		if plotnumber == 2 or plotnumber == 0 :
-			x = [0,1,2,3,4,5]
-			y = [1,2,3,4,5,6]
-			z = [2,3,4,5,6,7]
-			self.CVIplot2.plot(x,y, pen=(255,0,0), clear = True)
-			self.CVIplot2.plot(x,z, pen=(0,255,0))
-#			self.CVIplot2.plot(self.plotdata[0,:] , self.plotdata[self.dropdownindex2+1,:], clear = True)
-		'''	
 		app.processEvents()
 
 #Class for listening for client connections from the DSM
@@ -1463,14 +1462,6 @@ class IncomingServer(asyncio.Protocol):
 		self.peername = transport.get_extra_info('peername')
 		#print('Connection from {}'.format(peername))
 		self.transport = transport
-		
-		#Changes connected? indicator to green!!
-		palette = QtGui.QPalette()
-		brush = QtGui.QBrush(QtGui.QColor(0, 255, 0))
-		palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
-		palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
-		palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
-		ui.graphicsView.setPalette(palette)
 		
 		#Now that the DSM has connected, a client can be established
 		#to send data back to the DSM
@@ -1498,32 +1489,8 @@ class IncomingServer(asyncio.Protocol):
 		#Null string just in case
 		dataout = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 		
-		#If data looks normal (i.e. not a header) then proceed.
+		#If data looks normal (i.e. not a header) then proceed. Otherwise, print header to corresponding location
 		try:#if(datain[0] != 'N'):
-			#Flow boolean for deciding if flow is on or off
-			#flowonoff = True
-			
-			#These are the valve positions selected from the
-			#front panel.
-			
-			'''
-			valvepositions = [0]*4
-			
-			if ui.v1.isChecked() : valvepositions[0] = 1
-			else: valvepositions[0] = 0
-			if ui.v2.isChecked() : valvepositions[1] = 1
-			else: valvepositions[1] = 0			
-			if ui.v3.isChecked() : valvepositions[2] = 1
-			else: valvepositions[2] = 0
-			if ui.v4.isChecked() : valvepositions[3] = 1
-			else: valvepositions[3] = 0
-			'''
-			
-			
-			#CVI mode corresponding to "CVI"(false) and "total"(true)
-			#NOT YET IMPLEMENTED
-			#cvimode = False
-			
 			#Take input string and convert to float array for 
 			#	crunchcvi code to process
 			#input = data.decode(encoding='utf-8')
@@ -1536,13 +1503,13 @@ class IncomingServer(asyncio.Protocol):
 			#The first 16 rows contain C0, C1, C2 in their respective columns
 			#The next 5 rows contain RHOD, CVTBL, CVTBR, cvoff1, and LTip in the first column
 			#The next 4 rows contain C0, C1, C2, and C3
-			C0 = np.r_[ui.calvalues[:16,0]]
-			C1 = np.r_[ui.calvalues[:16,1]]
-			C2 = np.r_[ui.calvalues[:16,2]]
-			more = np.r_[ui.calvalues[16:21,0]]
+			C0 = np.r_[ui.calvalues[:16,0,ui.calversionlist.currentIndex()]]
+			C1 = np.r_[ui.calvalues[:16,1,ui.calversionlist.currentIndex()]]
+			C2 = np.r_[ui.calvalues[:16,2,ui.calversionlist.currentIndex()]]
+			more = np.r_[ui.calvalues[16:21,0,ui.calversionlist.currentIndex()]]
 			#tdl_cals
-			tdl_cals = np.c_[ui.calvalues[21:25,0], ui.calvalues[21:25,1], ui.calvalues[21:25,2], ui.calvalues[21:25,3]]
-			opc_cals = np.r_[ui.calvalues[25,0],ui.calvalues[25,1]]
+			tdl_cals = np.c_[ui.calvalues[21:25,0,ui.calversionlist.currentIndex()], ui.calvalues[21:25,1,ui.calversionlist.currentIndex()], ui.calvalues[21:25,2,ui.calversionlist.currentIndex()], ui.calvalues[21:25,3,ui.calversionlist.currentIndex()]]
+			opc_cals = np.r_[ui.calvalues[25,0,ui.calversionlist.currentIndex()],ui.calvalues[25,1,ui.calversionlist.currentIndex()]]
 			
 			tdl_cals = np.transpose(tdl_cals)
 			
@@ -2095,20 +2062,9 @@ class IncomingServer(asyncio.Protocol):
 				with open(ui.path+ui.file, "a") as f:
 					f.write(outputstring)
 					f.close()
-					
 		except:
 			print(datain)
 			ui.dsmheader.setText(str(datain))
-			
-			
-			#os.path.isfile('./file.txt') 
-			
-			#filename = "./CVI_data/"			
-			
-			#filename = "/foo/bar/baz.txt"¨
-			#os.makedirs(os.path.dirname(filename), exist_ok=True)
-			#with open(filename, "w") as f:
-			#f.write(outputstring)
 			
 		#Kept for testing purposes; however, unecessary with DSM
 		#Removed because CVI does not need an echo.

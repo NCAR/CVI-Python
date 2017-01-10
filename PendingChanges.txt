@@ -20,6 +20,7 @@ COMPLETE * Provide error instructions for if any files are not found.
 PARTIAL * CLEAN UP AND COMMENT CODE
 * Identify issue with segmentation faults occuring in linux and NOT windows
 COMPLETE * Add DSM header box on calibrations panel
+COMPLETE * Add calibration coefficient version dropdown
 
 
 Miscellaneous Updates
