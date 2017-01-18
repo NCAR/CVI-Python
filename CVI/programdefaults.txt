@@ -1,7 +1,8 @@
 #	Program Defaults for Python Code
 #		BE CAREFUL WITH SPACES, ENSURE ONE SPACE AFTER COLON
 #
-#	Directory for which all branching directories form
+#	Directory for which all branching directories form (DO NOT CHANGE). '~' signifies home directory
+#	If Base Directory needs to be changed, it needs to be done within the code for now.
 Base Directory: ~/CVI/
 #
 #	A directory name which contains project data
@@ -47,7 +48,7 @@ pause after flow increase: 1
 #		Temperature Source (0: User Input Temp, 1: cnt1), 
 #		User Input Temperature
 cvfx5options: WIBS, 0, 1.00, 0, 1, 20.00
-cvfx6options: cvfx6, 0, 3.00, 0, 1, 20.00
+cvfx6options: Other, 0, 3.00, 0, 1, 20.00
 cvfx7options: cvfx7, 0, 3.00, 0, 1, 20.00
 cvfx8options: cvfx8, 0, 3.00, 0, 1, 20.00
 #
