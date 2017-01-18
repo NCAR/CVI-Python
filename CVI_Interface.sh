@@ -1,2 +1,2 @@
 !#/bin/bash/env
-python3 ~/Desktop/CVI-Python/CVI_Linux_Interface.py
+python3 ~/Desktop/CVI-Python/CVI_Interface.py

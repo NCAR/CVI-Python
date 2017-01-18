@@ -94,6 +94,7 @@ class Ui_MainWindow(object):
 		self.tabLayout_3.setObjectName("tabLayout_3")
 		self.tabLayout_3.setSpacing(10)
 		
+		'''
 		#Create uniform grid spacing for layout resizing purposes
 		for i in range(0, 101):
 			#self.tabLayout_1.setColumnMinimumWidth(i,1) ###
@@ -105,25 +106,26 @@ class Ui_MainWindow(object):
 			self.tabLayout_1.setRowStretch(i,1)
 			self.tabLayout_2.setRowStretch(i,1)
 			self.tabLayout_3.setRowStretch(i,1)
+		'''
 
 		#Push buttons for establishing (or cancelling) server to receive data
 		self.connect = QtWidgets.QPushButton(self.tab)
 		self.connect.setObjectName("connect")
-		self.tabLayout_1.addWidget(self.connect, 0, 0, 1, 25)
+		self.tabLayout_1.addWidget(self.connect, 0, 0, 1, 10)
 		self.disconnect = QtWidgets.QPushButton(self.tab)
 		self.disconnect.setObjectName("disconnect")
-		self.tabLayout_1.addWidget(self.disconnect, 0, 25, 1, 25)		
+		self.tabLayout_1.addWidget(self.disconnect, 0, 10, 1, 10)		
 					
 		#Flow on/off toggle
 		self.flowio = QtWidgets.QPushButton(self.tab)
 		self.flowio.setObjectName("flowio")
-		self.tabLayout_1.addWidget(self.flowio, 3, 0, 2, 10)
+		self.tabLayout_1.addWidget(self.flowio, 3, 0, 1, 10)
 		self.flowio.setCheckable(True)
 		
 		#CVI Mode toggle for CVI/Total option
 		self.cvimode = QtWidgets.QPushButton(self.tab)
 		self.cvimode.setObjectName("cvimode")
-		self.tabLayout_1.addWidget(self.cvimode, 5, 0, 2, 10)
+		self.tabLayout_1.addWidget(self.cvimode, 4, 0, 1, 10)
 		self.cvimode.setCheckable(True)
 		
 		#Creation of arbitrary label
@@ -139,18 +141,18 @@ class Ui_MainWindow(object):
 		for i in range(0,len(self.flowedit)):
 			tmpobject = QtWidgets.QLabel(self.tab)
 			tmpobject.setObjectName(self.flowlabels[i])
-			self.tabLayout_1.addWidget(tmpobject, 8+2*i, 0, 2, 5)
+			self.tabLayout_1.addWidget(tmpobject, 6+1*i, 0, 1, 5)
 			tmpobject = QtWidgets.QLineEdit(self.tab)
 			tmpobject.setObjectName(self.flowedit[i])
-			self.tabLayout_1.addWidget(tmpobject, 8+2*i, 5, 2, 5)
+			self.tabLayout_1.addWidget(tmpobject, 6+1*i, 5, 1, 5)
 				
 		#Widget for displaying file that is being saved to
 		self.currentfilelabel = QtWidgets.QLabel(self.tab)
 		self.currentfilelabel.setObjectName("currentfilelabel")
-		self.tabLayout_1.addWidget(self.currentfilelabel, 22, 0, 1, 50)
+		self.tabLayout_1.addWidget(self.currentfilelabel, 10, 0, 1, 20)
 		self.currentfile = QtWidgets.QLineEdit(self.tab)
 		self.currentfile.setObjectName("currentfile")
-		self.tabLayout_1.addWidget(self.currentfile, 23, 0, 1, 50)
+		self.tabLayout_1.addWidget(self.currentfile, 11, 0, 1, 20)
 		self.currentfile.setDisabled(True)		
 					
 		#Status indicator for instructional display and current operation of instrument
@@ -158,16 +160,15 @@ class Ui_MainWindow(object):
 		self.mainstatus.setObjectName("mainstatus")
 		self.mainstatus.setAlignment(Qt.AlignTop)
 		self.mainstatus.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
-		self.tabLayout_1.addWidget(self.mainstatus, 2, 12, 15, 36)
+		self.tabLayout_1.addWidget(self.mainstatus, 2, 11, 8, 8)
 		
 		#Error indicator for alerting if there is a problem
 		self.errorstatus = QtWidgets.QTextEdit()
 		self.errorstatus.setObjectName("errorstatus")
 		self.errorstatus.setAlignment(Qt.AlignTop)
 		self.errorstatus.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
-		self.errorstatus.setStyleSheet("color: rgb(255, 0, 0);")
-		self.tabLayout_1.addWidget(self.errorstatus,18,0,4,48)
-		
+		#self.errorstatus.setStyleSheet("color: rgb(255, 0, 0);")
+		self.tabLayout_1.addWidget(self.errorstatus,18,0,2,20)
 
 		###############################################################################
 		###############################################################################
@@ -175,17 +176,17 @@ class Ui_MainWindow(object):
 		#Create Table for Viewing uncorrected, corrected, and calibrated flows
 		self.tableWidget = QtWidgets.QTableWidget(self.tab)
 		self.tableWidget.setObjectName("tableWidget")
-		self.tabLayout_1.addWidget(self.tableWidget, 25, 0, 25, 30)
+		self.tabLayout_1.addWidget(self.tableWidget, 13, 0, 5, 12)
 		
 		#Create Table for viewing raw input and output data
 		self.rawtableWidget = QtWidgets.QTableWidget(self.tab)
 		self.rawtableWidget.setObjectName("rawtablewidget")
-		self.tabLayout_1.addWidget(self.rawtableWidget, 25, 30, 25, 20)
+		self.tabLayout_1.addWidget(self.rawtableWidget, 13, 12, 5, 8)
 		
 		#First Plotting Widget
 		self.CVIplot = PlotWidget(self.tab)
 		self.CVIplot.setObjectName("CVIplot")
-		self.tabLayout_1.addWidget(self.CVIplot, 1, 50, 22, 50)
+		self.tabLayout_1.addWidget(self.CVIplot, 1, 25, 9, 25)
 		self.CVIplot.show()
 		self.CVIplot.setTitle("CVI Data",color='w')
 		self.CVIplot.setLabel('bottom',text = 'Time (seconds)')
@@ -207,7 +208,7 @@ class Ui_MainWindow(object):
 		#Second Plotting Widget
 		self.CVIplot2 = PlotWidget(self.tab)
 		self.CVIplot2.setObjectName("CVIplot")
-		self.tabLayout_1.addWidget(self.CVIplot2, 24, 50, 26, 50)
+		self.tabLayout_1.addWidget(self.CVIplot2, 11, 25, 9, 25)
 		self.CVIplot2.setTitle("CVI Data",color='w')
 		self.CVIplot2.setLabel('bottom',text = 'Time (seconds)')
 		self.CVIplot2.setLabel('left',text = 'Y1')
@@ -229,18 +230,18 @@ class Ui_MainWindow(object):
 		#Dropdown lists for selecting data for first plot
 		self.dropdownlist = QtWidgets.QComboBox(self.tab)
 		self.dropdownlist.setObjectName("dropdownlist")
-		self.tabLayout_1.addWidget(self.dropdownlist, 0, 50, 1, 25)
+		self.tabLayout_1.addWidget(self.dropdownlist, 0, 25, 1, 12)
 		self.dropdownlistline2 = QtWidgets.QComboBox(self.tab)
 		self.dropdownlistline2.setObjectName("dropdownlistline2")
-		self.tabLayout_1.addWidget(self.dropdownlistline2, 0, 75, 1, 25)
+		self.tabLayout_1.addWidget(self.dropdownlistline2, 0, 38, 1, 12)
 		
 		#Dropdown lists for selecting data for second plot
 		self.dropdownlist2 = QtWidgets.QComboBox(self.tab)
 		self.dropdownlist2.setObjectName("dropdownlist2")
-		self.tabLayout_1.addWidget(self.dropdownlist2, 23, 50, 1, 25)
+		self.tabLayout_1.addWidget(self.dropdownlist2, 10, 25, 1, 12)
 		self.dropdownlist2line2 = QtWidgets.QComboBox(self.tab)
 		self.dropdownlist2line2.setObjectName("dropdownlist2line2")
-		self.tabLayout_1.addWidget(self.dropdownlist2line2, 23, 75, 1, 25)	
+		self.tabLayout_1.addWidget(self.dropdownlist2line2, 10, 38, 1, 12)	
 		
 		###############################################################################
 		###############################################################################		
