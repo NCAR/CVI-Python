@@ -23,6 +23,17 @@ COMPLETE * Add DSM header box on calibrations panel
 COMPLETE * Add calibration coefficient version dropdown
 
 * Add rolling save files for main status and error status indicators
+* Correct calibration saving routine such that it will actually update
+* Try to find correction for thread.join() causing failure
+* Allow realtime updating for reading calibration coefficients from tables
+* Add delete button for deleting certain coefficients
+* Add update button to reread calibrations from files
+* Add ability to prevent rapid updates to text entry fields so that a . is not read, etc. (check if field is being entered?)
+* Remove DSM Header printout to terminal
+* Add wrap text and scrollable to dsm header box.
+* Verify why flow can be "off" and yet the user input voltages will still output.
+* Correct raw input/output indicator updating (and labeling)
+* 
 
 
 Miscellaneous Updates

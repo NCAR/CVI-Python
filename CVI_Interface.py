@@ -17,9 +17,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-#For creating parallel thread for server
-import threading
-
 #Following three imports appear to be the "newer" version of asyncore
 #Implemented; however, needs to be implemented as asynchronous I/O
 #As opposed to its current threading implementation
@@ -28,12 +25,17 @@ import asyncio.streams
 
 #For the simple non blocking tcp client output
 #Incorporates Select()
+import eventlet
+
 from eventlet.green import socket
 
 #For plotting within pyqt
 import pyqtgraph
 from pyqtgraph import PlotWidget, ViewBox
 import numpy as np
+
+#For creating parallel thread for server
+import threading
 
 #For File WRiting
 import os
@@ -53,9 +55,9 @@ class Ui_MainWindow(object):
 		
 		#MainWindow.sizePolicy.ignored()
 		#MainWindow.setWindowFlags(QtCore.Qt.FramelessWindowHint) #Removes window such that it cannot be closed.
-		#MainWindow.setMinimumSize(1,1)
-		#MainWindow.minimumSizeHint()
-		#MainWindow.adjustSize()
+		MainWindow.setMinimumSize(1,1)
+		MainWindow.minimumSizeHint()
+		MainWindow.adjustSize()
 		
 		#Creation of Main Layout
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -94,20 +96,33 @@ class Ui_MainWindow(object):
 		self.tabLayout_3.setObjectName("tabLayout_3")
 		self.tabLayout_3.setSpacing(10)
 		
-		'''
 		#Create uniform grid spacing for layout resizing purposes
+
+		for i in range(0, 21):
+			self.tabLayout_1.setRowStretch(i,1)
+			self.tabLayout_1.setRowMinimumHeight(i,1)	####
+#
+		for i in range(0, 51):
+			self.tabLayout_1.setColumnStretch(i,1)
+			self.tabLayout_1.setColumnMinimumWidth(i,1)	####
+
+
 		for i in range(0, 101):
 			#self.tabLayout_1.setColumnMinimumWidth(i,1) ###
-			self.tabLayout_1.setColumnStretch(i,1)
+			#self.tabLayout_1.setColumnStretch(i,1)
+			self.tabLayout_2.setColumnMinimumWidth(i,1) ###
 			self.tabLayout_2.setColumnStretch(i,1)
+			self.tabLayout_3.setColumnMinimumWidth(i,1) ###
 			self.tabLayout_3.setColumnStretch(i,1)			
 		for i in range(0, 51):
 			#self.tabLayout_1.setRowMinimumHeight(i,1)	####
-			self.tabLayout_1.setRowStretch(i,1)
+			#self.tabLayout_1.setRowStretch(i,1)
+			self.tabLayout_2.setRowMinimumHeight(i,1)	####
 			self.tabLayout_2.setRowStretch(i,1)
+			self.tabLayout_3.setRowMinimumHeight(i,1)	####
 			self.tabLayout_3.setRowStretch(i,1)
-		'''
 
+		
 		#Push buttons for establishing (or cancelling) server to receive data
 		self.connect = QtWidgets.QPushButton(self.tab)
 		self.connect.setObjectName("connect")
@@ -250,114 +265,115 @@ class Ui_MainWindow(object):
 		#Host and Port Configuration Labels and inputs
 		self.dsmiplabel = QtWidgets.QLabel(self.tab_2)
 		self.dsmiplabel.setObjectName("label")
-		self.tabLayout_2.addWidget(self.dsmiplabel, 0, 0, 1, 10)
+		self.tabLayout_2.addWidget(self.dsmiplabel, 0, 0, 2, 10)
 		self.ipaddress = QtWidgets.QLineEdit(self.tab_2)
 		self.ipaddress.setObjectName("ipaddress")
-		self.tabLayout_2.addWidget(self.ipaddress, 1, 0, 1, 10)
+		self.tabLayout_2.addWidget(self.ipaddress, 2, 0, 2, 10)
 		self.portinlabel = QtWidgets.QLabel(self.tab_2)
 		self.portinlabel.setObjectName("portinlabel")
-		self.tabLayout_2.addWidget(self.portinlabel, 2, 0, 1, 10)
+		self.tabLayout_2.addWidget(self.portinlabel, 4, 0, 2, 10)
 		self.portin = QtWidgets.QLineEdit(self.tab_2)
 		self.portin.setObjectName("portin")
-		self.tabLayout_2.addWidget(self.portin, 3, 0, 1, 10)
+		self.tabLayout_2.addWidget(self.portin, 6, 0, 2, 10)
 		self.portoutlabel = QtWidgets.QLabel(self.tab_2)
 		self.portoutlabel.setObjectName("portoutlabel")
-		self.tabLayout_2.addWidget(self.portoutlabel, 4, 0, 1, 10)
+		self.tabLayout_2.addWidget(self.portoutlabel, 8, 0, 2, 10)
 		self.portout = QtWidgets.QLineEdit(self.tab_2)
 		self.portout.setObjectName("portout")
-		self.tabLayout_2.addWidget(self.portout, 5, 0, 1, 10)
+		self.tabLayout_2.addWidget(self.portout, 10, 0, 2, 10)
 		
 		#Base File Path
 		self.basedirlabel = QtWidgets.QLabel(self.tab_2)
 		self.basedirlabel.setObjectName("basedirlabel")
-		self.tabLayout_2.addWidget(self.basedirlabel, 0, 10, 1, 10)
+		self.tabLayout_2.addWidget(self.basedirlabel, 0, 10, 2, 10)
 		self.basedirval = QtWidgets.QLineEdit(self.tab_2)
 		self.basedirval.setObjectName("basedirval")
-		self.tabLayout_2.addWidget(self.basedirval, 1, 10, 1, 10)
+		self.tabLayout_2.addWidget(self.basedirval, 2, 10, 2, 10)
 		self.basedirval.setDisabled(True)
 		
 		#Project specific path
 		self.projectdirlabel = QtWidgets.QLabel(self.tab_2)
 		self.projectdirlabel.setObjectName("projectdirlabel")
-		self.tabLayout_2.addWidget(self.projectdirlabel, 2, 10, 1, 10)
+		self.tabLayout_2.addWidget(self.projectdirlabel, 4, 10, 2, 10)
 		self.projectdirval = QtWidgets.QLineEdit(self.tab_2)
 		self.projectdirval.setObjectName("projectdirval")
-		self.tabLayout_2.addWidget(self.projectdirval, 3, 10, 1, 10)
+		self.tabLayout_2.addWidget(self.projectdirval, 6, 10, 2, 10)
 		self.projectdirval.setDisabled(True)
 		
 		#Calibrations specific path
 		self.caldirlabel = QtWidgets.QLabel(self.tab_2)
 		self.caldirlabel.setObjectName("caldirlabel")
-		self.tabLayout_2.addWidget(self.caldirlabel, 4, 10, 1, 10)
+		self.tabLayout_2.addWidget(self.caldirlabel, 8, 10, 2, 10)
 		self.caldirval = QtWidgets.QLineEdit(self.tab_2)
 		self.caldirval.setObjectName("caldirval")
-		self.tabLayout_2.addWidget(self.caldirval, 5, 10, 1, 10)
+		self.tabLayout_2.addWidget(self.caldirval, 10, 10, 2, 10)
 		self.caldirval.setDisabled(True)
 	
 		#Blank indicator for displaying the DSM header that is sent first upon connection
 		self.dsmheaderlabel = QtWidgets.QLabel(self.tab_2)
 		self.dsmheaderlabel.setObjectName("dsmheaderlabel")
-		self.tabLayout_2.addWidget(self.dsmheaderlabel, 0, 20, 1, 30)
+		self.tabLayout_2.addWidget(self.dsmheaderlabel, 0, 20, 2, 30)
 		self.dsmheader = QtWidgets.QLabel(self.tab_2)
 		self.dsmheader.setObjectName("dsmheader")
-		self.tabLayout_2.addWidget(self.dsmheader, 1, 20, 5, 30)
+		self.tabLayout_2.addWidget(self.dsmheader, 2, 20, 10, 30)
 		self.dsmheader.setWordWrap(True)
 		self.dsmheader.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")		
-		self.dsmheader.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+		#self.dsmheader.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.dsmheader.setAlignment(Qt.AlignTop)
 		self.dsmheaderlabel.setText("DSM HEADER INFORMATION")
 		
 		#Text Boxes for displaying the raw data string to and from the DSM
 		self.datafromdsmlabel = QtWidgets.QLabel(self.tab_2)
 		self.datafromdsmlabel.setObjectName("datafromdsmlabel")
-		self.tabLayout_2.addWidget(self.datafromdsmlabel, 6, 0, 1, 40)
+		self.tabLayout_2.addWidget(self.datafromdsmlabel, 12, 0, 2, 40)
 		self.datafromdsm = QtWidgets.QLabel(self.tab_2)
 		self.datafromdsm.setObjectName("datafromdsm")
-		self.tabLayout_2.addWidget(self.datafromdsm, 7, 0, 18, 50)
+		self.tabLayout_2.addWidget(self.datafromdsm, 14, 0, 8, 50)
 		self.datafromdsm.setWordWrap(True)
 		self.datafromdsm.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")
-		self.datafromdsm.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+		#self.datafromdsm.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.datafromdsm.setAlignment(Qt.AlignTop)
+
 		self.datatodsmlabel = QtWidgets.QLabel(self.tab_2)
 		self.datatodsmlabel.setObjectName("datatodsmlabel")
-		self.tabLayout_2.addWidget(self.datatodsmlabel, 25, 0, 1, 50)
+		self.tabLayout_2.addWidget(self.datatodsmlabel, 22, 0, 2, 50)
 		self.datatodsm = QtWidgets.QLabel(self.tab_2)
 		self.datatodsm.setObjectName("datafromdsm")
-		self.tabLayout_2.addWidget(self.datatodsm, 26, 0, 8, 50)
+		self.tabLayout_2.addWidget(self.datatodsm, 24, 0, 6, 50)
 		self.datatodsm.setWordWrap(True)
 		self.datatodsm.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")		
-		self.datatodsm.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+		#self.datatodsm.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.datatodsm.setAlignment(Qt.AlignTop)
 
 		#Status indicator for server connection status
 		self.statusindicatorlabel = QtWidgets.QLabel(self.tab_2)
 		self.statusindicatorlabel.setObjectName("statusindicatorlabel")
-		self.tabLayout_2.addWidget(self.statusindicatorlabel, 34, 0, 1, 30)
+		self.tabLayout_2.addWidget(self.statusindicatorlabel, 30, 0, 2, 30)
 
 		#Toggle button/label for determining whether valves 
 		#	are controlled by the user or by the calculation
 		self.valvesourcelabel = QtWidgets.QLabel(self.tab_2)
 		self.valvesourcelabel.setObjectName("valvesourcelabel")
-		self.tabLayout_2.addWidget(self.valvesourcelabel, 36, 0, 1, 50)
+		self.tabLayout_2.addWidget(self.valvesourcelabel, 32, 0, 2, 50)
 		self.valvesource = QtWidgets.QPushButton(self.tab_2)
 		self.valvesource.setObjectName("valvesource")
-		self.tabLayout_2.addWidget(self.valvesource, 37, 0, 2, 50)
+		self.tabLayout_2.addWidget(self.valvesource, 34, 0, 2, 50)
 		self.valvesource.setCheckable(True)
 		self.valvesourcelabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
 		
 		#Label and checkboxes for the four manually controllable valves!
 		self.v1 = QtWidgets.QPushButton(self.tab_2)
 		self.v1.setObjectName("valve1")
-		self.tabLayout_2.addWidget(self.v1, 39, 0, 2, 10)
+		self.tabLayout_2.addWidget(self.v1, 36, 0, 2, 10)
 		self.v2 = QtWidgets.QPushButton(self.tab_2)
 		self.v2.setObjectName("valve2")
-		self.tabLayout_2.addWidget(self.v2, 39, 10, 2, 10)
+		self.tabLayout_2.addWidget(self.v2, 36, 10, 2, 10)
 		self.v3 = QtWidgets.QPushButton(self.tab_2)
 		self.v3.setObjectName("valve3")
-		self.tabLayout_2.addWidget(self.v3, 39, 20, 2, 10)
+		self.tabLayout_2.addWidget(self.v3, 36, 20, 2, 10)
 		self.v4 = QtWidgets.QPushButton(self.tab_2)
 		self.v4.setObjectName("valve4")
-		self.tabLayout_2.addWidget(self.v4, 39, 30, 2, 10)
+		self.tabLayout_2.addWidget(self.v4, 36, 30, 2, 10)
 		self.v1.setCheckable(True)
 		self.v2.setCheckable(True)
 		self.v3.setCheckable(True)
@@ -367,59 +383,59 @@ class Ui_MainWindow(object):
 		#	are controlled by the user or by the calculation
 		self.flowsourcelabel = QtWidgets.QLabel(self.tab_2)
 		self.flowsourcelabel.setObjectName("flowsourcelabel")
-		self.tabLayout_2.addWidget(self.flowsourcelabel, 42, 0, 1, 50)
+		self.tabLayout_2.addWidget(self.flowsourcelabel, 38, 0, 2, 50)
 		self.flowsource = QtWidgets.QPushButton(self.tab_2)
 		self.flowsource.setObjectName("flowsource")
-		self.tabLayout_2.addWidget(self.flowsource, 43, 0, 2, 50)
+		self.tabLayout_2.addWidget(self.flowsource, 40, 0, 2, 50)
 		self.flowsource.setCheckable(True)
 		self.flowsourcelabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)		
 		
 		#User input flows and labels for cvfx0,cvfx2,cvfx3,cvfx4,cvf1
 		self.cvfx0wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx0wrlabel.setObjectName("cvfx0wrlabel")		
-		self.tabLayout_2.addWidget(self.cvfx0wrlabel, 45, 0, 1, 10)
+		self.tabLayout_2.addWidget(self.cvfx0wrlabel, 42, 0, 2, 10)
 		self.cvfx0wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx0wr.setObjectName("cvfx0wr")
-		self.tabLayout_2.addWidget(self.cvfx0wr, 46, 0, 1, 10)
+		self.tabLayout_2.addWidget(self.cvfx0wr, 44, 0, 2, 10)
 		self.cvfx2wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx2wrlabel.setObjectName("cvfx2wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx2wrlabel, 45, 10, 1, 10)
+		self.tabLayout_2.addWidget(self.cvfx2wrlabel, 42, 10, 2, 10)
 		self.cvfx2wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx2wr.setObjectName("cvfx2wr")
-		self.tabLayout_2.addWidget(self.cvfx2wr, 46, 10, 1, 10)
+		self.tabLayout_2.addWidget(self.cvfx2wr, 44, 10, 2, 10)
 		self.cvfx3wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx3wrlabel.setObjectName("cvfx3wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx3wrlabel, 45, 20, 1, 10)
+		self.tabLayout_2.addWidget(self.cvfx3wrlabel, 42, 20, 2, 10)
 		self.cvfx3wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx3wr.setObjectName("cvfx3wr")
-		self.tabLayout_2.addWidget(self.cvfx3wr, 46, 20, 1, 10)
+		self.tabLayout_2.addWidget(self.cvfx3wr, 44, 20, 2, 10)
 		self.cvfx4wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx4wrlabel.setObjectName("cvfx4wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx4wrlabel, 45, 30, 1, 10)
+		self.tabLayout_2.addWidget(self.cvfx4wrlabel, 42, 30, 2, 10)
 		self.cvfx4wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx4wr.setObjectName("cvfx4wr")
-		self.tabLayout_2.addWidget(self.cvfx4wr, 46, 30, 1, 10)
+		self.tabLayout_2.addWidget(self.cvfx4wr, 44, 30, 2, 10)
 		self.cvf1wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvf1wrlabel.setObjectName("cvf1wrlabel")			
-		self.tabLayout_2.addWidget(self.cvf1wrlabel, 45, 40, 1, 10)
+		self.tabLayout_2.addWidget(self.cvf1wrlabel, 42, 40, 2, 10)
 		self.cvf1wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvf1wr.setObjectName("cvf1wr")
-		self.tabLayout_2.addWidget(self.cvf1wr, 46, 40, 1, 10)
+		self.tabLayout_2.addWidget(self.cvf1wr, 44, 40, 2, 10)
 		
 		#Button for updating saved calibrations based on populated tables
 		self.updatecals = QtWidgets.QPushButton(self.tab_2)
 		self.updatecals.setObjectName("updatecals")
-		self.tabLayout_2.addWidget(self.updatecals, 0, 50, 1, 50)
+		self.tabLayout_2.addWidget(self.updatecals, 0, 50, 2, 50)
 		
 		#Dropdown menu for selecting which calibration version to use
 		self.calversionlist = QtWidgets.QComboBox(self.tab_2)
 		self.calversionlist.setObjectName("calversionlist")
-		self.tabLayout_2.addWidget(self.calversionlist, 1, 50, 1, 50)
+		self.tabLayout_2.addWidget(self.calversionlist, 2, 50, 2, 50)
 		
 		#Create Table for OPC Calibration Coefficients
 		self.opccaltableWidget = QtWidgets.QTableWidget(self.tab_2)
 		self.opccaltableWidget.setObjectName("opccaltableWidget")
-		self.tabLayout_2.addWidget(self.opccaltableWidget, 40, 50, 5, 50)
+		self.tabLayout_2.addWidget(self.opccaltableWidget, 37, 50, 4, 50)
 		self.opccaltablerowlabels = ['OPC Pressure Cals']
 		self.opccaltablecolumnlabels = ['OPC_C0','OPC_C1']
 		self.opccaltableWidget.setColumnCount(len(self.opccaltablecolumnlabels))
@@ -438,7 +454,7 @@ class Ui_MainWindow(object):
 		#Create Table for More Calibration Coefficients
 		self.morecaltableWidget = QtWidgets.QTableWidget(self.tab_2)
 		self.morecaltableWidget.setObjectName("morecaltableWidget")
-		self.tabLayout_2.addWidget(self.morecaltableWidget, 45, 50, 3, 50)
+		self.tabLayout_2.addWidget(self.morecaltableWidget, 41, 50, 4, 50)
 		self.morecaltablecolumnlabels = ['RHOD','CVTBL','CVTBR','CVOFF1','LTip']
 		self.morecaltablerowlabels = ['Coefficients']
 		self.morecaltableWidget.setColumnCount(len(self.morecaltablecolumnlabels))
@@ -495,7 +511,7 @@ class Ui_MainWindow(object):
 		#Create Table for MAIN Calibration Coefficients
 		self.caltableWidget = QtWidgets.QTableWidget(self.tab_2)
 		self.caltableWidget.setObjectName("caltableWidget")
-		self.tabLayout_2.addWidget(self.caltableWidget, 2, 50, 23, 50)
+		self.tabLayout_2.addWidget(self.caltableWidget, 4, 50, 21, 50)
 		self.caltablerowlabels = ['cvf1','cvfx0','cvfx1','cvfx2','cvfx3','cvfx4','cvfx5','cvfx6','cvfx7','cvfx8','cvpcn','cvtt','cvtp','cvts','cvtcn','cvtai']
 		self.caltablecolumnlabels = ['C0','C1','C2','UNUSED']
 		self.caltableWidget.setColumnCount(len(self.caltablecolumnlabels))
@@ -515,7 +531,7 @@ class Ui_MainWindow(object):
 		#Create Table for TDL Calibration Coefficients
 		self.tdlcaltableWidget = QtWidgets.QTableWidget(self.tab_2)
 		self.tdlcaltableWidget.setObjectName("tdlcaltableWidget")
-		self.tabLayout_2.addWidget(self.tdlcaltableWidget, 25, 50, 15, 50)
+		self.tabLayout_2.addWidget(self.tdlcaltableWidget, 25, 50, 12, 50)
 		self.tdlcaltablerowlabels = ['param_0','param_1','param_2','param_3']
 		self.tdlcaltablecolumnlabels = ['TDL_C0','TDL_C1','TDL_C2','TDL_C3']
 		self.tdlcaltableWidget.setColumnCount(len(self.tdlcaltablecolumnlabels))
@@ -1541,7 +1557,7 @@ class Ui_MainWindow(object):
 		
 		#asyncio.ensure_future(self.server_loop_in_thread)
 		
-		#Implement parallel thread for server
+		#Implement parallel thread for server	
 		self.server_thread = threading.Thread(target=self.server_loop_in_thread, args = ())#args = (self,))#, args=(loop,))
 		self.server_thread.start()			
 		
@@ -1557,7 +1573,7 @@ class Ui_MainWindow(object):
 		asyncio.set_event_loop(self.server_loop)
 		self.server_coro = self.server_loop.create_server(IncomingServer, '', int(self.portin.text()))#(self.hostin.text()),int(self.portin.text()))#'127.0.0.1',8888)
 		self.server = self.server_loop.run_until_complete(self.server_coro)#greet_every_two_seconds)#self.coro)#greet_every_two_seconds())
-	#	server_loop.run_until_complete(server.wait_closed())
+		#self.server_loop.run_until_complete(server.wait_closed())
 		self.server_loop.run_forever() #Is this necessary?
 			
 	#Code run when "disconnect" button is clicked.
@@ -1572,7 +1588,7 @@ class Ui_MainWindow(object):
 			self.server_loop.stop()
 			self.server.close()
 			self.server_thread.join()
-			self.server_loop.run_until_complete(self.server.wait_closed())
+			#self.server_loop.run_until_complete(self.server.wait_closed())
 			
 			#Display success message
 			self.statusindicatorlabel.setText("Disconnect Successful")
@@ -1664,7 +1680,7 @@ class IncomingServer(asyncio.Protocol):
 		
 		#If data looks does not produce error (i.e. not a header) then proceed. 
 		#	Otherwise, print header or error prone input to graphical interface
-		try:
+		if datain[0] != 'N' :
 			input = datain.split(',')
 			input = [float(i) for i in input]
 			
@@ -1832,8 +1848,8 @@ class IncomingServer(asyncio.Protocol):
 			#cvfxtemp ~ default temps; #cvfxtempsource ~ 1 is cnt1, 0 usrinput; 
 			#	cvfsw ~ is instrument connected; cvfxmode ~ 1 is calculated, 0 is usrinput;  
 			#	cvfxdatatype ~ 0 is Mass, 1 is Volume; #cvfxalt ~ USER INPUT FLOWS		
-			cvfxtemp = cvfxoptions[5][:]; cvfxtempsource = cvfxoptions[4][:]; cvfxsw = cvfxoptions[0][:]
-			cvfxmode = cvfxoptions[1][:]; cvfxalt = cvfxoptions[2][:]; cvfxdatatype = cvfxoptions[3][:]	
+			cvfxtemp = ui.cvfxoptions[5][:]; cvfxtempsource = ui.cvfxoptions[4][:]; cvfxsw = ui.cvfxoptions[0][:]
+			cvfxmode = ui.cvfxoptions[1][:]; cvfxalt = ui.cvfxoptions[2][:]; cvfxdatatype = ui.cvfxoptions[3][:]	
 	
 			#Modifications to the flow based on if there are data, mass vs. volume input, etc.
 			for i in range(0,4):
@@ -2008,7 +2024,7 @@ class IncomingServer(asyncio.Protocol):
 			output = np.r_[input[0], 0, 0, 0, input[3:19], calibrated[10:16], zerocorrectedflows[:], #ENDS AT INDEX 35, next line is 36
 				cvl, cvrhoo_tdl, cvrho_tdl, cvrad, cvcfact_tdl,  #ENDS AT 40, next line 41
 				cvf3, input[1], cvcnc1, cvcnc01, cvcfact,  cvftc, cvrh, cvdp, #ENDS at 48, next line 49
-				cvfxwr[0:4], cvf1wr, input[2], tdl_data[:], opcc, opcco, opc_data[0:2], 
+				ui.internalflowsetpts[0:4], cvf1wr, input[2], tdl_data[:], opcc, opcco, opc_data[0:2], 
 				opcc_Pcor, opcco_Pcor, opc_press_mb, input[34:37]]		
 			
 			#############################################################################
@@ -2062,12 +2078,12 @@ class IncomingServer(asyncio.Protocol):
 			
 			#Added for populating raw input/output data table
 			_translate = QtCore.QCoreApplication.translate
-			for i in range(0,len(input)):
-				item = ui.tableWidget.item(i, 0)
-				item.setText(_translate("MainWindow",str(self.input[i])))
-			for i in range(0,len(dataout)):
-				item = ui.tableWidget.item(i, 1)
-				item.setText(_translate("MainWindow",str(self.dataout[i])))
+			#for i in range(0,len(ui.input)):
+			#	item = ui.tableWidget.item(i, 0)
+			#	item.setText(_translate("MainWindow",str(ui.input[i])))
+			#for i in range(0,len(dataout)):
+			#	item = ui.tableWidget.item(i, 1)
+			#	item.setText(_translate("MainWindow",str(self.dataout[i])))
 
 			#Sample dataout for testing
 			#dataout = [dataout[0],-0.081,1.059,1.968,79.022,0.029,0,1,0,1,0,0,0,10.000,1.000,0.000,-83.974,0.000]
@@ -2159,7 +2175,8 @@ class IncomingServer(asyncio.Protocol):
 					
 		#Exception to print data header or error data to DSM
 		#	header text box on display
-		except:
+		#except:
+		else:
 			print(datain)
 			ui.dsmheader.setText(str(datain))
 			
