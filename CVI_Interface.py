@@ -98,6 +98,7 @@ class Ui_MainWindow(object):
 		
 		#Create uniform grid spacing for layout resizing purposes
 
+		'''
 		for i in range(0, 21):
 			self.tabLayout_1.setRowStretch(i,1)
 			self.tabLayout_1.setRowMinimumHeight(i,1)	####
@@ -105,18 +106,18 @@ class Ui_MainWindow(object):
 		for i in range(0, 51):
 			self.tabLayout_1.setColumnStretch(i,1)
 			self.tabLayout_1.setColumnMinimumWidth(i,1)	####
-
+		'''
 
 		for i in range(0, 101):
-			#self.tabLayout_1.setColumnMinimumWidth(i,1) ###
-			#self.tabLayout_1.setColumnStretch(i,1)
+			self.tabLayout_1.setColumnMinimumWidth(i,1) ###
+			self.tabLayout_1.setColumnStretch(i,1)
 			self.tabLayout_2.setColumnMinimumWidth(i,1) ###
 			self.tabLayout_2.setColumnStretch(i,1)
 			self.tabLayout_3.setColumnMinimumWidth(i,1) ###
 			self.tabLayout_3.setColumnStretch(i,1)			
 		for i in range(0, 51):
-			#self.tabLayout_1.setRowMinimumHeight(i,1)	####
-			#self.tabLayout_1.setRowStretch(i,1)
+			self.tabLayout_1.setRowMinimumHeight(i,1)	####
+			self.tabLayout_1.setRowStretch(i,1)
 			self.tabLayout_2.setRowMinimumHeight(i,1)	####
 			self.tabLayout_2.setRowStretch(i,1)
 			self.tabLayout_3.setRowMinimumHeight(i,1)	####
@@ -126,27 +127,27 @@ class Ui_MainWindow(object):
 		#Push buttons for establishing (or cancelling) server to receive data
 		self.connect = QtWidgets.QPushButton(self.tab)
 		self.connect.setObjectName("connect")
-		self.tabLayout_1.addWidget(self.connect, 0, 0, 1, 10)
+		self.tabLayout_1.addWidget(self.connect, 0, 0, 2, 20)
 		self.disconnect = QtWidgets.QPushButton(self.tab)
 		self.disconnect.setObjectName("disconnect")
-		self.tabLayout_1.addWidget(self.disconnect, 0, 10, 1, 10)		
+		self.tabLayout_1.addWidget(self.disconnect, 0, 20, 2, 20)		
 					
 		#Flow on/off toggle
 		self.flowio = QtWidgets.QPushButton(self.tab)
 		self.flowio.setObjectName("flowio")
-		self.tabLayout_1.addWidget(self.flowio, 3, 0, 1, 10)
+		self.tabLayout_1.addWidget(self.flowio, 4, 0, 2, 10)
 		self.flowio.setCheckable(True)
 		
 		#CVI Mode toggle for CVI/Total option
 		self.cvimode = QtWidgets.QPushButton(self.tab)
 		self.cvimode.setObjectName("cvimode")
-		self.tabLayout_1.addWidget(self.cvimode, 4, 0, 1, 10)
+		self.tabLayout_1.addWidget(self.cvimode, 6, 0, 2, 10)
 		self.cvimode.setCheckable(True)
 		
 		#Creation of arbitrary label
 		tmpobject = QtWidgets.QLabel(self.tab)
 		tmpobject.setObjectName("flowoptionslabel")
-		self.tabLayout_1.addWidget(tmpobject, 2, 0, 1, 10)
+		self.tabLayout_1.addWidget(tmpobject, 2, 0, 2, 10)
 		tmpobject.setText("FLOW OPTIONS")
 		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)		
 		
@@ -156,18 +157,18 @@ class Ui_MainWindow(object):
 		for i in range(0,len(self.flowedit)):
 			tmpobject = QtWidgets.QLabel(self.tab)
 			tmpobject.setObjectName(self.flowlabels[i])
-			self.tabLayout_1.addWidget(tmpobject, 6+1*i, 0, 1, 5)
+			self.tabLayout_1.addWidget(tmpobject, 11+2*i, 0, 2, 5)
 			tmpobject = QtWidgets.QLineEdit(self.tab)
 			tmpobject.setObjectName(self.flowedit[i])
-			self.tabLayout_1.addWidget(tmpobject, 6+1*i, 5, 1, 5)
+			self.tabLayout_1.addWidget(tmpobject, 11+2*i, 5, 2, 5)
 				
 		#Widget for displaying file that is being saved to
 		self.currentfilelabel = QtWidgets.QLabel(self.tab)
 		self.currentfilelabel.setObjectName("currentfilelabel")
-		self.tabLayout_1.addWidget(self.currentfilelabel, 10, 0, 1, 20)
+		self.tabLayout_1.addWidget(self.currentfilelabel, 21, 0, 2, 40)
 		self.currentfile = QtWidgets.QLineEdit(self.tab)
 		self.currentfile.setObjectName("currentfile")
-		self.tabLayout_1.addWidget(self.currentfile, 11, 0, 1, 20)
+		self.tabLayout_1.addWidget(self.currentfile, 23, 0, 2, 40)
 		self.currentfile.setDisabled(True)		
 					
 		#Status indicator for instructional display and current operation of instrument
@@ -175,33 +176,71 @@ class Ui_MainWindow(object):
 		self.mainstatus.setObjectName("mainstatus")
 		self.mainstatus.setAlignment(Qt.AlignTop)
 		self.mainstatus.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
-		self.tabLayout_1.addWidget(self.mainstatus, 2, 11, 8, 8)
+		self.tabLayout_1.addWidget(self.mainstatus, 4, 11, 18, 28)
 		
 		#Error indicator for alerting if there is a problem
 		self.errorstatus = QtWidgets.QTextEdit()
 		self.errorstatus.setObjectName("errorstatus")
 		self.errorstatus.setAlignment(Qt.AlignTop)
 		self.errorstatus.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
-		#self.errorstatus.setStyleSheet("color: rgb(255, 0, 0);")
-		self.tabLayout_1.addWidget(self.errorstatus,18,0,2,20)
-
-		###############################################################################
-		###############################################################################
+		self.errorstatus.setStyleSheet("color: rgb(255, 0, 0);")
+		self.tabLayout_1.addWidget(self.errorstatus,45,0,5,40)
 		
 		#Create Table for Viewing uncorrected, corrected, and calibrated flows
 		self.tableWidget = QtWidgets.QTableWidget(self.tab)
 		self.tableWidget.setObjectName("tableWidget")
-		self.tabLayout_1.addWidget(self.tableWidget, 13, 0, 5, 12)
+		self.tabLayout_1.addWidget(self.tableWidget, 25, 0, 20, 25)
 		
 		#Create Table for viewing raw input and output data
 		self.rawtableWidget = QtWidgets.QTableWidget(self.tab)
 		self.rawtableWidget.setObjectName("rawtablewidget")
-		self.tabLayout_1.addWidget(self.rawtableWidget, 13, 12, 5, 8)
+		self.tabLayout_1.addWidget(self.rawtableWidget, 25, 25, 20, 15)
+		
+		#Create table for viewing uncorrected,corrected, and calibrated inputs on first tab
+		self.tablerowlabels = ['cvf1','cvfx0','cvfx1','cvfx2','cvfx3','cvfx4','cvfx5','cvfx6','cvfx7','cvfx8','cvpcn','cvtt','cvtp','cvts','cvtcn','cvtai']
+		self.tablecolumnlabels = ['raw','calibrated','crunched']
+		self.tableWidget.setColumnCount(len(self.tablecolumnlabels))
+		self.tableWidget.setRowCount(len(self.tablerowlabels))
+		for i in range(0,len(self.tablerowlabels)):
+			item = QtWidgets.QTableWidgetItem()
+			self.tableWidget.setVerticalHeaderItem(i,item)
+		for i in range(0,len(self.tablecolumnlabels)):
+			item = QtWidgets.QTableWidgetItem()
+			self.tableWidget.setHorizontalHeaderItem(i, item)
+		for i in range(0,len(self.tablerowlabels)):
+			for j in range(0, len(self.tablecolumnlabels)):
+				item = QtWidgets.QTableWidgetItem()
+				self.tableWidget.setItem(i, j, item)
+
+		#table for raw input output parameters
+		self.rawtablecolumnlabels = ['Input','Output']
+		self.rawtablerowlabels = ['time', 'cvtas', 'counts', 'cvf1', 'cvfx0', 'cvfx1', 'cvfx2', 'cvfx3', 'cvfx4', 
+			'cvfx5', 'cvfx6', 'cvfx7', 'cvfx8', 'cvpcn', 'cvtt', 'cvtp', 'cvts', 'cvtcn', 'cvtai', 
+			'H2OR', 'ptdlR', 'ttdlR', 'TDLsignal', 'TDLlaser', 'TDLline', 'TDLzero', 'TTDLencl', 
+			'TTDLtec', 'TDLtrans', 'opc_cnts', 'opc_flow_raw', 'opc_pres_raw', 'ext1', 'ext2', 
+			'H2O-PIC', '18O', 'HDO']
+		self.rawtableWidget.setColumnCount(len(self.rawtablecolumnlabels))
+		self.rawtableWidget.setRowCount(len(self.rawtablerowlabels))
+		for i in range(0,len(self.rawtablerowlabels)):
+			item = QtWidgets.QTableWidgetItem()
+			self.rawtableWidget.setVerticalHeaderItem(i,item)
+		for i in range(0,len(self.rawtablecolumnlabels)):
+			item = QtWidgets.QTableWidgetItem()
+			self.rawtableWidget.setHorizontalHeaderItem(i, item)
+		for i in range(0,100):#len(self.tablerowlabels)):
+			for j in range(0, len(self.rawtablecolumnlabels)):
+				item = QtWidgets.QTableWidgetItem()
+				self.rawtableWidget.setItem(i, j, item)	
+		#self.rawtableWidget.verticalHeader().setVisible(False)	
+		
+
+		###############################################################################
+		###############################################################################
 		
 		#First Plotting Widget
 		self.CVIplot = PlotWidget(self.tab)
 		self.CVIplot.setObjectName("CVIplot")
-		self.tabLayout_1.addWidget(self.CVIplot, 1, 25, 9, 25)
+		self.tabLayout_1.addWidget(self.CVIplot, 2, 40, 23, 60)
 		self.CVIplot.show()
 		self.CVIplot.setTitle("CVI Data",color='w')
 		self.CVIplot.setLabel('bottom',text = 'Time (seconds)')
@@ -223,7 +262,7 @@ class Ui_MainWindow(object):
 		#Second Plotting Widget
 		self.CVIplot2 = PlotWidget(self.tab)
 		self.CVIplot2.setObjectName("CVIplot")
-		self.tabLayout_1.addWidget(self.CVIplot2, 11, 25, 9, 25)
+		self.tabLayout_1.addWidget(self.CVIplot2, 27, 40, 23, 60)
 		self.CVIplot2.setTitle("CVI Data",color='w')
 		self.CVIplot2.setLabel('bottom',text = 'Time (seconds)')
 		self.CVIplot2.setLabel('left',text = 'Y1')
@@ -245,18 +284,18 @@ class Ui_MainWindow(object):
 		#Dropdown lists for selecting data for first plot
 		self.dropdownlist = QtWidgets.QComboBox(self.tab)
 		self.dropdownlist.setObjectName("dropdownlist")
-		self.tabLayout_1.addWidget(self.dropdownlist, 0, 25, 1, 12)
+		self.tabLayout_1.addWidget(self.dropdownlist, 0, 40, 2, 30)
 		self.dropdownlistline2 = QtWidgets.QComboBox(self.tab)
 		self.dropdownlistline2.setObjectName("dropdownlistline2")
-		self.tabLayout_1.addWidget(self.dropdownlistline2, 0, 38, 1, 12)
+		self.tabLayout_1.addWidget(self.dropdownlistline2, 0, 70, 2, 30)
 		
 		#Dropdown lists for selecting data for second plot
 		self.dropdownlist2 = QtWidgets.QComboBox(self.tab)
 		self.dropdownlist2.setObjectName("dropdownlist2")
-		self.tabLayout_1.addWidget(self.dropdownlist2, 10, 25, 1, 12)
+		self.tabLayout_1.addWidget(self.dropdownlist2, 25, 40, 2, 30)
 		self.dropdownlist2line2 = QtWidgets.QComboBox(self.tab)
 		self.dropdownlist2line2.setObjectName("dropdownlist2line2")
-		self.tabLayout_1.addWidget(self.dropdownlist2line2, 10, 38, 1, 12)	
+		self.tabLayout_1.addWidget(self.dropdownlist2line2, 25, 70, 2, 30)	
 		
 		###############################################################################
 		###############################################################################		
@@ -328,7 +367,7 @@ class Ui_MainWindow(object):
 		self.tabLayout_2.addWidget(self.datafromdsmlabel, 12, 0, 2, 40)
 		self.datafromdsm = QtWidgets.QLabel(self.tab_2)
 		self.datafromdsm.setObjectName("datafromdsm")
-		self.tabLayout_2.addWidget(self.datafromdsm, 14, 0, 8, 50)
+		self.tabLayout_2.addWidget(self.datafromdsm, 14, 0, 12, 50)
 		self.datafromdsm.setWordWrap(True)
 		self.datafromdsm.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")
 		#self.datafromdsm.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -336,10 +375,10 @@ class Ui_MainWindow(object):
 
 		self.datatodsmlabel = QtWidgets.QLabel(self.tab_2)
 		self.datatodsmlabel.setObjectName("datatodsmlabel")
-		self.tabLayout_2.addWidget(self.datatodsmlabel, 22, 0, 2, 50)
+		self.tabLayout_2.addWidget(self.datatodsmlabel, 26, 0, 2, 50)
 		self.datatodsm = QtWidgets.QLabel(self.tab_2)
 		self.datatodsm.setObjectName("datafromdsm")
-		self.tabLayout_2.addWidget(self.datatodsm, 24, 0, 6, 50)
+		self.tabLayout_2.addWidget(self.datatodsm, 28, 0, 7, 50)
 		self.datatodsm.setWordWrap(True)
 		self.datatodsm.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")		
 		#self.datatodsm.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -348,32 +387,32 @@ class Ui_MainWindow(object):
 		#Status indicator for server connection status
 		self.statusindicatorlabel = QtWidgets.QLabel(self.tab_2)
 		self.statusindicatorlabel.setObjectName("statusindicatorlabel")
-		self.tabLayout_2.addWidget(self.statusindicatorlabel, 30, 0, 2, 30)
+		self.tabLayout_2.addWidget(self.statusindicatorlabel, 36, 0, 2, 30)
 
 		#Toggle button/label for determining whether valves 
 		#	are controlled by the user or by the calculation
 		self.valvesourcelabel = QtWidgets.QLabel(self.tab_2)
 		self.valvesourcelabel.setObjectName("valvesourcelabel")
-		self.tabLayout_2.addWidget(self.valvesourcelabel, 32, 0, 2, 50)
+		self.tabLayout_2.addWidget(self.valvesourcelabel, 39, 0, 2, 50)
 		self.valvesource = QtWidgets.QPushButton(self.tab_2)
 		self.valvesource.setObjectName("valvesource")
-		self.tabLayout_2.addWidget(self.valvesource, 34, 0, 2, 50)
+		self.tabLayout_2.addWidget(self.valvesource, 41, 0, 2, 50)
 		self.valvesource.setCheckable(True)
 		self.valvesourcelabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
 		
 		#Label and checkboxes for the four manually controllable valves!
 		self.v1 = QtWidgets.QPushButton(self.tab_2)
 		self.v1.setObjectName("valve1")
-		self.tabLayout_2.addWidget(self.v1, 36, 0, 2, 10)
+		self.tabLayout_2.addWidget(self.v1, 43, 0, 2, 10)
 		self.v2 = QtWidgets.QPushButton(self.tab_2)
 		self.v2.setObjectName("valve2")
-		self.tabLayout_2.addWidget(self.v2, 36, 10, 2, 10)
+		self.tabLayout_2.addWidget(self.v2, 43, 10, 2, 10)
 		self.v3 = QtWidgets.QPushButton(self.tab_2)
 		self.v3.setObjectName("valve3")
-		self.tabLayout_2.addWidget(self.v3, 36, 20, 2, 10)
+		self.tabLayout_2.addWidget(self.v3, 43, 20, 2, 10)
 		self.v4 = QtWidgets.QPushButton(self.tab_2)
 		self.v4.setObjectName("valve4")
-		self.tabLayout_2.addWidget(self.v4, 36, 30, 2, 10)
+		self.tabLayout_2.addWidget(self.v4, 43, 30, 2, 10)
 		self.v1.setCheckable(True)
 		self.v2.setCheckable(True)
 		self.v3.setCheckable(True)
@@ -383,135 +422,69 @@ class Ui_MainWindow(object):
 		#	are controlled by the user or by the calculation
 		self.flowsourcelabel = QtWidgets.QLabel(self.tab_2)
 		self.flowsourcelabel.setObjectName("flowsourcelabel")
-		self.tabLayout_2.addWidget(self.flowsourcelabel, 38, 0, 2, 50)
+		self.tabLayout_2.addWidget(self.flowsourcelabel, 45, 0, 1, 50)
 		self.flowsource = QtWidgets.QPushButton(self.tab_2)
 		self.flowsource.setObjectName("flowsource")
-		self.tabLayout_2.addWidget(self.flowsource, 40, 0, 2, 50)
+		self.tabLayout_2.addWidget(self.flowsource, 46, 0, 2, 50)
 		self.flowsource.setCheckable(True)
 		self.flowsourcelabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)		
 		
 		#User input flows and labels for cvfx0,cvfx2,cvfx3,cvfx4,cvf1
 		self.cvfx0wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx0wrlabel.setObjectName("cvfx0wrlabel")		
-		self.tabLayout_2.addWidget(self.cvfx0wrlabel, 42, 0, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx0wrlabel, 47, 0, 2, 10)
 		self.cvfx0wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx0wr.setObjectName("cvfx0wr")
-		self.tabLayout_2.addWidget(self.cvfx0wr, 44, 0, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx0wr, 48, 0, 2, 10)
 		self.cvfx2wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx2wrlabel.setObjectName("cvfx2wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx2wrlabel, 42, 10, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx2wrlabel, 47, 10, 2, 10)
 		self.cvfx2wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx2wr.setObjectName("cvfx2wr")
-		self.tabLayout_2.addWidget(self.cvfx2wr, 44, 10, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx2wr, 48, 10, 2, 10)
 		self.cvfx3wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx3wrlabel.setObjectName("cvfx3wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx3wrlabel, 42, 20, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx3wrlabel, 47, 20, 2, 10)
 		self.cvfx3wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx3wr.setObjectName("cvfx3wr")
-		self.tabLayout_2.addWidget(self.cvfx3wr, 44, 20, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx3wr, 48, 20, 2, 10)
 		self.cvfx4wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx4wrlabel.setObjectName("cvfx4wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx4wrlabel, 42, 30, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx4wrlabel, 47, 30, 2, 10)
 		self.cvfx4wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx4wr.setObjectName("cvfx4wr")
-		self.tabLayout_2.addWidget(self.cvfx4wr, 44, 30, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx4wr, 48, 30, 2, 10)
 		self.cvf1wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvf1wrlabel.setObjectName("cvf1wrlabel")			
-		self.tabLayout_2.addWidget(self.cvf1wrlabel, 42, 40, 2, 10)
+		self.tabLayout_2.addWidget(self.cvf1wrlabel, 47, 40, 2, 10)
 		self.cvf1wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvf1wr.setObjectName("cvf1wr")
-		self.tabLayout_2.addWidget(self.cvf1wr, 44, 40, 2, 10)
+		self.tabLayout_2.addWidget(self.cvf1wr, 48, 40, 2, 10)
 		
 		#Button for updating saved calibrations based on populated tables
-		self.updatecals = QtWidgets.QPushButton(self.tab_2)
-		self.updatecals.setObjectName("updatecals")
-		self.tabLayout_2.addWidget(self.updatecals, 0, 50, 2, 50)
+		self.saveCals = QtWidgets.QPushButton(self.tab_2)
+		self.saveCals.setObjectName("saveCals")
+		self.tabLayout_2.addWidget(self.saveCals, 0, 50, 2, 50)
+		
+		#Refresh calibration coefficients from files
+		self.refreshCals = QtWidgets.QPushButton(self.tab_2)
+		self.refreshCals.setObjectName("refreshCals")
+		self.tabLayout_2.addWidget(self.refreshCals, 2, 50, 2, 25)
+		
+		#Delete currently selected calibration coefficients
+		self.deleteCals = QtWidgets.QPushButton(self.tab_2)
+		self.deleteCals.setObjectName("deleteCals")
+		self.tabLayout_2.addWidget(self.deleteCals, 2, 75, 2, 25)		
 		
 		#Dropdown menu for selecting which calibration version to use
 		self.calversionlist = QtWidgets.QComboBox(self.tab_2)
 		self.calversionlist.setObjectName("calversionlist")
-		self.tabLayout_2.addWidget(self.calversionlist, 2, 50, 2, 50)
+		self.tabLayout_2.addWidget(self.calversionlist, 4, 50, 2, 50)
 		
-		#Create Table for OPC Calibration Coefficients
-		self.opccaltableWidget = QtWidgets.QTableWidget(self.tab_2)
-		self.opccaltableWidget.setObjectName("opccaltableWidget")
-		self.tabLayout_2.addWidget(self.opccaltableWidget, 37, 50, 4, 50)
-		self.opccaltablerowlabels = ['OPC Pressure Cals']
-		self.opccaltablecolumnlabels = ['OPC_C0','OPC_C1']
-		self.opccaltableWidget.setColumnCount(len(self.opccaltablecolumnlabels))
-		self.opccaltableWidget.setRowCount(len(self.opccaltablerowlabels))
-		for i in range(0,len(self.opccaltablerowlabels)):
-			item = QtWidgets.QTableWidgetItem()
-			self.opccaltableWidget.setVerticalHeaderItem(i,item)
-		for i in range(0,len(self.opccaltablecolumnlabels)):
-			item = QtWidgets.QTableWidgetItem()
-			self.opccaltableWidget.setHorizontalHeaderItem(i, item)
-		for i in range(0,len(self.opccaltablerowlabels)):
-			for j in range(0, len(self.opccaltablecolumnlabels)):
-				item = QtWidgets.QTableWidgetItem()
-				self.opccaltableWidget.setItem(i, j, item)	
-		
-		#Create Table for More Calibration Coefficients
-		self.morecaltableWidget = QtWidgets.QTableWidget(self.tab_2)
-		self.morecaltableWidget.setObjectName("morecaltableWidget")
-		self.tabLayout_2.addWidget(self.morecaltableWidget, 41, 50, 4, 50)
-		self.morecaltablecolumnlabels = ['RHOD','CVTBL','CVTBR','CVOFF1','LTip']
-		self.morecaltablerowlabels = ['Coefficients']
-		self.morecaltableWidget.setColumnCount(len(self.morecaltablecolumnlabels))
-		self.morecaltableWidget.setRowCount(len(self.morecaltablerowlabels))
-		for i in range(0,len(self.morecaltablerowlabels)):
-			item = QtWidgets.QTableWidgetItem()
-			self.morecaltableWidget.setVerticalHeaderItem(i,item)
-		for i in range(0,len(self.morecaltablecolumnlabels)):
-			item = QtWidgets.QTableWidgetItem()
-			self.morecaltableWidget.setHorizontalHeaderItem(i, item)
-		for i in range(0,len(self.morecaltablerowlabels)):
-			for j in range(0, len(self.morecaltablecolumnlabels)):
-				item = QtWidgets.QTableWidgetItem()
-				self.morecaltableWidget.setItem(i, j, item)			
-		self.morecaltableWidget.verticalHeader().setVisible(False)		
-
-		#Create table for viewing uncorrected,corrected, and calibrated inputs on first tab
-		self.tablerowlabels = ['cvf1','cvfx0','cvfx1','cvfx2','cvfx3','cvfx4','cvfx5','cvfx6','cvfx7','cvfx8','cvpcn','cvtt','cvtp','cvts','cvtcn','cvtai']
-		self.tablecolumnlabels = ['raw','calibrated','crunched']
-		self.tableWidget.setColumnCount(len(self.tablecolumnlabels))
-		self.tableWidget.setRowCount(len(self.tablerowlabels))
-		for i in range(0,len(self.tablerowlabels)):
-			item = QtWidgets.QTableWidgetItem()
-			self.tableWidget.setVerticalHeaderItem(i,item)
-		for i in range(0,len(self.tablecolumnlabels)):
-			item = QtWidgets.QTableWidgetItem()
-			self.tableWidget.setHorizontalHeaderItem(i, item)
-		for i in range(0,len(self.tablerowlabels)):
-			for j in range(0, len(self.tablecolumnlabels)):
-				item = QtWidgets.QTableWidgetItem()
-				self.tableWidget.setItem(i, j, item)
-
-		#table for raw input output parameters
-		self.rawtablecolumnlabels = ['Input','Output']
-		self.rawtablerowlabels = ['time', 'cvtas', 'counts', 'cvf1', 'cvfx0', 'cvfx1', 'cvfx2', 'cvfx3', 'cvfx4', 
-			'cvfx5', 'cvfx6', 'cvfx7', 'cvfx8', 'cvpcn', 'cvtt', 'cvtp', 'cvts', 'cvtcn', 'cvtai', 
-			'H2OR', 'ptdlR', 'ttdlR', 'TDLsignal', 'TDLlaser', 'TDLline', 'TDLzero', 'TTDLencl', 
-			'TTDLtec', 'TDLtrans', 'opc_cnts', 'opc_flow_raw', 'opc_pres_raw', 'ext1', 'ext2', 
-			'H2O-PIC', '18O', 'HDO']
-		self.rawtableWidget.setColumnCount(len(self.rawtablecolumnlabels))
-		self.rawtableWidget.setRowCount(len(self.rawtablerowlabels))
-		for i in range(0,len(self.rawtablerowlabels)):
-			item = QtWidgets.QTableWidgetItem()
-			self.rawtableWidget.setVerticalHeaderItem(i,item)
-		for i in range(0,len(self.rawtablecolumnlabels)):
-			item = QtWidgets.QTableWidgetItem()
-			self.rawtableWidget.setHorizontalHeaderItem(i, item)
-		for i in range(0,100):#len(self.tablerowlabels)):
-			for j in range(0, len(self.rawtablecolumnlabels)):
-				item = QtWidgets.QTableWidgetItem()
-				self.rawtableWidget.setItem(i, j, item)	
-		#self.rawtableWidget.verticalHeader().setVisible(False)					
-				
 		#Create Table for MAIN Calibration Coefficients
 		self.caltableWidget = QtWidgets.QTableWidget(self.tab_2)
 		self.caltableWidget.setObjectName("caltableWidget")
-		self.tabLayout_2.addWidget(self.caltableWidget, 4, 50, 21, 50)
+		self.tabLayout_2.addWidget(self.caltableWidget, 6, 50, 22, 50)
 		self.caltablerowlabels = ['cvf1','cvfx0','cvfx1','cvfx2','cvfx3','cvfx4','cvfx5','cvfx6','cvfx7','cvfx8','cvpcn','cvtt','cvtp','cvts','cvtcn','cvtai']
 		self.caltablecolumnlabels = ['C0','C1','C2','UNUSED']
 		self.caltableWidget.setColumnCount(len(self.caltablecolumnlabels))
@@ -531,7 +504,7 @@ class Ui_MainWindow(object):
 		#Create Table for TDL Calibration Coefficients
 		self.tdlcaltableWidget = QtWidgets.QTableWidget(self.tab_2)
 		self.tdlcaltableWidget.setObjectName("tdlcaltableWidget")
-		self.tabLayout_2.addWidget(self.tdlcaltableWidget, 25, 50, 12, 50)
+		self.tabLayout_2.addWidget(self.tdlcaltableWidget, 28, 50, 14, 50)
 		self.tdlcaltablerowlabels = ['param_0','param_1','param_2','param_3']
 		self.tdlcaltablecolumnlabels = ['TDL_C0','TDL_C1','TDL_C2','TDL_C3']
 		self.tdlcaltableWidget.setColumnCount(len(self.tdlcaltablecolumnlabels))
@@ -547,21 +520,60 @@ class Ui_MainWindow(object):
 				item = QtWidgets.QTableWidgetItem()
 				self.tdlcaltableWidget.setItem(i, j, item)	
 		
+		#Create Table for OPC Calibration Coefficients
+		self.opccaltableWidget = QtWidgets.QTableWidget(self.tab_2)
+		self.opccaltableWidget.setObjectName("opccaltableWidget")
+		self.tabLayout_2.addWidget(self.opccaltableWidget, 42, 50, 4, 50)
+		self.opccaltablerowlabels = ['OPC Pressure Cals']
+		self.opccaltablecolumnlabels = ['OPC_C0','OPC_C1']
+		self.opccaltableWidget.setColumnCount(len(self.opccaltablecolumnlabels))
+		self.opccaltableWidget.setRowCount(len(self.opccaltablerowlabels))
+		for i in range(0,len(self.opccaltablerowlabels)):
+			item = QtWidgets.QTableWidgetItem()
+			self.opccaltableWidget.setVerticalHeaderItem(i,item)
+		for i in range(0,len(self.opccaltablecolumnlabels)):
+			item = QtWidgets.QTableWidgetItem()
+			self.opccaltableWidget.setHorizontalHeaderItem(i, item)
+		for i in range(0,len(self.opccaltablerowlabels)):
+			for j in range(0, len(self.opccaltablecolumnlabels)):
+				item = QtWidgets.QTableWidgetItem()
+				self.opccaltableWidget.setItem(i, j, item)	
+		
+		#Create Table for More Calibration Coefficients
+		self.morecaltableWidget = QtWidgets.QTableWidget(self.tab_2)
+		self.morecaltableWidget.setObjectName("morecaltableWidget")
+		self.tabLayout_2.addWidget(self.morecaltableWidget, 46, 50, 4, 50)
+		self.morecaltablecolumnlabels = ['RHOD','CVTBL','CVTBR','CVOFF1','LTip']
+		self.morecaltablerowlabels = ['Coefficients']
+		self.morecaltableWidget.setColumnCount(len(self.morecaltablecolumnlabels))
+		self.morecaltableWidget.setRowCount(len(self.morecaltablerowlabels))
+		for i in range(0,len(self.morecaltablerowlabels)):
+			item = QtWidgets.QTableWidgetItem()
+			self.morecaltableWidget.setVerticalHeaderItem(i,item)
+		for i in range(0,len(self.morecaltablecolumnlabels)):
+			item = QtWidgets.QTableWidgetItem()
+			self.morecaltableWidget.setHorizontalHeaderItem(i, item)
+		for i in range(0,len(self.morecaltablerowlabels)):
+			for j in range(0, len(self.morecaltablecolumnlabels)):
+				item = QtWidgets.QTableWidgetItem()
+				self.morecaltableWidget.setItem(i, j, item)			
+		self.morecaltableWidget.verticalHeader().setVisible(False)						
+		
 		###############################################################################
 		###############################################################################
 		
 		#Push buttons for connecting or disconnecting instruments
 		self.devconnect = QtWidgets.QPushButton(self.tab_3)
 		self.devconnect.setObjectName("devconnect")
-		self.tabLayout_3.addWidget(self.devconnect, 0, 0, 1, 10)
+		self.tabLayout_3.addWidget(self.devconnect, 0, 6, 3, 14)
 		self.devdisconnect = QtWidgets.QPushButton(self.tab_3)
 		self.devdisconnect.setObjectName("devdisconnect")
-		self.tabLayout_3.addWidget(self.devdisconnect, 0, 10, 1, 10)
+		self.tabLayout_3.addWidget(self.devdisconnect, 0, 20, 3, 14)
 		
 		#Text Box for displaying instructions for instrument connections
 		self.devinstruct = QtWidgets.QLabel(self.tab_3)
 		self.devinstruct.setObjectName("devinstruct")
-		self.tabLayout_3.addWidget(self.devinstruct, 4, 0, 14, 20)
+		self.tabLayout_3.addWidget(self.devinstruct, 12, 6, 38, 28)
 		self.devinstruct.setWordWrap(True)
 		self.devinstruct.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")
 		self.devinstruct.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -573,79 +585,79 @@ class Ui_MainWindow(object):
 		#Button for continuing addition/subtraction of instruments
 		self.devcontinue = QtWidgets.QPushButton(self.tab_3)
 		self.devcontinue.setObjectName("devcontinue")
-		self.tabLayout_3.addWidget(self.devcontinue, 0, 0, 1, 10)
+		self.tabLayout_3.addWidget(self.devcontinue, 0, 6, 3, 14)
 		self.devcontinue.hide()
 		
 		#Button for cancelling addition/subtraction of instruments
 		self.devcancel = QtWidgets.QPushButton(self.tab_3)
 		self.devcancel.setObjectName("devcancel")
-		self.tabLayout_3.addWidget(self.devcancel, 0, 10, 1, 10)
+		self.tabLayout_3.addWidget(self.devcancel, 0, 20, 3, 14)
 		self.devcancel.hide()
 					
 		#USER INPUTS FOR DELAY, OFFSET, and CVF3CW
 		self.delaylabel = QtWidgets.QLabel(self.tab_3)
 		self.delaylabel.setObjectName("delaylabel")		
-		self.tabLayout_3.addWidget(self.delaylabel, 1, 0, 1, 6)
+		self.tabLayout_3.addWidget(self.delaylabel, 3, 6, 3, 8)
 		self.delay = QtWidgets.QLineEdit(self.tab_3)
 		self.delay.setObjectName("delay")
-		self.tabLayout_3.addWidget(self.delay, 2, 0, 1, 6)
+		self.tabLayout_3.addWidget(self.delay, 6, 6, 3, 8)
 		self.delaylabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)		
 		
 		self.offsetlabel = QtWidgets.QLabel(self.tab_3)
 		self.offsetlabel.setObjectName("offsetlabel")		
-		self.tabLayout_3.addWidget(self.offsetlabel, 1, 7, 1, 6)
+		self.tabLayout_3.addWidget(self.offsetlabel, 3, 14, 3, 8)
 		self.offset = QtWidgets.QLineEdit(self.tab_3)
 		self.offset.setObjectName("offset")
-		self.tabLayout_3.addWidget(self.offset, 2, 7, 1, 6)
+		self.tabLayout_3.addWidget(self.offset, 6, 14, 3, 8)
 		self.offsetlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)		
 		
 		self.cvf3cwlabel = QtWidgets.QLabel(self.tab_3)
 		self.cvf3cwlabel.setObjectName("cvf3cwlabel")		
-		self.tabLayout_3.addWidget(self.cvf3cwlabel, 1, 14, 1, 6)
+		self.tabLayout_3.addWidget(self.cvf3cwlabel, 3, 22, 3, 12)
 		self.cvf3cw = QtWidgets.QLineEdit(self.tab_3)
 		self.cvf3cw.setObjectName("cvf3cw")
-		self.tabLayout_3.addWidget(self.cvf3cw, 2, 14, 1, 6)	
+		self.tabLayout_3.addWidget(self.cvf3cw, 6, 22, 3, 12)	
 		self.cvf3cwlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)		
 
 		#Device toggles for selection of which instruments to add/remove
 		self.auxdev1 = QtWidgets.QPushButton(self.tab_3)
 		self.auxdev1.setObjectName("auxdev1")
-		self.tabLayout_3.addWidget(self.auxdev1, 3, 0, 1, 5)
+		self.tabLayout_3.addWidget(self.auxdev1, 9, 6, 3, 7)
 		self.auxdev1.setCheckable(True)
 		self.auxdev2 = QtWidgets.QPushButton(self.tab_3)
 		self.auxdev2.setObjectName("auxdev2")
-		self.tabLayout_3.addWidget(self.auxdev2, 3, 5, 1, 5)
+		self.tabLayout_3.addWidget(self.auxdev2, 9, 13, 3, 7)
 		self.auxdev2.setCheckable(True)		
 		self.auxdev3 = QtWidgets.QPushButton(self.tab_3)
 		self.auxdev3.setObjectName("auxdev3")
-		self.tabLayout_3.addWidget(self.auxdev3, 3, 10, 1, 5)
+		self.tabLayout_3.addWidget(self.auxdev3, 9, 20, 3, 7)
 		self.auxdev3.setCheckable(True)
 		self.auxdev4 = QtWidgets.QPushButton(self.tab_3)
 		self.auxdev4.setObjectName("auxdev4")
-		self.tabLayout_3.addWidget(self.auxdev4, 3, 15, 1, 5)
+		self.tabLayout_3.addWidget(self.auxdev4, 9, 27, 3, 7)
 		self.auxdev4.setCheckable(True)
 
 		#Toggles for nulling channels
 		self.signalnulls = self.caltablerowlabels
 		tmpobject = QtWidgets.QLabel(self.tab_3)
 		tmpobject.setObjectName("NullLabel")
-		self.tabLayout_3.addWidget(tmpobject, 0, 25, 2, 10)
+		self.tabLayout_3.addWidget(tmpobject, 0, 40, 3, 10)
 		tmpobject.setText("NULL SIGNALS")
 		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)		
 		tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 		for i in range(0,len(self.signalnulls)):
 			tmpobject = QtWidgets.QLabel(self.tab_3)
 			tmpobject.setObjectName("NullLabel"+str(i))
-			self.tabLayout_3.addWidget(tmpobject, 2+i, 25, 1, 5)	
+			self.tabLayout_3.addWidget(tmpobject, 3+3*i, 40, 3, 5)	
 			tmpobject = QtWidgets.QPushButton(self.tab_3)
 			tmpobject.setObjectName("Null"+str(i))
-			self.tabLayout_3.addWidget(tmpobject, 2+i, 30, 1, 5)
+			self.tabLayout_3.addWidget(tmpobject, 3+3*i, 45, 3, 5)
 			tmpobject.setCheckable(True)			
 		
 		#Label for device configurations
 		tmpobject = QtWidgets.QLabel(self.tab_3)
 		tmpobject.setObjectName("AuxDevLabel")
-		self.tabLayout_3.addWidget(tmpobject, 0, 50, 2, 40)
+		self.tabLayout_3.addWidget(tmpobject, 0, 50, 3, 50)
 		tmpobject.setText("AUXILIARY DEVICE CONFIGURATIONS")
 		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)				
 		tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
@@ -658,17 +670,17 @@ class Ui_MainWindow(object):
 				if j in [0,2,5]:
 					self.tmpobject = QtWidgets.QLineEdit(self.tab_3)
 					self.tmpobject.setObjectName("cvfx"+str(i+5)+self.auxdevtoggleslist[j])
-					self.tabLayout_3.addWidget(self.tmpobject, j+2, 50+i*10, 1, 10)
+					self.tabLayout_3.addWidget(self.tmpobject, 3*j+3, 55+i*10, 3, 10)
 				else:
 					self.tmpobject = QtWidgets.QPushButton(self.tab_3)
 					self.tmpobject.setObjectName("cvfx"+str(i+5)+self.auxdevtoggleslist[j])
-					self.tabLayout_3.addWidget(self.tmpobject, j+2, 50+i*10, 1, 10)
+					self.tabLayout_3.addWidget(self.tmpobject, 3*j+3, 55+i*10, 3, 10)
 					self.tmpobject.setCheckable(True)
 
 		#Text box displaying instructional interface for device configurations
 		self.auxoptions = QtWidgets.QLabel(self.tab_3)
 		self.auxoptions.setObjectName("auxoptions")
-		self.tabLayout_3.addWidget(self.auxoptions, 8, 50, 10, 40)
+		self.tabLayout_3.addWidget(self.auxoptions, 21, 55, 29, 40)
 		self.auxoptions.setWordWrap(True)
 		self.auxoptions.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")
 		self.auxoptions.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -866,7 +878,9 @@ class Ui_MainWindow(object):
 		self.opccaltableWidget.setSortingEnabled(False)
 		
 		#Button label for saving coefficients from tables
-		self.updatecals.setText(_translate("MainWindow", "Press to SAVE new calibrations"))
+		self.saveCals.setText(_translate("MainWindow", "Click here to SAVE new calibrations"))
+		self.refreshCals.setText(_translate("MainWindow","Reload Calibrations"))
+		self.deleteCals.setText(_translate("MainWindow","Delete Currently Selected Calibration"))
 		
 		#Starting index for which data is plotted
 		self.dropdownindices = [0,0,0,0]
@@ -992,7 +1006,9 @@ class Ui_MainWindow(object):
 		self.readcalsfromfiles(MainWindow)
 		
 		#Connect signal/slots for calibration saving
-		self.updatecals.clicked.connect(lambda: self.savecalibrations(MainWindow))
+		self.saveCals.clicked.connect(lambda: self.savecalibrations(MainWindow))
+		self.deleteCals.clicked.connect(lambda: self.deleteCalibrations(MainWindow))
+		self.refreshCals.clicked.connect(lambda: self.readcalsfromfiles(MainWindow))
 		
 		# creates a server and starts listening to TCP connections
 		self.runconnection = False
@@ -1312,8 +1328,8 @@ class Ui_MainWindow(object):
 	#	all calibration tables and will carry a 3 dimensional array
 	#	with each calibration versions for changing whenever
 	def readcalsfromfiles(self, MainWindow):	
+		self.calversionlist.clear()
 		_translate = QtCore.QCoreApplication.translate
-		
 		#Defining calibration coefficients path
 		self.calpath = self.basedir + '/' + self.calname + '/' 
 
@@ -1338,7 +1354,7 @@ class Ui_MainWindow(object):
 						lines = lines.decode('utf-8')
 						#If the line does not contain a comment and is not empty
 						#	then proceed as if it is a calibration entry
-						if (lines[0] != '#' and len(lines[0].replace(" ","").replace("\n","").replace("\r","")) != 0) :
+						if (lines[0] != '#' and len(lines.replace(" ","").replace("\n","").replace("\r","")) != 0) :
 							#Archive each calibration line from the file
 							#	If first line, create array, otherwise
 							#	add to the array
@@ -1355,8 +1371,10 @@ class Ui_MainWindow(object):
 								try:
 									self.calvalues[i,:,calcounter] = calinput
 								except:
-									self.calvalues = np.repeat(self.calvalues[:, :, None], 2, axis=2)
+									self.calvalues = np.repeat(self.calvalues[:, :, None], 20, axis=2)
 									self.calvalues[i,:,calcounter] = calinput
+									#self.calvalues[i,:,calcounter] = calinput
+								#if (i==0):	print(self.calvalues[i,:])
 							#Increment counter to indicate that a new calibration version
 							#	has been found
 							calcounter+=1
@@ -1399,6 +1417,78 @@ class Ui_MainWindow(object):
 				self.errorstatus.setText(self.mainerrorlist[1])
 			elif not self.mainerrorlist[1] in self.errorstatus.toPlainText():
 				self.errorstatus.append(self.mainerrorlist[1])
+				
+	def deleteCalibrations(self, MainWindow):
+		_translate = QtCore.QCoreApplication.translate
+		
+		#Defining calibration coefficients path
+		self.calpath = self.basedir + '/' + self.calname + '/' 
+		
+		#contupdate = QMessageBox#(MainWindow, 'Updating Calibrations', 'Please provide update comment. Press cancel to abort update')		
+
+		#contupdate = QInputDialog.getItem(MainWindow, 'Updating Calibrations', 'Please provide update comment. Press cancel to abort update',0,False,ok)	
+   
+		reply = QtGui.QMessageBox.question(MainWindow, 'WARNING', 
+                     "Are you sure you want to delete the currently selected calibration?", 
+					 QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)#, QtGui.QMessageBox.Warning)
+
+		#print(reply)
+		if reply == QtGui.QMessageBox.Yes:		
+			#Exception handling to ensure that all files are read as they should.
+			#	If exception is found, an error message is presented and
+			#	recommendations are made
+			try:
+				#Iteration through each of the known separate calibration files
+				for i in range(0,len(self.calarray)):
+					#Open indexed file with reference
+					with open(self.calpath + self.calarray[i]+'.dat',"rb") as f:
+						#Counters to determine current line in file and
+						#	current number of calibration versions
+						tmpcounter = 0
+						calcounter = 0
+					
+						#Initialize array to for temporary use				
+						tmparray = None
+					
+						#Iterate through the lines in the file
+						for lines in f:
+							#If the line does not contain a comment and is not empty
+							#	then proceed as if it is a calibration entry
+							#print(calcounter,self.calversionlist.currentIndex())
+							lines = lines.decode('utf-8')
+							if (calcounter!=self.calversionlist.currentIndex()):
+								#if(lines[0] != '#' and len(lines.replace(" ","").replace("\n","").replace("\r","")) != 0) :
+								#Archive each calibration line from the file
+								#	If first line, create array, otherwise
+								#	add to the array
+								try:
+									tmparray.extend([lines.replace('\r','')])
+								except:
+									tmparray = [lines.replace('\r','')]
+								#print(lines)
+								#Increment counter to indicate that a new calibration version
+								#	has been found
+							if(lines[0] != '#' and len(lines.replace(" ","").replace("\n","").replace("\r","")) != 0) :
+								calcounter+=1
+							#Increment counter for knowing how many total lines have been read		
+							#tmpcounter += 1
+						with open(self.calpath + self.calarray[i]+'.dat',"w+") as f:
+							for lines in tmparray:
+								f.write(lines)
+												
+						#print(tmparray)
+				
+						tmparray = None
+						calcounter = 0
+			
+			#Exception throws error message and instructions to the front panel
+			except:
+				if self.mainerrorlist[0] in self.errorstatus.toPlainText():
+					self.errorstatus.setText(self.mainerrorlist[1])
+				elif not self.mainerrorlist[1] in self.errorstatus.toPlainText():
+					self.errorstatus.append(self.mainerrorlist[1])
+		
+			self.readcalsfromfiles(MainWindow)
 			
 	#Function that updates calibration coefficients within the GUI tables
 	def calVersionChange(self, MainWindow):
@@ -1482,7 +1572,7 @@ class Ui_MainWindow(object):
 				except ValueError:
 					self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels)+len(self.tdlcaltablecolumnlabels),j,self.calversionlist.currentIndex()] = 0
 		
-		calupdatetext, contupdate = QInputDialog.getText(MainWindow, 'Text Input MainWindow', 'Please provide update comment. Press cancel to abort update')		
+		calupdatetext, contupdate = QInputDialog.getText(MainWindow, 'Updating Calibrations', 'Please provide update comment. Press cancel to abort update')		
 		#If cancel is clicked, ('', False)
 		
 		#Checks if user chose to continue with save or not
@@ -1507,6 +1597,7 @@ class Ui_MainWindow(object):
 						f.write(caloutput)
 						f.close()
 		
+		self.readcalsfromfiles(MainWindow)
 			
 	#Global updating function for toggles. Various toggles have different text
 	#	depending on state of toggle. Therefore, whenever anything is toggled,
@@ -2177,7 +2268,6 @@ class IncomingServer(asyncio.Protocol):
 		#	header text box on display
 		#except:
 		else:
-			print(datain)
 			ui.dsmheader.setText(str(datain))
 			
 		#Kept for testing purposes; however, unecessary with DSM
