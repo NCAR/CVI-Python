@@ -9,6 +9,8 @@ import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from multiprocessing import Process
+
 #CVI code for performing all of the data manipulation
 from crunchcvi import *
 
@@ -367,7 +369,7 @@ class Ui_MainWindow(object):
 		self.tabLayout_2.addWidget(self.datafromdsmlabel, 12, 0, 2, 40)
 		self.datafromdsm = QtWidgets.QLabel(self.tab_2)
 		self.datafromdsm.setObjectName("datafromdsm")
-		self.tabLayout_2.addWidget(self.datafromdsm, 14, 0, 12, 50)
+		self.tabLayout_2.addWidget(self.datafromdsm, 14, 0, 10, 50)
 		self.datafromdsm.setWordWrap(True)
 		self.datafromdsm.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")
 		#self.datafromdsm.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -375,10 +377,10 @@ class Ui_MainWindow(object):
 
 		self.datatodsmlabel = QtWidgets.QLabel(self.tab_2)
 		self.datatodsmlabel.setObjectName("datatodsmlabel")
-		self.tabLayout_2.addWidget(self.datatodsmlabel, 26, 0, 2, 50)
+		self.tabLayout_2.addWidget(self.datatodsmlabel, 24, 0, 2, 50)
 		self.datatodsm = QtWidgets.QLabel(self.tab_2)
 		self.datatodsm.setObjectName("datafromdsm")
-		self.tabLayout_2.addWidget(self.datatodsm, 28, 0, 7, 50)
+		self.tabLayout_2.addWidget(self.datatodsm, 26, 0, 7, 50)
 		self.datatodsm.setWordWrap(True)
 		self.datatodsm.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")		
 		#self.datatodsm.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -387,32 +389,32 @@ class Ui_MainWindow(object):
 		#Status indicator for server connection status
 		self.statusindicatorlabel = QtWidgets.QLabel(self.tab_2)
 		self.statusindicatorlabel.setObjectName("statusindicatorlabel")
-		self.tabLayout_2.addWidget(self.statusindicatorlabel, 36, 0, 2, 30)
+		self.tabLayout_2.addWidget(self.statusindicatorlabel, 33, 0, 2, 30)
 
 		#Toggle button/label for determining whether valves 
 		#	are controlled by the user or by the calculation
 		self.valvesourcelabel = QtWidgets.QLabel(self.tab_2)
 		self.valvesourcelabel.setObjectName("valvesourcelabel")
-		self.tabLayout_2.addWidget(self.valvesourcelabel, 39, 0, 2, 50)
+		self.tabLayout_2.addWidget(self.valvesourcelabel, 36, 0, 2, 50)
 		self.valvesource = QtWidgets.QPushButton(self.tab_2)
 		self.valvesource.setObjectName("valvesource")
-		self.tabLayout_2.addWidget(self.valvesource, 41, 0, 2, 50)
+		self.tabLayout_2.addWidget(self.valvesource, 38, 0, 2, 50)
 		self.valvesource.setCheckable(True)
 		self.valvesourcelabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
 		
 		#Label and checkboxes for the four manually controllable valves!
 		self.v1 = QtWidgets.QPushButton(self.tab_2)
 		self.v1.setObjectName("valve1")
-		self.tabLayout_2.addWidget(self.v1, 43, 0, 2, 10)
+		self.tabLayout_2.addWidget(self.v1, 40, 0, 2, 10)
 		self.v2 = QtWidgets.QPushButton(self.tab_2)
 		self.v2.setObjectName("valve2")
-		self.tabLayout_2.addWidget(self.v2, 43, 10, 2, 10)
+		self.tabLayout_2.addWidget(self.v2, 40, 10, 2, 10)
 		self.v3 = QtWidgets.QPushButton(self.tab_2)
 		self.v3.setObjectName("valve3")
-		self.tabLayout_2.addWidget(self.v3, 43, 20, 2, 10)
+		self.tabLayout_2.addWidget(self.v3, 40, 20, 2, 10)
 		self.v4 = QtWidgets.QPushButton(self.tab_2)
 		self.v4.setObjectName("valve4")
-		self.tabLayout_2.addWidget(self.v4, 43, 30, 2, 10)
+		self.tabLayout_2.addWidget(self.v4, 40, 30, 2, 10)
 		self.v1.setCheckable(True)
 		self.v2.setCheckable(True)
 		self.v3.setCheckable(True)
@@ -422,41 +424,41 @@ class Ui_MainWindow(object):
 		#	are controlled by the user or by the calculation
 		self.flowsourcelabel = QtWidgets.QLabel(self.tab_2)
 		self.flowsourcelabel.setObjectName("flowsourcelabel")
-		self.tabLayout_2.addWidget(self.flowsourcelabel, 45, 0, 1, 50)
+		self.tabLayout_2.addWidget(self.flowsourcelabel, 42, 0, 2, 50)
 		self.flowsource = QtWidgets.QPushButton(self.tab_2)
 		self.flowsource.setObjectName("flowsource")
-		self.tabLayout_2.addWidget(self.flowsource, 46, 0, 2, 50)
+		self.tabLayout_2.addWidget(self.flowsource, 44, 0, 2, 50)
 		self.flowsource.setCheckable(True)
 		self.flowsourcelabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)		
 		
 		#User input flows and labels for cvfx0,cvfx2,cvfx3,cvfx4,cvf1
 		self.cvfx0wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx0wrlabel.setObjectName("cvfx0wrlabel")		
-		self.tabLayout_2.addWidget(self.cvfx0wrlabel, 47, 0, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx0wrlabel, 46, 0, 2, 10)
 		self.cvfx0wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx0wr.setObjectName("cvfx0wr")
 		self.tabLayout_2.addWidget(self.cvfx0wr, 48, 0, 2, 10)
 		self.cvfx2wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx2wrlabel.setObjectName("cvfx2wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx2wrlabel, 47, 10, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx2wrlabel, 46, 10, 2, 10)
 		self.cvfx2wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx2wr.setObjectName("cvfx2wr")
 		self.tabLayout_2.addWidget(self.cvfx2wr, 48, 10, 2, 10)
 		self.cvfx3wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx3wrlabel.setObjectName("cvfx3wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx3wrlabel, 47, 20, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx3wrlabel, 46, 20, 2, 10)
 		self.cvfx3wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx3wr.setObjectName("cvfx3wr")
 		self.tabLayout_2.addWidget(self.cvfx3wr, 48, 20, 2, 10)
 		self.cvfx4wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvfx4wrlabel.setObjectName("cvfx4wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx4wrlabel, 47, 30, 2, 10)
+		self.tabLayout_2.addWidget(self.cvfx4wrlabel, 46, 30, 2, 10)
 		self.cvfx4wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvfx4wr.setObjectName("cvfx4wr")
 		self.tabLayout_2.addWidget(self.cvfx4wr, 48, 30, 2, 10)
 		self.cvf1wrlabel = QtWidgets.QLabel(self.tab_2)
 		self.cvf1wrlabel.setObjectName("cvf1wrlabel")			
-		self.tabLayout_2.addWidget(self.cvf1wrlabel, 47, 40, 2, 10)
+		self.tabLayout_2.addWidget(self.cvf1wrlabel, 46, 40, 2, 10)
 		self.cvf1wr = QtWidgets.QLineEdit(self.tab_2)
 		self.cvf1wr.setObjectName("cvf1wr")
 		self.tabLayout_2.addWidget(self.cvf1wr, 48, 40, 2, 10)
@@ -752,7 +754,7 @@ class Ui_MainWindow(object):
 				
 		#Current saved file labeling
 		self.currentfilelabel.setText(_translate("MainWindow","Current Saved File"))
-		self.currentfile.setText(_translate("MainWindow","Not Yet Implemented"))
+		self.currentfile.setText(_translate("MainWindow","Waiting to save data"))
 				
 		#Instrument connection labels: delay, offset, counterflow excess
 		self.delaylabel.setText(_translate("MainWindow","Delay"))
@@ -1016,6 +1018,7 @@ class Ui_MainWindow(object):
 		#Create default data array for plotting from
 		self.plotdata = np.c_[[-9999]*(self.dropdownlist.count()+1)]#np.c_[[np.nan]*4]
 		self.tabledata = np.c_[[-9999]*(len(self.tablerowlabels)),[-9999]*(len(self.tablerowlabels)),[-9999]*len(self.tablerowlabels)]
+		self.rawInOutData = np.c_[[-9999]*(len(self.rawtablerowlabels)),[-9999]*(len(self.rawtablerowlabels))]
 		self.dim = self.plotdata.shape
 		
 		#Force selection change on the plot to the default to
@@ -1150,7 +1153,10 @@ class Ui_MainWindow(object):
 		
 		#Stores the initial counterflow value to reference to
 		self.initialcfexcess = float(self.cvf3cw.text())
-		
+
+		#Stores the initial valve positions (just in case something is cancelled)
+		self.initialValvePositions = [int(self.v1.isChecked()),int(self.v2.isChecked()),int(self.v3.isChecked()),int(self.v4.isChecked())]
+
 		#Offsets counterflow to allow external instrument changes
 		#	This also updates a parameter that is used within a separate
 		#	processor thread so that it is responds to function changes
@@ -1173,7 +1179,7 @@ class Ui_MainWindow(object):
 		
 		#Link signal/slots for connect/cancel buttons
 		self.devcontinue.clicked.connect(lambda: self.updateinstruments(True))
-		self.devcancel.clicked.connect(lambda: self.gradualflowreduction(True))		
+		self.devcancel.clicked.connect(lambda: self.gradualflowreduction(True, True))		
 		
 	#Removal of external instruments from the counterflow calculation
 	#	Only runs once the disconnect button is clicked
@@ -1195,6 +1201,9 @@ class Ui_MainWindow(object):
 		#Stores the initial counterflow value to reference to		
 		self.initialcfexcess = float(self.cvf3cw.text())
 		
+		#Stores the initial valve positions (just in case something is cancelled)
+		self.initialValvePositions = [int(self.v1.isChecked()),int(self.v2.isChecked()),int(self.v3.isChecked()),int(self.v4.isChecked())]
+		
 		#Offsets counterflow to allow external instrument changes
 		#	This also updates a parameter that is used within a separate
 		#	processor thread so that it is responds to function changes
@@ -1211,7 +1220,7 @@ class Ui_MainWindow(object):
 		
 		#Link signal/slots for connect/cancel buttons		
 		self.devcontinue.clicked.connect(lambda: self.updateinstruments(False))
-		self.devcancel.clicked.connect(self.gradualflowreduction)
+		self.devcancel.clicked.connect(lambda: self.gradualflowreduction(False, True))
 		
 	def updateinstruments(self, connecting):
 		#Disable continue button to prevent rushing program
@@ -1254,14 +1263,23 @@ class Ui_MainWindow(object):
 
 		#Force gui events to be processed and connect continue signal/slots
 		app.processEvents()
-		self.devcontinue.clicked.connect(lambda: self.gradualflowreduction(connecting))
+		self.devcontinue.clicked.connect(lambda: self.gradualflowreduction(connecting, False))
 
 	#Function to be run if anything is cancelled at any point
 	#	or once addition/removal routines have been completed
-	def gradualflowreduction(self, connecting):		
+	def gradualflowreduction(self, connecting, cancelled):		
 		#Disconnect button signal/slots to prevent rushing
 		self.devcontinue.disconnect()
 		self.devcancel.disconnect()
+
+		if cancelled:
+			self.v1.setChecked(self.initialValvePositions[0])
+			self.v2.setChecked(self.initialValvePositions[1])
+			self.v3.setChecked(self.initialValvePositions[2])
+			self.v4.setChecked(self.initialValvePositions[3])
+
+		time.sleep(3)
+		self.devinstruct.setText("The valves have been reverted to their original state")
 		
 		#If disconnecting instruments, this is the final routine to process
 		if(not connecting): 
@@ -1428,7 +1446,7 @@ class Ui_MainWindow(object):
 
 		#contupdate = QInputDialog.getItem(MainWindow, 'Updating Calibrations', 'Please provide update comment. Press cancel to abort update',0,False,ok)	
    
-		reply = QtGui.QMessageBox.question(MainWindow, 'WARNING', 
+		reply = QtGui.QMessageBox.warning(MainWindow, 'WARNING', 
                      "Are you sure you want to delete the currently selected calibration?", 
 					 QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)#, QtGui.QMessageBox.Warning)
 
@@ -1650,6 +1668,7 @@ class Ui_MainWindow(object):
 		
 		#Implement parallel thread for server	
 		self.server_thread = threading.Thread(target=self.server_loop_in_thread, args = ())#args = (self,))#, args=(loop,))
+		#self.server_thread = Process(target=self.server_loop_in_thread, args = ())
 		self.server_thread.start()			
 		
 		#Update network status indicator
@@ -1704,6 +1723,9 @@ class Ui_MainWindow(object):
 			item.setText(_translate("MainWindow",str(self.tabledata[i,1])))
 			item = ui.tableWidget.item(i, 2)
 			item.setText(_translate("MainWindow",str(self.tabledata[i,2])))
+
+		for i in range(0,len(self.rawtablerowlabels)):
+			ui.rawtableWidget.item(i,0).setText(_translate("MainWindow",str(self.rawInOutData[i,0])))
 
 		#Update base plots based on first dropdown list positions
 		self.CVIplot.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist.currentIndex()+1,:], clear = True)
@@ -2169,9 +2191,11 @@ class IncomingServer(asyncio.Protocol):
 			
 			#Added for populating raw input/output data table
 			_translate = QtCore.QCoreApplication.translate
-			#for i in range(0,len(ui.input)):
-			#	item = ui.tableWidget.item(i, 0)
-			#	item.setText(_translate("MainWindow",str(ui.input[i])))
+			for i in range(0,min(len(ui.rawtablerowlabels),len(input))):
+				ui.rawInOutData[i,0] =  float(input[i])
+			for i in range(0,len(dataout)):
+				ui.rawInOutData[i,1] = float(dataout[i])
+
 			#for i in range(0,len(dataout)):
 			#	item = ui.tableWidget.item(i, 1)
 			#	item.setText(_translate("MainWindow",str(self.dataout[i])))
@@ -2263,6 +2287,8 @@ class IncomingServer(asyncio.Protocol):
 				with open(ui.path+ui.file, "a") as f:
 					f.write(outputstring)
 					f.close()
+
+			ui.currentfile.setText(str(ui.path+ui.file))
 					
 		#Exception to print data header or error data to DSM
 		#	header text box on display
