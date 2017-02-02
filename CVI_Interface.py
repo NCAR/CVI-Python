@@ -81,7 +81,7 @@ class Ui_MainWindow(object):
 		print os.getenv('KEY_THAT_MIGHT_EXIST', default_value)
 		'''
 		
-		QApplication.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
+		QApplication.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
 		
 		#Creation of Main Layout
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -119,7 +119,7 @@ class Ui_MainWindow(object):
 		self.tabLayout_2 = QtWidgets.QGridLayout(self.tab_2)
 		self.tabLayout_2.setContentsMargins(10, 10, 10, 10)
 		self.tabLayout_2.setObjectName("tabLayout_2")	
-		self.tabLayout_2.setSpacing(10)
+		self.tabLayout_2.setSpacing(5)
 
 		#Create Third Tab
 		self.tab_3 = QtWidgets.QWidget()
@@ -128,7 +128,7 @@ class Ui_MainWindow(object):
 		self.tabLayout_3 = QtWidgets.QGridLayout(self.tab_3)
 		self.tabLayout_3.setContentsMargins(10, 10, 10, 10)
 		self.tabLayout_3.setObjectName("tabLayout_3")
-		self.tabLayout_3.setSpacing(10)
+		self.tabLayout_3.setSpacing(5)
 		
 		
 		#Create uniform grid spacing for layout resizing purposes
@@ -1232,7 +1232,6 @@ class Ui_MainWindow(object):
 		if saveCode == 0: saveFile = self.dataFile
 		if saveCode == 1: saveFile = self.logFile
 		if saveCode == 2: saveFile = self.errorFile
-	
 		if (len(self.preflightPrefix) != 0):
 			if os.path.isfile(self.basedir+saveFile):
 				if not os.path.exists(self.basedir+self.preflightPrefix):
@@ -1240,7 +1239,8 @@ class Ui_MainWindow(object):
 				os.rename(self.basedir+saveFile, self.basedir+self.preflightPrefix+saveFile)
 				
 		if not os.path.isfile(self.basedir+self.preflightPrefix+saveFile):
-			os.makedirs(os.path.dirname(self.basedir+self.preflightPrefix+saveFile))
+			if not os.path.exists(self.basedir+self.preflightPrefix):
+				os.makedirs(os.path.dirname(self.basedir+self.preflightPrefix+saveFile))
 			if(header == ''):
 				with open(self.basedir+self.preflightPrefix+saveFile, 'a') as f:
 					f.write(header)
@@ -1249,6 +1249,8 @@ class Ui_MainWindow(object):
 			f.write(data)
 		#os.rename("path/to/current/file.foo", "path/to/new/desination/for/file.foo")
 		#shutil.move("path/to/current/file.foo", "path/to/new/destination/for/file.foo")
+
+		self.currentfile.setText(str(self.basedir+self.preflightPrefix+self.dataFile))
 
 
 	def syncSliders(self, MainWindow):
@@ -1996,8 +1998,8 @@ class Ui_MainWindow(object):
 			ui.rawtableWidget.item(i,0).setText(_translate("MainWindow",str(self.rawInOutData[i,0])))
 
 		#Update base plots based on first dropdown list positions
-		self.CVIplot.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist.currentIndex()+1,:], clear = True)
-		self.CVIplot2.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist2.currentIndex()+1,:], clear = True)
+		self.CVIplot.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist.currentIndex()+1,:], clear = True,pen=pyqtgraph.mkPen(color=(255,255,255), width=1))
+		self.CVIplot2.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist2.currentIndex()+1,:], clear = True,pen=pyqtgraph.mkPen(color=(255,255,255), width=1))
 		self.CVIplotline2.clear()
 		self.CVIplot2line2.clear()
 		
@@ -2009,11 +2011,11 @@ class Ui_MainWindow(object):
 
 		#Form dual lines on each plot if opted for
 		if (self.dropdownlistline2.currentIndex() != 0) : 
-			self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlistline2.currentIndex(),:],clear = True))#,pen=pyqtgraph.mkPen(color=(150,150,255), width=3)))#,clear=True))
+			self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlistline2.currentIndex(),:],clear = True,pen=pyqtgraph.mkPen(color=(150,150,255), width=1)))#,clear=True))
 			self.CVIplot.setTitle(self.plottitles[self.dropdownlist.currentIndex()]+' & '+self.plottitles[self.dropdownlistline2.currentIndex()-1])
 			self.CVIplot.getAxis('right').setLabel(self.ylabels[self.dropdownlistline2.currentIndex()-1])#, color = (150,150,255))#'#0000ff')
 		if (self.dropdownlist2line2.currentIndex() != 0) : 
-			self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex(),:],clear=True))#,pen='b',clear=True))
+			self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex(),:],clear=True,pen=pyqtgraph.mkPen(color=(150,150,255), width=1)))#,pen='b',clear=True))
 			self.CVIplot2.setTitle(self.plottitles[self.dropdownlist2.currentIndex()]+' & '+self.plottitles[self.dropdownlist2line2.currentIndex()-1])
 			self.CVIplot2.getAxis('right').setLabel(self.ylabels[self.dropdownlist2line2.currentIndex()-1])#, color = (150,150,255))#'#0000ff')
 		
@@ -2061,7 +2063,7 @@ class IncomingServer(asyncio.Protocol):
 		
 		#If data looks does not produce error (i.e. not a header) then proceed. 
 		#	Otherwise, print header or error prone input to graphical interface
-		try:#if datain[0] != 'N' :
+		try: #if datain[0] != 'N' :
 			input = datain.split(',')
 			input = [float(i) for i in input]
 			
@@ -2565,14 +2567,12 @@ class IncomingServer(asyncio.Protocol):
 			#	with open(ui.path+ui.dataFile, "a") as f:
 			#		f.write(outputstring)
 			#		f.close()
-
-			ui.currentfile.setText(str(ui.path+ui.dataFile))
 					
 		#Exception to print data header or error data to DSM
 		#	header text box on display
 		#except:
 		except:#else:
-			if datain[0] != 'N' :
+			if datain[0] == 'N' :
 				ui.dsmheader.setText(str(datain))
 			else:
 				ui.errorHandler(3)
