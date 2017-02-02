@@ -24,18 +24,127 @@ COMPLETE * Add DSM header box on calibrations panel
 COMPLETE * Add calibration coefficient version dropdown
 
 * Add rolling save files for main status and error status indicators
-* Correct calibration saving routine such that it will actually update
-* Allow realtime updating for reading calibration coefficients from tables
+	* Potentially add buttons (dropdown list) for conditions (saw a cloud, went to restroom, etc.)
+PARTIAL * Correct calibration saving routine such that it will actually update
+PARTIAL * Allow realtime updating for reading calibration coefficients from tables
 COMPLETE * Add delete button for deleting certain coefficients
 COMPLETE * Add update button to reread calibrations from files
-* Add ability to prevent rapid updates to text entry fields so that a . is not read, etc. (check if field is being entered?)
+UNECESSARY * Add ability to prevent rapid updates to text entry fields so that a . is not read, etc. (check if field is being entered?)
 COMPLETE * Remove DSM Header printout to terminal
 UNECESSARY * Add wrap text and scrollable to dsm header box.
 * Verify why flow can be "off" and yet the user input voltages will still output.
-* Correct raw input/output indicator updating (and labeling)
+PARTIAL * Correct raw input/output indicator updating (and labeling)
 COMPLETE * Correct Display scaling for program
+COMPLETE * Verify that when instrument add routine is cancelled, valves are reverted and things are reversed.
+PARTIAL * Add sliders to everything!!!
+* Add counterflow excess increase button for just in case moments
+* Allow cvfx0, cvfx2, cvfx3, cvfx4 to independently increased while allowing other flows to compensate.
+	cvfx0 would compensate for any changes to the other ones (autopilot button?)
+COMPLETE * Grey out the connect and disconnect buttons after the connect button is pressed.
+* Add checklist that pops up upon request that allows you to set a data folder prefix for flight, etc.
+* Add dropdown list for common notes to be added to the log
 
 
 Miscellaneous Updates
 
 * Added exception handling for full feedback loop. Try to perform calculation, exception prints out raw data stream to terminal.
+
+
+Error Events:
+	Error in calculation
+
+Log Events:
+	Program started…
+	Server established…
+	Data received…
+	Connection Lost
+	Error in calculation
+	Whenever anything is done with the instrument connection/disconnection routine
+	After each change in the preflight checklist.
+	
+
+CHECKLIST
+	Preflight check:
+		List of preflight things that should have been completed (checkboxes for each?)
+			Probe Cover Off
+			Add butanol if needed -- 50 mls (2/3" height in fill bottle) for 25 hours
+			Power strip switch ON, UHSAS switch ON, Top Box Power Switch ON, TDL switch ON
+			CVI Laptop ON, WIBS laptop ON.
+			Set up T Controller: CTR1(release)/RUN(release), CTR2/RUN, CTR3/RUN (CTR4 not needed).
+				To change setpoint 1, CTR1/STOP, CTR1(hold)/SETPT(release). Enter setpoint with right key,
+				left key to exit (if passcode is needed, it's 3254)
+			Open main valve on one zero air cylinder and toggle valve downstream, check gauge P at ~20 psi
+			When Laptop boots:
+				Login as CVI-OPS without password (FYI--Admin password is "cvi") & check time
+				Start UHSAS vi. Then: Laser Control: Temp & Current On, Histogram Tab: Run
+				Double click on CVI_IDEAS2013 icon to start labview VI (program)
+			On open vi, click Run arrow. Click big black flow button (to ON). Check DSM data coming on TEST tables
+			Press CONNECT (left side of screen): & follow prompts for WIBS connect, ignoring valve changes
+			Pump switch ON (main box) to test system flows & that particles and water vapor are ~0
+			VNC to WIBS computer, follow WIBS checklist, minimize VNC ("dms-sw-loaner" is name)
+			On Top box: Pump switch OFF
+			On main vi, click big Flow button (to OFF), & yellow STOP button
+			(if you have time) Open Date/Time windows on both laptops to make sure they sync
+			Open xchat, join #GV
+	BEFORE TAKEOFF
+		Start UHSAS recording and give data file name: Record (enter file name)
+		On open main vi, click Run arrow. Big black Flow button (to On). Check DSM data coming on TEST tables
+		Press CONNECT (left side of screen): & follow prompts for WIBS connect, ignoring valve changes
+		Pump switch ON (main box)
+		Main heater switch ON box (No shroud, so "Shroud Heater" switch stays OFF)
+		Through VNC, check that WIBS is still running
+		Record Labview data file name (*.*q) at bottom of screen
+	DURING FLIGHT
+		Monitor variables. Monitor Zero Air & switch cylinders if nec. by closing one and rapidly opening other.
+		Take ambient sample as needed for WIBS & filters (saves air but don't overdo)
+			Change "CVI" switch up to "TOTAL" (front panel, upper left)
+			After sample, change "TOTAL" down to "CVI" (Return to CVI mode for landing)
+		If RHOOTDL > ~0.4 g/m^3), increase FX0C & FX2C from 2.0 to ~ 6.0 clpm or higher (5 slpm is max).
+			Return flows to normal 2.0 when out of cloud
+		To sample on filter in cloud (set up prior to cloud pass)
+		Begin Sampling:
+			Press CONNECT button on CVI display front panel. Ignore steps for Users.
+			Open 2 green impactor valves and close blue on in center.
+			Press large CVI button on right of windows that opens
+			Push large USER button on 2nd window.
+			Record sample start time, alt, etc. in lab book chart
+		After Sampling:
+			Press disconnect button on front panel	
+			Open blue vale in center and close 2 green impactor valves
+			Press large USER button on right of window that opens
+			Push large CVI button on 2nd window
+			Record sample end time, alt, etc. on chart.
+	AFTER LANDING
+		Main heaters OFF (Can do on descent if cloud-free)
+		Pump Switch OFF
+		Laptop:
+			Click big red Flow button (to OFF)
+			Click big yellow STOP toggle switch (updates stop)
+			File-Exit Program
+		UHSAS: Stop button in program
+		TDL and Main box Power switch OFF, UHSAS OFF, rear power strip OFF
+		Thru VNC, run WIBS in Forced Trigger mode 3 minutes, then File-Exit
+		If time, download CVI "q" file & WIBS data files to memory stick
+		Shutdown CVI & WIBS laptops
+		Zero Air Valves closed, record pressure and replace zero air if necessary (uses ~200 psi/hour)
+		Check Probe Cover on
+		
+		
+THINGS TO DO WITH A PREFLIGHT BUTTON
+	Request what prefix to give the flight (RF01, TF92, etc.)
+	Provide Preflight checklist and allow users to connect WIBS (single button?)
+	
+		
+
+	
+		
+		
+		
+		
+		
+		
+		
+
+
+
+
