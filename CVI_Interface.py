@@ -46,6 +46,9 @@ import shutil
 #for scheduling replot (NO LONGER USED) 
 #from apscheduler.schedulers.background import BackgroundScheduler
 
+
+####IF PROGRAM FAILS, RUN COMMAND "lsof -i" and kill the pid associated with python####
+
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
 		MainWindow.setObjectName("MainWindow")
@@ -82,6 +85,10 @@ class Ui_MainWindow(object):
 		'''
 		
 		QApplication.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
+		#MainWindow.setStyleSheet("background-color: darkgray")
+		#MainWindow.setStyleSheet("""QMainWindow{background-color: lightgray;}""")
+		MainWindow.setStyleSheet("""QMainWindow{background-color: rgb(0, 0, 100);}""")
+		
 		
 		#Creation of Main Layout
 		self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -92,6 +99,8 @@ class Ui_MainWindow(object):
 		#Creation of Tabs to nest within Layout
 		self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
 		self.tabWidget.setObjectName("tabWidget")
+		#self.tabWidget.setStyleSheet("""QTabWidget{background-color: lightgray;}""")
+		self.tabWidget.setStyleSheet("""QTabWidget{background-color: rgb(220,220,255);}""")
 
 		#Create First Tab
 		self.tab = QtWidgets.QWidget()
@@ -102,7 +111,7 @@ class Ui_MainWindow(object):
 		self.tabLayout_1 = QtWidgets.QGridLayout(self.tab)
 		self.tabLayout_1.setContentsMargins(10, 10, 10, 10)
 		self.tabLayout_1.setObjectName("tabLayout_1")
-		self.tabLayout_1.setSpacing(10)
+		self.tabLayout_1.setSpacing(5)
 		
 		'''
 		#Create first tab sublayout
@@ -194,7 +203,7 @@ class Ui_MainWindow(object):
 		self.tabLayout_1.addWidget(self.flowio, 2, 10, 2, 10)
 		self.flowio.setCheckable(True)
 		self.flowio.setStyleSheet("background-color: red")
-		self.flowio.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
+		#self.flowio.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 		
 		#CVI Mode toggle for CVI/Total option
 		self.cvimode = QtWidgets.QPushButton(self.tab)
@@ -217,12 +226,12 @@ class Ui_MainWindow(object):
 			tmpobject = QtWidgets.QLabel(self.tab)
 			tmpobject.setObjectName(self.flowedit[i]+'label')
 			self.tabLayout_1.addWidget(tmpobject, 5+4*i, 0, 2, 5)
-			tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
+			#tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 			
 			tmpobject = QtWidgets.QLineEdit(self.tab)
 			tmpobject.setObjectName(self.flowedit[i])
 			self.tabLayout_1.addWidget(tmpobject, 5+4*i, 5, 2, 5)
-			tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
+			#tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 			tmpobject.editingFinished.connect(lambda: self.updateSliders(MainWindow))
 			#tmpobject.textChanged.connect(lambda: self.updateSliders(MainWindow))
 			
@@ -244,7 +253,9 @@ class Ui_MainWindow(object):
 		self.tabLayout_1.addWidget(self.preflightButton, 22, 0, 3, 10)
 		self.preflightButton.setStyleSheet("background-color: red")
 		self.preflightButton.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
-		self.preflightButton.setDisabled(True)
+		#self.preflightButton.setDisabled(True)
+		self.preflightButton.setText("Pre-Flight")
+		self.preflightButton.clicked.connect(lambda: self.preflightChecklist(MainWindow))
 
 		#Dropdown lists for selecting data for first plot
 		self.commonNoteDropdown = QtWidgets.QComboBox(self.tab)
@@ -541,13 +552,13 @@ class Ui_MainWindow(object):
 		for i in range(0,len(self.cvfManVoltLabels)):
 			tmpobject = QtWidgets.QLabel(self.tab_2)
 			tmpobject.setObjectName(self.cvfManVoltLabels[i]+'label')
-			self.tabLayout_2.addWidget(tmpobject, 45, 10*i, 2, 10)
+			self.tabLayout_2.addWidget(tmpobject, 45, 10*i, 1, 10)
 			tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)				
 			tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 			
 			tmpobject = QtWidgets.QLineEdit(self.tab_2)
 			tmpobject.setObjectName(self.cvfManVoltLabels[i])
-			self.tabLayout_2.addWidget(tmpobject, 47, 10*i, 2, 10)
+			self.tabLayout_2.addWidget(tmpobject, 46, 10*i, 2, 10)
 			tmpobject.editingFinished.connect(lambda: self.updateSliders(MainWindow))
 
 			
@@ -558,7 +569,7 @@ class Ui_MainWindow(object):
 			tmpobject.setTickPosition(QSlider.TicksBelow)
 			tmpobject.setTickInterval(10)
 			tmpobject.setObjectName(self.cvfManVoltLabels[i]+'Slider')
-			self.tabLayout_2.addWidget(tmpobject, 49, 10*i, 1, 10)
+			self.tabLayout_2.addWidget(tmpobject, 48, 10*i, 2, 10)
 			tmpobject.valueChanged.connect(lambda: self.syncSliders(MainWindow))
 
 		'''
@@ -749,6 +760,7 @@ class Ui_MainWindow(object):
 		self.delay.setObjectName("delay")
 		self.tabLayout_3.addWidget(self.delay, 5, 6, 2, 8)
 		self.delaylabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+		self.delay.editingFinished.connect(lambda: self.updateSliders(MainWindow))
 
 		self.delaySlider = QSlider(Qt.Horizontal, self.tab_3)
 		self.delaySlider.setMinimum(0)
@@ -756,10 +768,10 @@ class Ui_MainWindow(object):
 		self.delaySlider.setValue(0)
 		self.delaySlider.setTickPosition(QSlider.TicksBelow)
 		self.delaySlider.setTickInterval(10)
-		self.delaySlider.setObjectName(self.flowedit[i]+'Slider')
+		self.delaySlider.setObjectName('delaySlider')
 		self.tabLayout_3.addWidget(self.delaySlider, 7, 6, 2, 8)
+		self.delaySlider.valueChanged.connect(lambda: self.syncSliders(MainWindow))
 		#tmpobject.setTracking(False)
-		#self.delaySlider.valueChanged.connect(lambda: self.syncSliders(MainWindow))
 					
 		
 		self.offsetlabel = QtWidgets.QLabel(self.tab_3)
@@ -768,7 +780,8 @@ class Ui_MainWindow(object):
 		self.offset = QtWidgets.QLineEdit(self.tab_3)
 		self.offset.setObjectName("offset")
 		self.tabLayout_3.addWidget(self.offset, 5, 14, 2, 8)
-		self.offsetlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)	
+		self.offsetlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+		self.offset.editingFinished.connect(lambda: self.updateSliders(MainWindow))	
 
 		self.offsetSlider = QSlider(Qt.Horizontal, self.tab_3)
 		self.offsetSlider.setMinimum(0)
@@ -776,8 +789,9 @@ class Ui_MainWindow(object):
 		self.offsetSlider.setValue(0)
 		self.offsetSlider.setTickPosition(QSlider.TicksBelow)
 		self.offsetSlider.setTickInterval(10)
-		self.offsetSlider.setObjectName(self.flowedit[i]+'Slider')
-		self.tabLayout_3.addWidget(self.offsetSlider, 7, 14, 2, 8)		
+		self.offsetSlider.setObjectName('offsetSlider')
+		self.tabLayout_3.addWidget(self.offsetSlider, 7, 14, 2, 8)	
+		self.offsetSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow))	
 		
 		self.cvf3cwlabel = QtWidgets.QLabel(self.tab_3)
 		self.cvf3cwlabel.setObjectName("cvf3cwlabel")		
@@ -785,7 +799,8 @@ class Ui_MainWindow(object):
 		self.cvf3cw = QtWidgets.QLineEdit(self.tab_3)
 		self.cvf3cw.setObjectName("cvf3cw")
 		self.tabLayout_3.addWidget(self.cvf3cw, 5, 22, 2, 12)	
-		self.cvf3cwlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)		
+		self.cvf3cwlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+		self.cvf3cw.editingFinished.connect(lambda: self.updateSliders(MainWindow))		
 
 		self.cvf3cwSlider = QSlider(Qt.Horizontal, self.tab_3)
 		self.cvf3cwSlider.setMinimum(0)
@@ -793,8 +808,9 @@ class Ui_MainWindow(object):
 		self.cvf3cwSlider.setValue(0)
 		self.cvf3cwSlider.setTickPosition(QSlider.TicksBelow)
 		self.cvf3cwSlider.setTickInterval(10)
-		self.cvf3cwSlider.setObjectName(self.flowedit[i]+'Slider')
-		self.tabLayout_3.addWidget(self.cvf3cwSlider, 7, 22, 2, 12)	
+		self.cvf3cwSlider.setObjectName('cvf3cwSlider')
+		self.tabLayout_3.addWidget(self.cvf3cwSlider, 7, 22, 2, 12)
+		self.cvf3cwSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow))	
 		
 		#Device toggles for selection of which instruments to add/remove
 		self.auxdev1 = QtWidgets.QPushButton(self.tab_3)
@@ -1213,6 +1229,12 @@ class Ui_MainWindow(object):
 		
 		#Create server loop
 		self.server_loop = asyncio.get_event_loop()	
+
+	def preflightChecklist(self, MainWindow):
+		calupdatetext, contupdate = QInputDialog.getText(MainWindow, 'Updating Preflight Prefix', 'Please enter a directory prefix for the flight (e.g. RF01)')		
+		if contupdate:
+			self.preflightPrefix = '/'+calupdatetext+'/'
+		self.preflightButton.setDisabled(True)
 		
 	def errorHandler(self, errorCode):
 		#Code for populating error status on first tab
@@ -1233,24 +1255,28 @@ class Ui_MainWindow(object):
 		if saveCode == 1: saveFile = self.logFile
 		if saveCode == 2: saveFile = self.errorFile
 		if (len(self.preflightPrefix) != 0):
-			if os.path.isfile(self.basedir+saveFile):
-				if not os.path.exists(self.basedir+self.preflightPrefix):
-					os.makedirs(os.path.dirname(self.basedir+self.preflightPrefix+saveFile))
-				os.rename(self.basedir+saveFile, self.basedir+self.preflightPrefix+saveFile)
+			if os.path.isfile(self.basedir+'/'+self.project+'/'+saveFile):
+				if not os.path.exists(self.basedir+'/'+self.project+'/'+self.preflightPrefix):
+					os.makedirs(os.path.dirname(self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile))
+				#os.rename(self.basedir+'/'+self.project+'/'+saveFile, self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile)
+				shutil.move(self.basedir+'/'+self.project+'/'+saveFile,\
+					self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile)
+				#os.remove(self.basedir+'/'+self.project+'/'+saveFile)
+				#os.remove(self.basedir+'/'+self.project+'/'+saveFile)
 				
-		if not os.path.isfile(self.basedir+self.preflightPrefix+saveFile):
-			if not os.path.exists(self.basedir+self.preflightPrefix):
-				os.makedirs(os.path.dirname(self.basedir+self.preflightPrefix+saveFile))
-			if(header == ''):
-				with open(self.basedir+self.preflightPrefix+saveFile, 'a') as f:
+		if not os.path.isfile(self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile):
+			if not os.path.exists(self.basedir+'/'+self.project+'/'+self.preflightPrefix):
+				os.makedirs(os.path.dirname(self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile))
+			if(header != ''):
+				with open(self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile, 'a') as f:
 					f.write(header)
 				
-		with open(self.basedir+self.preflightPrefix+saveFile,'a') as f:
+		with open(self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile,'a') as f:
 			f.write(data)
 		#os.rename("path/to/current/file.foo", "path/to/new/desination/for/file.foo")
 		#shutil.move("path/to/current/file.foo", "path/to/new/destination/for/file.foo")
 
-		self.currentfile.setText(str(self.basedir+self.preflightPrefix+self.dataFile))
+		self.currentfile.setText(str(self.basedir+'/'+self.project+'/'+self.preflightPrefix+self.dataFile))
 
 
 	def syncSliders(self, MainWindow):
@@ -1262,25 +1288,61 @@ class Ui_MainWindow(object):
 				.value()/10.0))
 				
 		for i in range(0,len(self.flowedit)):
+			#print(MainWindow.findChild(QtWidgets.QSlider,self.flowedit[i]+'Slider').value()/10.0)
 			MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[i])\
 				.setText(str(MainWindow.findChild(QtWidgets.QSlider,self.flowedit[i]+'Slider')\
 				.value()/10.0))
+
+		MainWindow.findChild(QtWidgets.QLineEdit,'delay')\
+			.setText(str(MainWindow.findChild(QtWidgets.QSlider,'delaySlider')\
+			.value()/10.0))
+
+		MainWindow.findChild(QtWidgets.QLineEdit,'offset')\
+			.setText(str(MainWindow.findChild(QtWidgets.QSlider,'offsetSlider')\
+			.value()/10.0))
+
+		MainWindow.findChild(QtWidgets.QLineEdit,'cvf3cw')\
+			.setText(str(MainWindow.findChild(QtWidgets.QSlider,'cvf3cwSlider')\
+			.value()/10.0))
+
+		#self.updateSliders(MainWindow)
 				
 	def updateSliders(self, MainWindow):
 		for i in range(0, len(self.flowedit)):
-			try:
+			#try:
+			#print(MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[1]).text())
+			try:			
 				MainWindow.findChild(QtWidgets.QSlider,self.flowedit[i]+'Slider')\
 					.setValue(int(float(MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[i]).text())*10.0))
 			except: pass
 			try:
 				self.internalFlows[i] = float(MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[i]).text())
+				#print(self.internalFlows[i])			
 			except: pass
+			#	print("There was an error")
 		for i in range(0, len(self.cvfManVoltLabels)):
 			try:
 				MainWindow.findChild(QtWidgets.QSlider,self.cvfManVoltLabels[i]+'Slider')\
 					.setValue(int(float(MainWindow.findChild(QtWidgets.QLineEdit,self.cvfManVoltLabels[i]).text())*10.0))
 			except:
 				pass
+
+		try:
+			MainWindow.findChild(QtWidgets.QSlider,'delaySlider')\
+				.setValue(int(float(MainWindow.findChild(QtWidgets.QLineEdit,'delay').text())*10.0))
+		except: pass
+
+		try:
+			MainWindow.findChild(QtWidgets.QSlider,'offsetSlider')\
+				.setValue(int(float(MainWindow.findChild(QtWidgets.QLineEdit,'offset').text())*10.0))
+		except: pass
+
+		try:
+			MainWindow.findChild(QtWidgets.QSlider,'cvf3cwSlider')\
+				.setValue(int(float(MainWindow.findChild(QtWidgets.QLineEdit,'cvf3cw').text())*10.0))
+		except: pass
+
+
 				
 	#Function for loading program defaults from base path
 	def loadprogramdefaults(self, MainWindow):
@@ -1379,8 +1441,11 @@ class Ui_MainWindow(object):
 
 			#External instrument addition/removal parameters
 			self.cvf3cw.setText(programdefaultstrings[10].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))
+			self.cvf3cwSlider.setValue(int(float(programdefaultstrings[10].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))*10.0))
 			self.offset.setText(programdefaultstrings[11].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))
+			self.offsetSlider.setValue(int(float(programdefaultstrings[11].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))*10.0))
 			self.delay.setText(programdefaultstrings[12].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))
+			self.delaySlider.setValue(int(float(programdefaultstrings[12].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))*10.0))
 			
 			#Full external instrument configurations
 			for i in range(0,4):
@@ -1538,6 +1603,10 @@ class Ui_MainWindow(object):
 			self.v2.setChecked(self.initialValvePositions[1])
 			self.v3.setChecked(self.initialValvePositions[2])
 			self.v4.setChecked(self.initialValvePositions[3])
+			self.auxdev1.setChecked(self.initialValvePositions[0])
+			self.auxdev2.setChecked(self.initialValvePositions[1])
+			self.auxdev3.setChecked(self.initialValvePositions[2])
+			self.auxdev4.setChecked(self.initialValvePositions[3])
 
 		time.sleep(3)
 		self.devinstruct.setText("The valves have been reverted to their original state")
@@ -1896,12 +1965,20 @@ class Ui_MainWindow(object):
 		#self.cvfx3wr.setDisabled(self.flowsource.isChecked())
 		#self.cvfx4wr.setDisabled(self.flowsource.isChecked())
 		#self.cvf1wr.setDisabled(self.flowsource.isChecked())
-		if self.flowio.isChecked() : self.flowio.setText("Flow ON")
-		else: self.flowio.setText("Flow OFF")
-		if self.cvimode.isChecked() : self.cvimode.setText("Mode: Total")
-		else: self.cvimode.setText("Mode: CVI")
-		if self.valvesource.isChecked(): self.valvesource.setText("Calculated")
-		else: self.valvesource.setText("User Input")
+		if self.flowio.isChecked() : 
+			self.flowio.setText("Flow ON")
+			self.flowio.setStyleSheet("background-color: lightgreen")
+		else: 
+			self.flowio.setText("Flow OFF")
+			self.flowio.setStyleSheet("background-color: red")
+		if self.cvimode.isChecked() : 
+			self.cvimode.setText("Mode: Total")
+		else: 
+			self.cvimode.setText("Mode: CVI")
+		if self.valvesource.isChecked(): 
+			self.valvesource.setText("Calculated")
+		else: 
+			self.valvesource.setText("User Input")
 		self.v1.setDisabled(self.valvesource.isChecked())
 		self.v2.setDisabled(self.valvesource.isChecked())
 		self.v3.setDisabled(self.valvesource.isChecked())
@@ -1917,8 +1994,12 @@ class Ui_MainWindow(object):
 
 		for i in range(0,len(self.signalnulls)):
 			tmpobject = MainWindow.findChild(QtWidgets.QPushButton,'Null'+str(i))
-			if not tmpobject.isChecked(): tmpobject.setText("Active")
-			else: tmpobject.setText("Disabled")
+			if not tmpobject.isChecked(): 
+				tmpobject.setText("Active")
+				tmpobject.setStyleSheet("background-color: lightgreen")
+			else: 
+				tmpobject.setText("Disabled")
+				tmpobject.setStyleSheet("background-color: red")
 			
 	#Function runs when the "connect" button is clicked
 	#Establishes server in separate thread for receiving data
@@ -2244,8 +2325,10 @@ class IncomingServer(asyncio.Protocol):
 					if cvfxdatatype[i] == 1 : calibrated[i+6] = calibrated[i+6]*(calibrated[10]/1013.23)*(294.26/(cvfxtemp[i]+273.15)) #calibrated[10] is cvpcn				
 
 			#Calibration of opc_data parameters and cvfx4
-			opc_flow = C0[5] + opc_data[1]*C1[5] #opc_data[1] corresponds to opc_flow_raw	
-			calibrated[5] = opc_flow*(calibrated[10]/1013.23)*(294.26/(cvfxtemp[1]+273.15)) #cvfxtemp[i] corresponds to cvfx6temp (user input)
+			#opc_flow = C0[5] + opc_data[1]*C1[5] #opc_data[1] corresponds to opc_flow_raw	
+			#calibrated[5] = opc_flow*(calibrated[10]/1013.23)*(294.26/(cvfxtemp[1]+273.15)) #cvfxtemp[i] corresponds to cvfx6temp (user input)
+
+			calibrated[5] = C0[5]+C1[5]*data[5]+C2[5]*data[5]**2
 
 			#For nulling of signals
 			for i in range(0,16):
@@ -2378,6 +2461,7 @@ class IncomingServer(asyncio.Protocol):
 	
 			#If lower <= flow <= Upper, flow set point from before, #	Otherwise, recalculate
 			if ui.flowio.isChecked():
+				#print(ui.internalFlows)
 				if (zerocorrectedflows[1] > (ui.internalFlows[0] + 0.05)) or (zerocorrectedflows[1] < (ui.internalFlows[0] - 0.05)) :
 					cvfxnw = ui.internalFlows[0]*(calibrated[10]/1013.25)*(294.26/(calibrated[14]+273.15))
 					ui.internalflowsetpts[0] = (cvfxnw-calcoeffs[3])/calcoeffs[4] #will be 6 and 7 on next iteration.
@@ -2394,7 +2478,7 @@ class IncomingServer(asyncio.Protocol):
 			#CVI MODE AND FLOW ON/OFF OPTIONS
 			if ui.flowio.isChecked() and not ui.cvimode.isChecked() :
 				cfexcess_cor=ui.cfexcess*(calibrated[10]/1013.25)*294.26/(calibrated[14]+273.15)
-				cfsummed=cfexcess_cor + summedflow + calcoeffs[21] - calibrated[5]  #cvoff1 is equivalent to calcoeffs[21]
+				cfsummed=cfexcess_cor + summedflow + calcoeffs[21]# - calibrated[5]  #cvoff1 is equivalent to calcoeffs[21]
 				cvf1wr=( cfsummed - calcoeffs[0])/calcoeffs[1]
 			else: cvf1wr = 0.0
 
@@ -2451,10 +2535,11 @@ class IncomingServer(asyncio.Protocol):
 					#ui.cvfx4wr.setText(str(dataout[4]))
 					#ui.cvf1wr.setText(str(dataout[5]))
 			else:
-				if MainWindow.findChild(QtWidgets.QLineEdit,ui.cvfManVoltLabels[i]).text() != "" :
-					dataout[i+1] = float(MainWindow.findChild(QtWidgets.QLineEdit,ui.cvfManVoltLabels[i]).text())
-				else:
-					dataout[i+1] = 0.00
+				for i in range(0,len(ui.cvfManVoltLabels)):
+					if MainWindow.findChild(QtWidgets.QLineEdit,ui.cvfManVoltLabels[i]).text() != "" :
+						dataout[i+1] = float(MainWindow.findChild(QtWidgets.QLineEdit,ui.cvfManVoltLabels[i]).text())
+					else:
+						dataout[i+1] = 0.00
 				'''
 				if ui.cvfx0wr.text() != "" : dataout[1] = float(ui.cvfx0wr.text())
 				else: dataout[1] = 0.00
