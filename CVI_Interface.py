@@ -12,7 +12,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from multiprocessing import Process
 
 #CVI code for performing all of the data manipulation
-from crunchcvi import *
+#from crunchcvi import *
+import time
+import math
 
 #GUI imports
 from PyQt5.QtGui import *
@@ -50,6 +52,9 @@ import shutil
 ####IF PROGRAM FAILS, RUN COMMAND "lsof -i" and kill the pid associated with python####
 
 class Ui_MainWindow(object):
+	#def _init_(self, parent=None):
+	#	super(Ui_MainWindow, self)._init_(parent)
+	
 	def setupUi(self, MainWindow):
 		MainWindow.setObjectName("MainWindow")
 		self.MainWindow = MainWindow
@@ -232,7 +237,7 @@ class Ui_MainWindow(object):
 			tmpobject.setObjectName(self.flowedit[i])
 			self.tabLayout_1.addWidget(tmpobject, 5+4*i, 5, 2, 5)
 			#tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
-			tmpobject.editingFinished.connect(lambda: self.updateSliders(MainWindow))
+			tmpobject.editingFinished.connect(lambda: self.updateSliders(MainWindow, self.flowedit[i]))
 			#tmpobject.textChanged.connect(lambda: self.updateSliders(MainWindow))
 			
 			tmpobject = QSlider(Qt.Horizontal, self.tab)
@@ -245,6 +250,7 @@ class Ui_MainWindow(object):
 			self.tabLayout_1.addWidget(tmpobject, 7+4*i, 0, 2, 10)
 			#tmpobject.setTracking(False)
 			tmpobject.valueChanged.connect(lambda: self.syncSliders(MainWindow))
+			tmpobject.valueChanged.connect(lambda: self.syncSliders(MainWindow, self.flowedit[i]))
 			
 			
 		#Preflight checklist
@@ -1228,7 +1234,7 @@ class Ui_MainWindow(object):
 		self.CVIreplot()
 		
 		#Create server loop
-		self.server_loop = asyncio.get_event_loop()	
+		#self.server_loop = asyncio.get_event_loop()	
 
 	def preflightChecklist(self, MainWindow):
 		calupdatetext, contupdate = QInputDialog.getText(MainWindow, 'Updating Preflight Prefix', 'Please enter a directory prefix for the flight (e.g. RF01)')		
@@ -1242,13 +1248,13 @@ class Ui_MainWindow(object):
 			self.errorstatus.setText(self.mainerrorlist[errorCode])
 		elif not self.mainerrorlist[errorCode] in self.errorstatus.toPlainText():
 			self.errorstatus.append(self.mainerrorlist[errorCode])
-		self.dataSave(2, time.strftime("%x %X\t")+self.mainerrorlist[errorCode])
+		self.dataSave(2, time.strftime("%x %X\t")+self.mainerrorlist[errorCode]+'\n')
 		#self.dataSave(2, self.mainerrorlist[errorCode])			
 		
 	def mainLog(self, logCode):
 		self.mainstatus.append('\n')
 		self.mainstatus.append(time.strftime("%x %X\t")+self.mainstatuslist[logCode])
-		self.dataSave(1, time.strftime("%x %X\t")+self.mainstatuslist[logCode])
+		self.dataSave(1, time.strftime("%x %X\t")+self.mainstatuslist[logCode]+'\n')
 		
 	def dataSave(self, saveCode, data, header=''):
 		if saveCode == 0: saveFile = self.dataFile
@@ -1279,19 +1285,29 @@ class Ui_MainWindow(object):
 		self.currentfile.setText(str(self.basedir+'/'+self.project+'/'+self.preflightPrefix+self.dataFile))
 
 
-	def syncSliders(self, MainWindow):
+	def syncSliders(self, MainWindow, widget = None):
 		#print(str(self.cvfx0wrSlider.value()))
 		#self.cvfx0wr.setText(str(self.cvfx0wrSlider.value()))
+
 		for i in range(0,len(self.cvfManVoltLabels)):
 			MainWindow.findChild(QtWidgets.QLineEdit,self.cvfManVoltLabels[i])\
 				.setText(str(MainWindow.findChild(QtWidgets.QSlider,self.cvfManVoltLabels[i]+'Slider')\
 				.value()/10.0))
-				
+		
+		#if widget != None:
+		#	MainWindow.findChild(QtWidgets.QLineEdit,widget)\
+		#		.setText(str(MainWindow.findChild(QtWidgets.QSlider,widget+'Slider')\
+		#		.value()/10.0))
+
 		for i in range(0,len(self.flowedit)):
 			#print(MainWindow.findChild(QtWidgets.QSlider,self.flowedit[i]+'Slider').value()/10.0)
 			MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[i])\
 				.setText(str(MainWindow.findChild(QtWidgets.QSlider,self.flowedit[i]+'Slider')\
 				.value()/10.0))
+
+		#for i in range(0,len(self.flowedit)):
+		#	self.internalFlows[i] = float(MainWindow.findChild(QtWidgets.QSlider,self.flowedit[i]+'Slider')\
+		#		.value()/10.0)
 
 		MainWindow.findChild(QtWidgets.QLineEdit,'delay')\
 			.setText(str(MainWindow.findChild(QtWidgets.QSlider,'delaySlider')\
@@ -1307,18 +1323,35 @@ class Ui_MainWindow(object):
 
 		#self.updateSliders(MainWindow)
 				
-	def updateSliders(self, MainWindow):
+	def updateSliders(self, MainWindow, widget = None):
 		for i in range(0, len(self.flowedit)):
 			#try:
-			#print(MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[1]).text())
+				#print(MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[1]).text())
 			try:			
 				MainWindow.findChild(QtWidgets.QSlider,self.flowedit[i]+'Slider')\
 					.setValue(int(float(MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[i]).text())*10.0))
 			except: pass
+
 			try:
-				self.internalFlows[i] = float(MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[i]).text())
-				#print(self.internalFlows[i])			
+				self.internalFlows[i] = float(MainWindow.findChild(QtWidgets.QSlider,self.flowedit[i]+'Slider')\
+					.value()/10.0)
 			except: pass
+
+		#if widget != None:
+		#try:
+		#	MainWindow.findChild(QtWidgets.QSlider,widget+'Slider')\
+		#		.setValue(int(float(MainWindow.findChild(QtWidgets.QLineEdit,widget).text())*10.0))
+		#except: pass
+		#try:
+		#	self.internalFlows[i] = float(MainWindow.findChild(QtWidgets.QSlider, widget+'Slider')\
+		#		.value()/10.0)
+		#except: pass
+
+
+			#try:
+			#	self.internalFlows[i] = float(MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[i]).text())
+			#	#print(self.internalFlows[i])			
+			#except: pass
 			#	print("There was an error")
 		for i in range(0, len(self.cvfManVoltLabels)):
 			try:
@@ -2009,19 +2042,30 @@ class Ui_MainWindow(object):
 		#Check to make sure that connection was not attempted multiple times in succession
 		#self.disconnecting(MainWindow)
 		
-		self.connect.setDisabled(True)
-		self.disconnect.setDisabled(True)
+		#self.connect.setDisabled(True)
+		#self.disconnect.setDisabled(True)
 		self.statusindicatorlabel.setText("Ensuring Disconnection . . . . . . . ")
 		self.statusindicatorlabel.setText("Initiating Connection . . . . . . . .")
 		self.runconnection = True
 		
 		#asyncio.ensure_future(self.server_loop_in_thread)
 		
+		#Create server loop
+		self.server_loop = asyncio.get_event_loop()
+
 		#Implement parallel thread for server	
 		self.server_thread = threading.Thread(target=self.server_loop_in_thread, args = ())#args = (self,))#, args=(loop,))
 		#self.server_thread = Process(target=self.server_loop_in_thread, args = ())
+		#self.server_thread.daemon = True
 		self.server_thread.start()			
 		
+		#self.server_coro = self.server_loop.create_server(IncomingServer,'',int(self.portin.text()))
+		#self.server_coro.finished.connect(app.exit)
+		#self.server_coro.start()
+		
+		#asyncio.get_event_loop().create_server(IncomingServer,'',int(self.portin.text()))
+
+
 		#Update network status indicator
 		self.statusindicatorlabel.setText("Incoming data server has been established")	
 		
@@ -2054,6 +2098,7 @@ class Ui_MainWindow(object):
 			#Display success message
 			self.statusindicatorlabel.setText("Disconnect Successful")
 			self.runconnection = False
+			self.disconnect.setDisabled(True)
 			
 	#function for replotting the data based on which data
 	#selection has been chosen
@@ -2103,6 +2148,15 @@ class Ui_MainWindow(object):
 		#Force GUI to update display
 		app.processEvents()
 
+	#def closeEvent(self, event):
+	#	reply = QtGui.QMessageBox.warning(MainWindow, 'WARNING',\
+	#		 "Are you sure you want to close the program?", QtGui.QMessageBox.Yes, \
+	#		QtGui.QMessageBox.No)#, QtGui.QMessageBox.Warning)
+	#	if not reply:
+	#		event.ignore()
+
+
+
 #Class for listening for client connections from the DSM
 class IncomingServer(asyncio.Protocol):
 	def connection_made(self, transport):
@@ -2113,12 +2167,14 @@ class IncomingServer(asyncio.Protocol):
 		When the connection is closed, connection_lost() is called.
 		'''
 		self.peername = transport.get_extra_info('peername')
-		#print('Connection from {}'.format(peername))
+		#print('Connection from {}'.format(self.peername))
 		self.transport = transport
+		#print(self.transport)
 		
 		#Now that the DSM has connected, a client can be established
 		#to send data back to the DSM
 		self.client_sock = socket.socket()
+
 		self.client_sock.connect((ui.ipaddress.text(), int(ui.portout.text())))	
 
 		
@@ -2131,13 +2187,15 @@ class IncomingServer(asyncio.Protocol):
 		
 		#Update status indicator to show connection
 		#print('Data received: {!r}'.format(message))
-		ui.statusindicatorlabel.setText('Data is being received from {}'.format(self.peername))
+		try: ui.statusindicatorlabel.setText('Data is being received from {}'.format(self.peername))
+		except: pass
 		
 		#Decode data into a string
 		datain = data.decode(encoding='utf-8')
 		
 		#Update front panel with data that has just been received
-		ui.datafromdsm.setText(str(datain).replace(",", ", "))
+		try: ui.datafromdsm.setText(str(datain).replace(",", ", "))
+		except: pass
 		
 		#Null string just in case
 		dataout = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -2233,12 +2291,13 @@ class IncomingServer(asyncio.Protocol):
 					else:
 						tmpobject = ui.MainWindow.findChild(QtWidgets.QPushButton,'cvfx'+str(i+5)+ui.auxdevtoggleslist[j])
 						ui.cvfxoptions[j][i] = int(tmpobject.isChecked())
-				
+
 			#Connection status of individual channels	
 			ui.cvfxoptions[0][0] = int(ui.v1.isChecked())
 			ui.cvfxoptions[0][1] = int(ui.v2.isChecked())
 			ui.cvfxoptions[0][2] = int(ui.v3.isChecked())
 			ui.cvfxoptions[0][3] = int(ui.v4.isChecked())
+
 
 			'''
 				PRIMARY COMPUTATION
@@ -2657,10 +2716,12 @@ class IncomingServer(asyncio.Protocol):
 		#	header text box on display
 		#except:
 		except:#else:
-			if datain[0] == 'N' :
-				ui.dsmheader.setText(str(datain))
-			else:
-				ui.errorHandler(3)
+			try:
+				if datain[0] == 'N' :
+					ui.dsmheader.setText(str(datain))
+				else:
+					ui.errorHandler(3)
+			except:	pass
 			
 		#Kept for testing purposes; however, unecessary with DSM
 		#Removed because CVI does not need an echo.
@@ -2674,7 +2735,8 @@ class IncomingServer(asyncio.Protocol):
 		The argument is an exception object or None (the latter
 		meaning a regular EOF is received or the connection was aborted or closed).
 		'''
-		ui.statusindicatorlabel.setText('Connection Lost!!')
+		try: ui.statusindicatorlabel.setText('Connection Lost!!')
+		except: pass
 		#ui.server.close()
 		#ui.disconnecting(MainWindow)
 			
@@ -2696,4 +2758,5 @@ if __name__ == "__main__":
 	#asyncio.ensure_future(app.exec_())
 	#asyncio.ensure_future(ui.server_loop_in_thread)	
 	#loop.run_forever() 
+	#app.exec_()
 	sys.exit(app.exec_())
