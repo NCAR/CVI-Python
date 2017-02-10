@@ -55,7 +55,10 @@ import shutil
 
 ####IF PROGRAM FAILS, RUN COMMAND "lsof -i" and kill the pid associated with python####
 
-class Ui_MainWindow(object):
+class Ui_MainWindow(QObject):
+
+	dataReceived = pyqtSignal(object,object)
+
 	#def _init_(self, parent=None):
 	#	super(Ui_MainWindow, self)._init_(parent)
 	
@@ -1228,14 +1231,14 @@ class Ui_MainWindow(object):
 		self.runconnection = False
 		
 		#Create default data array for plotting from
-		self.plotdata = np.c_[[-9999]*(self.dropdownlist.count()+1)]#np.c_[[np.nan]*4]
-		self.tabledata = np.c_[[-9999]*(len(self.tablerowlabels)),[-9999]*(len(self.tablerowlabels)),[-9999]*len(self.tablerowlabels)]
-		self.rawInOutData = np.c_[[-9999]*(len(self.rawtablerowlabels)),[-9999]*(len(self.rawtablerowlabels))]
-		self.dim = self.plotdata.shape
+		#self.plotdata = np.c_[[-9999]*(self.dropdownlist.count()+1)]#np.c_[[np.nan]*4]
+		#self.tabledata = np.c_[[-9999]*(len(self.tablerowlabels)),[-9999]*(len(self.tablerowlabels)),[-9999]*len(self.tablerowlabels)]
+		#self.rawInOutData = np.c_[[-9999]*(len(self.rawtablerowlabels)),[-9999]*(len(self.rawtablerowlabels))]
+		#self.dim = self.plotdata.shape
 		
 		#Force selection change on the plot to the default to
 		#Initialize title and axes
-		self.CVIreplot()
+		#self.CVIreplot()
 		
 		#Create server loop
 		#self.server_loop = asyncio.get_event_loop()	
@@ -1505,8 +1508,8 @@ class Ui_MainWindow(object):
 		self.devdisconnect.hide()
 		
 		#Disables other tabs to prevent interference
-		self.tabWidget.setTabEnabled(0, False)
-		self.tabWidget.setTabEnabled(1, False)
+		#self.tabWidget.setTabEnabled(0, False)
+		#self.tabWidget.setTabEnabled(1, False)
 		
 		#Updates temporary instrument i/o buttons with actual states
 		self.auxdev1.setChecked(self.v1.isChecked())
@@ -2061,106 +2064,20 @@ class Ui_MainWindow(object):
 #		self.server_thread = threading.Thread(target=self.server_loop_in_thread, args = ())#args = (self,))#, args=(loop,))
 		###self.server_thread = Process(target=self.server_loop_in_thread, args = ())
 		###self.server_thread.daemon = True
-#		self.server_thread.start()
+#		self.server_thread.start()	
 		
-		#asyncio.set_event_loop(self.server_loop)
-		#self.server_coro = self.server_loop.create_server(IncomingServer, '', int(self.portin.text()))#(self.hostin.text()),int(self.portin.text()))#'127.0.0.1',8888)
+		self.CVI_Server = myServer()
+		self.CVI_Server.start()
 		
-		#self.server_coro = loop.create_server(IncomingServer,'',int(self.portin.text()))
-		#loop.run_forever()
-		
-		#self.server = self.server_loop.run_until_complete(self.server_coro)#greet_every_two_seconds)#self.coro)#greet_every_two_seconds())
-		#self.server_loop.run_until_complete(server.wait_closed())
-		#self.server_loop.run_forever() #Is this necessary?
-		#loop.run_until_complete(self.server_coro)#self.server_coro)
-		#loop.run_forever()
-
-		#def incomingConnection(self, socketId):
-		#self.thread = Thread(IncomingServer, self)
-		#self.thread = Thread(#IncomingServer()
-		#self.thread.start()
-		
-		#self.tcpServer = TcpServer()
-		#self.tcpServer.listen(QHostAddress(''),30005)
-		
-		#Server().StartServer()
-
-		#testthread = ServerThread()
-		#testthread.finished.connect(app.exit)
-		#testthread.start()
-		#testthread.run()
-		
-#		self.tcpServer = TcpServer()#self)
-#		if not self.tcpServer.listen(QHostAddress(''),30005):#QHostAddress.LocalHost, 30005):
-#			QMessageBox.critical(self, "Threaded Server",
-#					"Failed to start server: {}".format(
-#					self.tcpServer.errorString()))
-#			self.close()
-#			return
-		
-		#self.tcpServer = TcpServer()#self)
-		
-		#self.server_coro = self.server_loop.create_server(IncomingServer,'',int(self.portin.text()))
-		#self.server_coro.finished.connect(app.exit)
-		#self.server_coro.start()
-		
-		#asyncio.get_event_loop().create_server(IncomingServer,'',int(self.portin.text()))
-
-		#self.thready = Server().StartServer()
-		
-	#	print('spawning remote thread')
-	#	#self.newRemoteLines.connect(self.routeServerLines)
-	#	#self.connect(self, QtCore.SIGNAL('newRemoteLines'), self.routeServerLines)
-	#	self.thready = GenericThread(self.remoteConn)
-	#	self.thready.start()
-	#	print('thread started')
-		
-		
-		self.servery = myServer()
-		self.servery.start()
-		
-	#	self.server = FortuneServer()
-	#	self.server.listen(QHostAddress(''), 30005)
-		#if not self.server.listen(QHostAddress(''), 30005):#QHostAddress.LocalHost, 30005):#()
-		#	QtGui.QMessageBox.critical(self, "Threaded Fortune Server",
-		#			"Unable to start the server: %s." % self.server.errorString())
-		#	self.close()
-		#	return
-		
+		self.dataReceived.connect(self.processData)
+	
 		#Update network status indicator
 		self.statusindicatorlabel.setText("Incoming data server has been established")	
 		
 		#Timer for establishing plotting frequency
-		timer.timeout.connect(self.CVIreplot)
-		timer.start(300)		
-		
-	'''
-	def remoteConn(self, HOST='', PORT=30005):
-		#import socket
-		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		s.connect((HOST, PORT))
-		newLinesRaw = ''
-		#while 1:
-		#	newData = s.recv(1024)
-		#	if newData:
-		#		print('<rawData>\n', newData, '\n</newData>\n')
-		#		newLinesRaw += newData
-		#	else:
-		#		if newLinesRaw:
-		#			newLines = newLinesRaw.split('\n')
-		#			print('\nNew Lines:\n', newLines)
-		#			#self.emit(QtCore.SIGNAL('newRemoteLines'), newLines)
-		#			newLinesRaw=''
-		#		else:
-		#			time.sleep(.1)
-		#s.close()
-	'''
-	
-	#@asyncio.coroutine
-	#def task_1(futue_1):
-	#	for i in range(50):
-	#		window.results_window.setText("task_1")
-	#		yield from asyncio.sleep(.1)	
+		#timer.timeout.connect(self.CVIreplot)
+		#timer.start(300)		
+
 		
 	#Server code to be established in parallel thread
 	def server_loop_in_thread(self):
@@ -2179,11 +2096,15 @@ class Ui_MainWindow(object):
 			self.statusindicatorlabel.setText("Initiating Disconnect . . . . . . .")
 
 			#Close the server
-			self.server_loop.stop()
-			self.server.close()
-			self.server_thread.join()
+		#	self.server_loop.stop()
+		#	self.server.close()
+		#	self.server_thread.join()
 			#self.server_loop.run_until_complete(self.server.wait_closed())
-			
+		
+			#del(self.CVI_Server)
+			self.CVI_Server.release
+			#del(self.CVI_Server)
+		
 			#Display success message
 			self.statusindicatorlabel.setText("Disconnect Successful")
 			self.runconnection = False
@@ -2244,16 +2165,13 @@ class Ui_MainWindow(object):
 	#	if not reply:
 	#		event.ignore()
 
-#PORT = 30005
-#SIZEOF_UINT16 = 2
 
-
-	def processData(self, datain):
-		try: ui.statusindicatorlabel.setText('Data is being received from {}'.format(self.peername))
+	def processData(self, datain, client_sock = ''):
+		try: self.statusindicatorlabel.setText('Data is being received from {}'.format(self.peername))
 		except: pass
 		
 		#Update front panel with data that has just been received
-		try: ui.datafromdsm.setText(str(datain).replace(",", ", "))
+		try: self.datafromdsm.setText(str(datain).replace(",", ", "))
 		except: pass
 		
 		#Null string just in case
@@ -2269,31 +2187,31 @@ class Ui_MainWindow(object):
 			#	The first 16 rows contain C0, C1, C2 in their respective columns
 			#	The next 5 rows contain RHOD, CVTBL, CVTBR, cvoff1, and LTip in the first column
 			#	The next 4 rows contain C0, C1, C2, and C3
-			C0 = np.r_[ui.calvalues[:16,0,ui.calversionlist.currentIndex()]]
-			C1 = np.r_[ui.calvalues[:16,1,ui.calversionlist.currentIndex()]]
-			C2 = np.r_[ui.calvalues[:16,2,ui.calversionlist.currentIndex()]]
-			more = np.r_[ui.calvalues[16:21,0,ui.calversionlist.currentIndex()]]
-			tdl_cals = np.c_[ui.calvalues[21:25,0,ui.calversionlist.currentIndex()], ui.calvalues[21:25,1,ui.calversionlist.currentIndex()], ui.calvalues[21:25,2,ui.calversionlist.currentIndex()], ui.calvalues[21:25,3,ui.calversionlist.currentIndex()]]
-			opc_cals = np.r_[ui.calvalues[25,0,ui.calversionlist.currentIndex()],ui.calvalues[25,1,ui.calversionlist.currentIndex()]]
+			C0 = np.r_[self.calvalues[:16,0,self.calversionlist.currentIndex()]]
+			C1 = np.r_[self.calvalues[:16,1,self.calversionlist.currentIndex()]]
+			C2 = np.r_[self.calvalues[:16,2,self.calversionlist.currentIndex()]]
+			more = np.r_[self.calvalues[16:21,0,self.calversionlist.currentIndex()]]
+			tdl_cals = np.c_[self.calvalues[21:25,0,self.calversionlist.currentIndex()], self.calvalues[21:25,1,self.calversionlist.currentIndex()], self.calvalues[21:25,2,self.calversionlist.currentIndex()], self.calvalues[21:25,3,self.calversionlist.currentIndex()]]
+			opc_cals = np.r_[self.calvalues[25,0,self.calversionlist.currentIndex()],self.calvalues[25,1,self.calversionlist.currentIndex()]]
 			tdl_cals = np.transpose(tdl_cals)
 			####MAY NEED TO TRANSPOSE TDL_CALS######
 			
 			#File operations for "rollover" file. File is used to carry previous data
 			#	from prior program runs to replace "bad" data with previously "good" data
-			if not os.path.isfile(ui.basedir+ui.tmpfile):
+			if not os.path.isfile(self.basedir+self.tmpfile):
 				#Formats data in a good way to be saved
 				rolloverinput = input
 				inputstring = [ "{:11.10g}".format(x) for x in rolloverinput ]
 				inputstring = ','.join(inputstring)
 				inputstring += '\n'
 				#Create rollover file since it does not already exist
-				os.makedirs(os.path.dirname(ui.basedir+ui.tmpfile), exist_ok=True)
-				with open(ui.basedir+ui.tmpfile, "w") as f:
+				os.makedirs(os.path.dirname(self.basedir+self.tmpfile), exist_ok=True)
+				with open(self.basedir+self.tmpfile, "w") as f:
 					f.write(inputstring)
 					f.close()
 			#If file already exists, grab previous data to potentially overwrite with
 			else:
-				with open(ui.basedir + ui.tmpfile, "rb") as f:
+				with open(self.basedir + self.tmpfile, "rb") as f:
 					first = f.readline()      # Read the first line.
 					f.close()
 				rolloverinput = first.decode('utf-8').split(',')#('\t')
@@ -2322,7 +2240,7 @@ class Ui_MainWindow(object):
 			inputstring = ','.join(inputstring)
 			inputstring += '\n'
 			#Open file and write rollover data
-			with open(ui.basedir+ui.tmpfile, "w") as f:
+			with open(self.basedir+self.tmpfile, "w") as f:
 				f.write(inputstring)
 				f.close()
 			
@@ -2333,29 +2251,29 @@ class Ui_MainWindow(object):
 			
 			#Taking the null signals from the display
 			nullsignals = [0]*16
-			for i in range(0,len(ui.signalnulls)):
-				nullsignals[i] = int(ui.MainWindow.findChild(QtWidgets.QPushButton,"Null"+str(i)).isChecked())
+			for i in range(0,len(self.signalnulls)):
+				nullsignals[i] = int(self.MainWindow.findChild(QtWidgets.QPushButton,"Null"+str(i)).isChecked())
 
 			#Taking the internal instrument flows from the display
 			#for i in range(0,4):
-				#if ui.MainWindow.findChild(QtWidgets.QLineEdit,ui.flowedit[i]).text() != '': 
-					#ui.flowlimits[i] = float(ui.MainWindow.findChild(QtWidgets.QLineEdit,ui.flowedit[i]).text())
+				#if self.MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[i]).text() != '': 
+					#self.flowlimits[i] = float(self.MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[i]).text())
 				
 			#Taking the instrument configuration data from the display
 			for i in range(0,4):
-				for j in range(1,len(ui.auxdevtoggleslist)):
+				for j in range(1,len(self.auxdevtoggleslist)):
 					if j in [0,2,5]:
-						tmpobject = ui.MainWindow.findChild(QtWidgets.QLineEdit,'cvfx'+str(i+5)+ui.auxdevtoggleslist[j])
-						if tmpobject.text() != '': ui.cvfxoptions[j][i] = float(tmpobject.text())
+						tmpobject = self.MainWindow.findChild(QtWidgets.QLineEdit,'cvfx'+str(i+5)+self.auxdevtoggleslist[j])
+						if tmpobject.text() != '': self.cvfxoptions[j][i] = float(tmpobject.text())
 					else:
-						tmpobject = ui.MainWindow.findChild(QtWidgets.QPushButton,'cvfx'+str(i+5)+ui.auxdevtoggleslist[j])
-						ui.cvfxoptions[j][i] = int(tmpobject.isChecked())
+						tmpobject = self.MainWindow.findChild(QtWidgets.QPushButton,'cvfx'+str(i+5)+self.auxdevtoggleslist[j])
+						self.cvfxoptions[j][i] = int(tmpobject.isChecked())
 
 			#Connection status of individual channels	
-			ui.cvfxoptions[0][0] = int(ui.v1.isChecked())
-			ui.cvfxoptions[0][1] = int(ui.v2.isChecked())
-			ui.cvfxoptions[0][2] = int(ui.v3.isChecked())
-			ui.cvfxoptions[0][3] = int(ui.v4.isChecked())
+			self.cvfxoptions[0][0] = int(self.v1.isChecked())
+			self.cvfxoptions[0][1] = int(self.v2.isChecked())
+			self.cvfxoptions[0][2] = int(self.v3.isChecked())
+			self.cvfxoptions[0][3] = int(self.v4.isChecked())
 
 
 			'''
@@ -2371,7 +2289,7 @@ class Ui_MainWindow(object):
 			#############################################################################
 			
 			#OLD REFERENCE FOR WHEN COMPUTATION ROUTINE WAS SEPARATE
-			#output, calibrated = cvioutput( input , ui.flowlimits, ui.cfexcess, ui.cvfxoptions, nullsignals, ui.flowio.isChecked(), ui.cvimode.isChecked(), C0, C1, C2, more, tdl_cals, opc_cals)
+			#output, calibrated = cvioutput( input , self.flowlimits, self.cfexcess, self.cvfxoptions, nullsignals, self.flowio.isChecked(), self.cvimode.isChecked(), C0, C1, C2, more, tdl_cals, opc_cals)
 			
 			
 			'''
@@ -2430,8 +2348,8 @@ class Ui_MainWindow(object):
 			#cvfxtemp ~ default temps; #cvfxtempsource ~ 1 is cnt1, 0 usrinput; 
 			#	cvfsw ~ is instrument connected; cvfxmode ~ 1 is calculated, 0 is usrinput;  
 			#	cvfxdatatype ~ 0 is Mass, 1 is Volume; #cvfxalt ~ USER INPUT FLOWS		
-			cvfxtemp = ui.cvfxoptions[5][:]; cvfxtempsource = ui.cvfxoptions[4][:]; cvfxsw = ui.cvfxoptions[0][:]
-			cvfxmode = ui.cvfxoptions[1][:]; cvfxalt = ui.cvfxoptions[2][:]; cvfxdatatype = ui.cvfxoptions[3][:]	
+			cvfxtemp = self.cvfxoptions[5][:]; cvfxtempsource = self.cvfxoptions[4][:]; cvfxsw = self.cvfxoptions[0][:]
+			cvfxmode = self.cvfxoptions[1][:]; cvfxalt = self.cvfxoptions[2][:]; cvfxdatatype = self.cvfxoptions[3][:]	
 	
 			#Modifications to the flow based on if there are data, mass vs. volume input, etc.
 			for i in range(0,4):
@@ -2578,24 +2496,24 @@ class Ui_MainWindow(object):
 			cvcnc01 = cvcnc1/cvcfact
 	
 			#If lower <= flow <= Upper, flow set point from before, #	Otherwise, recalculate
-			if ui.flowio.isChecked():
-				#print(ui.internalFlows)
-				if (zerocorrectedflows[1] > (ui.internalFlows[0] + 0.05)) or (zerocorrectedflows[1] < (ui.internalFlows[0] - 0.05)) :
-					cvfxnw = ui.internalFlows[0]*(calibrated[10]/1013.25)*(294.26/(calibrated[14]+273.15))
-					ui.internalflowsetpts[0] = (cvfxnw-calcoeffs[3])/calcoeffs[4] #will be 6 and 7 on next iteration.
+			if self.flowio.isChecked():
+				#print(self.internalFlows)
+				if (zerocorrectedflows[1] > (self.internalFlows[0] + 0.05)) or (zerocorrectedflows[1] < (self.internalFlows[0] - 0.05)) :
+					cvfxnw = self.internalFlows[0]*(calibrated[10]/1013.25)*(294.26/(calibrated[14]+273.15))
+					self.internalflowsetpts[0] = (cvfxnw-calcoeffs[3])/calcoeffs[4] #will be 6 and 7 on next iteration.
 				#else: #cvfxwr[0] = 0.0 #Needs to be left as older value. #Nothing is done so flow is as before.
 				#Starting at cvfx2 to cvfx4 (index 2 to 3 on calibrated)
 				for i in range(1,4) : # int i = 1 ; i < 4; i++ ) {
-					if (zerocorrectedflows[i+2] > ui.internalFlows[i] + 0.05) or (zerocorrectedflows[i+2] < ui.internalFlows[i] - 0.05) :
-						cvfxnw = ui.internalFlows[i] * (calibrated[10]/1013.25)*(294.26/(calibrated[14] + 273.15))
+					if (zerocorrectedflows[i+2] > self.internalFlows[i] + 0.05) or (zerocorrectedflows[i+2] < self.internalFlows[i] - 0.05) :
+						cvfxnw = self.internalFlows[i] * (calibrated[10]/1013.25)*(294.26/(calibrated[14] + 273.15))
 						#cvfx0wr = ( cvfxnw – c0cvfx0) / c1cvfx0;
-						ui.internalflowsetpts[i] = ( cvfxnw - calcoeffs[(i+2)*3] ) / calcoeffs[(i+2)*3+1] #will be 9 (12) and 10 (13) on next iteration.			
+						self.internalflowsetpts[i] = ( cvfxnw - calcoeffs[(i+2)*3] ) / calcoeffs[(i+2)*3+1] #will be 9 (12) and 10 (13) on next iteration.			
 					#else : 	#cvfxwr[i] = 0.0; #REPLACE WITH OLDER VALUE
-			else: ui.internalflowsetpts = [0.00]*4
+			else: self.internalflowsetpts = [0.00]*4
 	
 			#CVI MODE AND FLOW ON/OFF OPTIONS
-			if ui.flowio.isChecked() and not ui.cvimode.isChecked() :
-				cfexcess_cor=ui.cfexcess*(calibrated[10]/1013.25)*294.26/(calibrated[14]+273.15)
+			if self.flowio.isChecked() and not self.cvimode.isChecked() :
+				cfexcess_cor=self.cfexcess*(calibrated[10]/1013.25)*294.26/(calibrated[14]+273.15)
 				cfsummed=cfexcess_cor + summedflow + calcoeffs[21]# - calibrated[5]  #cvoff1 is equivalent to calcoeffs[21]
 				cvf1wr=( cfsummed - calcoeffs[0])/calcoeffs[1]
 			else: cvf1wr = 0.0
@@ -2609,7 +2527,7 @@ class Ui_MainWindow(object):
 			output = np.r_[input[0], 0, 0, 0, input[3:19], calibrated[10:16], zerocorrectedflows[:], #ENDS AT INDEX 35, next line is 36
 				cvl, cvrhoo_tdl, cvrho_tdl, cvrad, cvcfact_tdl,  #ENDS AT 40, next line 41
 				cvf3, input[1], cvcnc1, cvcnc01, cvcfact,  cvftc, cvrh, cvdp, #ENDS at 48, next line 49
-				ui.internalflowsetpts[0:4], cvf1wr, input[2], tdl_data[:], opcc, opcco, opc_data[0:2], 
+				self.internalflowsetpts[0:4], cvf1wr, input[2], tdl_data[:], opcc, opcco, opc_data[0:2], 
 				opcc_Pcor, opcco_Pcor, opc_press_mb, input[34:37]]		
 			
 			#############################################################################
@@ -2622,17 +2540,17 @@ class Ui_MainWindow(object):
 
 			#Adjustment to parameter based on number of external
 			#	instrument addition/removals have been made
-			output[3] = ui.numchanges
+			output[3] = self.numchanges
 
 			#cvl is at index 36?, #cvf3 is at index 41, 
 			#	cvfxwr0 is at index 49, #opcc_Pcor is at index 69
-			flowbyte = (2*int(ui.v1.isChecked()))**3+(2*int(ui.v2.isChecked()))**2+(2*int(ui.v3.isChecked()))**1+int(ui.v4.isChecked())
+			flowbyte = (2*int(self.v1.isChecked()))**3+(2*int(self.v2.isChecked()))**2+(2*int(self.v3.isChecked()))**1+int(self.v4.isChecked())
 			output[2] = flowbyte
 			
 			#FLOW OUTPUTS ARE DECIDED IN THE CONNECTION SEQUENCE
 			dataout = np.round(np.r_[ output[0], output[49:54], 
-				int(ui.v1.isChecked()), int(ui.v2.isChecked()), int(ui.v3.isChecked()), int(ui.v4.isChecked()), 
-				int(ui.cvimode.isChecked()), flowbyte, ui.numchanges, 
+				int(self.v1.isChecked()), int(self.v2.isChecked()), int(self.v3.isChecked()), int(self.v4.isChecked()), 
+				int(self.cvimode.isChecked()), flowbyte, self.numchanges, 
 				output[39], output[45], output[47:49], output[37] ],3)
 			
 			zerocorrectedflows = output[26:36]
@@ -2644,42 +2562,49 @@ class Ui_MainWindow(object):
 			#Checked to see if user input or calculated mode is selected
 			#	and proceed to populate output array accordingly
 			#	IF FLOW IS CHECKED, THEN EVERYTHING IS CALCULATED!!!!
-			if ui.flowsource.isChecked():
-				for i in range(0,len(ui.cvfManVoltLabels)):
-					MainWindow.findChild(QtWidgets.QLineEdit,ui.cvfManVoltLabels[i]).setText(str(dataout[i+1]))
-					#ui.cvfx0wr.setText(str(dataout[1]))
-					#ui.cvfx2wr.setText(str(dataout[2]))
-					#ui.cvfx3wr.setText(str(dataout[3]))
-					#ui.cvfx4wr.setText(str(dataout[4]))
-					#ui.cvf1wr.setText(str(dataout[5]))
+			if self.flowsource.isChecked():
+				for i in range(0,len(self.cvfManVoltLabels)):
+					MainWindow.findChild(QtWidgets.QLineEdit,self.cvfManVoltLabels[i]).setText(str(dataout[i+1]))
+					#self.cvfx0wr.setText(str(dataout[1]))
+					#self.cvfx2wr.setText(str(dataout[2]))
+					#self.cvfx3wr.setText(str(dataout[3]))
+					#self.cvfx4wr.setText(str(dataout[4]))
+					#self.cvf1wr.setText(str(dataout[5]))
 			else:
-				for i in range(0,len(ui.cvfManVoltLabels)):
-					if MainWindow.findChild(QtWidgets.QLineEdit,ui.cvfManVoltLabels[i]).text() != "" :
-						dataout[i+1] = float(MainWindow.findChild(QtWidgets.QLineEdit,ui.cvfManVoltLabels[i]).text())
+				for i in range(0,len(self.cvfManVoltLabels)):
+					if MainWindow.findChild(QtWidgets.QLineEdit,self.cvfManVoltLabels[i]).text() != "" :
+						dataout[i+1] = float(MainWindow.findChild(QtWidgets.QLineEdit,self.cvfManVoltLabels[i]).text())
 					else:
 						dataout[i+1] = 0.00
 				'''
-				if ui.cvfx0wr.text() != "" : dataout[1] = float(ui.cvfx0wr.text())
+				if self.cvfx0wr.text() != "" : dataout[1] = float(self.cvfx0wr.text())
 				else: dataout[1] = 0.00
-				if ui.cvfx2wr.text() != "" : dataout[2] = float(ui.cvfx2wr.text())
+				if self.cvfx2wr.text() != "" : dataout[2] = float(self.cvfx2wr.text())
 				else: dataout[2] = 0.00
-				if ui.cvfx3wr.text() != "" : dataout[3] = float(ui.cvfx3wr.text())
+				if self.cvfx3wr.text() != "" : dataout[3] = float(self.cvfx3wr.text())
 				else: dataout[3] = 0.00
-				if ui.cvfx4wr.text() != "" : dataout[4] = float(ui.cvfx4wr.text())
+				if self.cvfx4wr.text() != "" : dataout[4] = float(self.cvfx4wr.text())
 				else: dataout[4] = 0.00
-				if ui.cvf1wr.text() != "" : dataout[5] = float(ui.cvf1wr.text())
+				if self.cvf1wr.text() != "" : dataout[5] = float(self.cvf1wr.text())
 				else: dataout[5] = 0.00	
 				'''
 			
 			#Added for populating raw input/output data table
 			_translate = QtCore.QCoreApplication.translate
-			#for i in range(0,min(len(ui.rawtablerowlabels),len(input))):
-			ui.rawInOutData[:,0] = np.r_[input[i]]
+			#for i in range(0,min(len(self.rawtablerowlabels),len(input))):
+			
+			self.rawInOutData = (np.c_[input, input])
+			#print(self.rawInOutData[0:len(dataout),1])
+			#print(self.rawInOutData)
+			for i in range(0,len(dataout)):
+				self.rawInOutData[i,1] = dataout[i]
+ 			
+			#self.rawInOutData[:,0] = np.r_[input[i]]
 			#for i in range(0,len(dataout)):
-			ui.rawInOutData[:,1] = np.r_[dataout[i]]
+			#self.rawInOutData[:,1] = np.r_[dataout[i]]
 
 			#for i in range(0,len(dataout)):
-			#	item = ui.tableWidget.item(i, 1)
+			#	item = self.tableWidget.item(i, 1)
 			#	item.setText(_translate("MainWindow",str(self.dataout[i])))
 
 			#Sample dataout for testing
@@ -2718,12 +2643,12 @@ class Ui_MainWindow(object):
 			'''
 			
 			#Send off the new data to the DSM
-			#self.client_sock.send(dataout)	
+			if client_sock != '': client_sock.send(dataout)	
 			
 			#Update front panel with data sent to dsm
-			ui.datatodsm.setText(str(dataout).replace(",", ", "))	
+			self.datatodsm.setText(str(dataout).replace(",", ", "))	
 			
-			ui.tabledata = np.c_[input[3:19], calibrated[0:16], np.r_[zerocorrectedflows[:], [np.nan]*6]]
+			self.tabledata = np.c_[input[3:19], calibrated[0:16], np.r_[zerocorrectedflows[:], [np.nan]*6]]
 			try:
 				#If array has -9999 in first slot (i.e. initialized
 				#	but does not contain data), replace data with
@@ -2733,20 +2658,32 @@ class Ui_MainWindow(object):
 				#else add new value to end
 				
 				#SHOULD BE REPLACED WITH EXCEPTION ROUTINE
+				
 				newdata = np.r_[input[0],input[19:22], extra[:]]
 				for i in range(1,len(newdata)):
 					if (newdata[i] <= 0): newdata[i] = np.nan
-				if( ui.dim[1] == 1 and ui.plotdata[0] == -9999 ):
-					ui.plotdata = np.c_[newdata] #Appends the column b onto a
-				elif (ui.dim[1] >= 900):
-					ui.plotdata = np.c_[ui.plotdata[:,-899:], newdata ]
-				else:
-					ui.plotdata = np.c_[ui.plotdata,  newdata]
+				
+				try:
+					try:
+						self.plotdata = np.c_[self.plotdata[:,-899:], newdata]
+					except:
+						self.plotdata = np.c_[self.plotdata, newdata]
+				except:
+					self.plotdata = np.c_[newdata]
+				#newdata = np.r_[input[0],input[19:22], extra[:]]
+				#for i in range(1,len(newdata)):
+				#	if (newdata[i] <= 0): newdata[i] = np.nan
+				#if( self.dim[1] == 1 and self.plotdata[0] == -9999 ):
+				#	self.plotdata = np.c_[newdata] #Appends the column b onto a
+				#elif (self.dim[1] >= 900):
+				#	self.plotdata = np.c_[self.plotdata[:,-899:], newdata ]
+				#else:
+				#	self.plotdata = np.c_[self.plotdata,  newdata]
 			except NameError:
 				print ("There was a problem in the plotting")
-			finally:
+			#finally:
 				#determine size of new array
-				ui.dim = ui.plotdata.shape
+				#self.dim = self.plotdata.shape
 				
 			#Originally had C:\data\
 			#	Appended to project title (i.e. IDEAS2013\)
@@ -2759,15 +2696,15 @@ class Ui_MainWindow(object):
 			outputstring += '\n'
 			
 			#Save data to project path
-			ui.dataSave(0, outputstring, ui.header)
-			#if not os.path.isfile(ui.path+ui.dataFile):
-			#	os.makedirs(os.path.dirname(ui.path+ui.dataFile), exist_ok=True)
-			#	with open(ui.path+ui.dataFile, "w") as f:
-			#		f.write(ui.header)
+			self.dataSave(0, outputstring, self.header)
+			#if not os.path.isfile(self.path+self.dataFile):
+			#	os.makedirs(os.path.dirname(self.path+self.dataFile), exist_ok=True)
+			#	with open(self.path+self.dataFile, "w") as f:
+			#		f.write(self.header)
 			#		f.write(outputstring)
 			#		f.close()
 			#else:
-			#	with open(ui.path+ui.dataFile, "a") as f:
+			#	with open(self.path+self.dataFile, "a") as f:
 			#		f.write(outputstring)
 			#		f.close()
 					
@@ -2777,44 +2714,24 @@ class Ui_MainWindow(object):
 		except:#else:
 			try:
 				if datain[0] == 'N' :
-					ui.dsmheader.setText(str(datain))
+					self.dsmheader.setText(str(datain))
 				else:
-					ui.errorHandler(3)
+					self.errorHandler(3)
 			except:	pass
+		finally:
+			try: self.CVIreplot()
+			except: pass
 			
 		#Kept for testing purposes; however, unecessary with DSM
 		#Removed because CVI does not need an echo.
 		#self.transport.write(data)
 		#print('Close the client socket')
 		#self.transport.close()					
-		
-		
-		
-		
-
-
-class GenericThread(QtCore.QThread):
-	def __init__(self, function, *args, **kwargs):
-		QtCore.QThread.__init__(self)
-		self.function = function
-		self.args = args
-		self.kwargs = kwargs
-
-	def __del__(self):
-		self.wait()
-
-	def run(self):
-		if self.args and self.kwargs:
-			self.function(*self.args,**self.kwargs)
-		elif self.args and not self.kwargs:
-			self.function(*self.args)
-		elif not self.args and self.kwargs:
-			self.function(**self.kwargs)
-		else:
-			self.function()
-		return	
 
 class myServer(QThread):
+	
+	#dataReceived = pyqtSignal()
+
 	#error = QtCore.pyqtSignal(QtNetwork.QTcpSocket.SocketError)
 	#class FortuneServer(QtNetwork.QTcpServer):
 	#def __init__(self, parent=None):
@@ -2827,7 +2744,7 @@ class myServer(QThread):
 		#Then bind() is used to associate the socket with the server address. In this case, the address is localhost, referring to the current server, and the port number is 10000.		
 		# Bind the socket to the port
 		server_address = ('', 30005)
-		print(sys.stderr, 'starting up on %s port %s' % server_address)
+		#print(sys.stderr, 'starting up on %s port %s' % server_address)
 		self.sock.bind(server_address)
 		#Calling listen() puts the socket into server mode, and accept() waits for an incoming connection.
 		
@@ -2835,302 +2752,44 @@ class myServer(QThread):
 		self.sock.listen(1)
 		
 	def run(self):
-		# Wait for a connection
 		while True:
-		
 			print(sys.stderr, 'waiting for a connection')
 			connection, client_address = self.sock.accept()
 			#accept() returns an open connection between the server and client, along with the address of the client. The connection is actually a different socket on another port (assigned by the kernel). Data is read from the connection with recv() and transmitted with sendall().
-	
+			
+			print(client_address)
+			
 			try:
-				#print(sys.stderr, 'connection from', client_address)
-	
+				print(sys.stderr, 'connection from', client_address)
+				
+				try:
+					self.client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+					self.client_sock.connect(('localhost', 30006))
+				except:
+					self.client_sock = ''
+				
 				# Receive the data in small chunks and retransmit it
 				while True:
 					data = connection.recv(1024)
-					print(sys.stderr, 'received "%s"' % data)
+					#print(sys.stderr, 'received "%s"' % data)
 					if data:
 						#print(sys.stderr, 'sending data back to the client')
 						#connection.sendall(data)
 						datain = data.decode(encoding='utf-8')
-						ui.processData(datain)
+						ui.dataReceived.emit(datain, self.client_sock)
+						#ui.processData(datain)
 					else:
 						print(sys.stderr, 'no more data from', client_address)
 						break
             
 			finally:
 				# Clean up the connection
-				connection.close()		
-				
+				connection.close()	
 
-class FortuneThread(QThread):
-	error = QtCore.pyqtSignal(QtNetwork.QTcpSocket.SocketError)
-
-	def __init__(self, socketDescriptor, parent):#(self, socketDescriptor, fortune, parent):
-		super(FortuneThread, self).__init__(parent)
-
-		self.socketDescriptor = socketDescriptor
-		print(socketDescriptor)
-		#self.text = fortune
-
-	def run(self):
-		self.tcpSocket = QtNetwork.QTcpSocket()
-		if not self.tcpSocket.setSocketDescriptor(self.socketDescriptor):
-			self.error.emit(self.tcpSocket.error())
-			return
-		while 1:
-			print(self.receive())
-			
-		#block = QtCore.QByteArray()
-		#outstr = QtCore.QDataStream(block, QtCore.QIODevice.WriteOnly)
-		#outstr.setVersion(QtCore.QDataStream.Qt_4_0)
-		#outstr.writeUInt16(0)
-		#outstr.writeString(self.text)
-		#outstr.device().seek(0)
-		#outstr.writeUInt16(block.count() - 2)
-		
-		#print(outstr)
-		
-		#tcpSocket.write(block)
-		#tcpSocket.disconnectFromHost()
-		#tcpSocket.waitForDisconnected()
-		#self.tcpSocket = tcpSocket
-	
-		#self.tcpSocket.readyRead.connect(self.readyRead)
-		
-	def receive(self):
-		size = self.tcpSocket.bytesAvailable()
-		if size>0: return self.tcpSocket.readData(size)
-		else: return b''#tcpSocket.bytes()	
-	
-	def readyRead(self):
-		msg = self.tcpSocket.readAll()
-		print(msg)
-		
-		
-		'''
-		self.blockSize = 0
-		
-		#print(tcpSocket.read(self))
-		
-		instr = QtCore.QDataStream(tcpSocket)
-		instr.setVersion(QtCore.QDataStream.Qt_4_0)
-
-		if self.blockSize == 0:
-			if tcpSocket.bytesAvailable() < 2:
-				return
-
-			self.blockSize = instr.readUInt16()
-
-		if tcpSocket.bytesAvailable() < self.blockSize:
-			return
-
-		nextFortune = instr.readString()
-		nextFortune = str(nextFortune, encoding='ascii')
-		print(nextFortune)
-		'''	
-
-class FortuneServer(QtNetwork.QTcpServer):
-	def __init__(self, parent=None):
-		super(FortuneServer, self).__init__(parent)
-
-		#self.fortunes = (
-		#		"You've been leading a dog's life. Stay off the furniture.",
-		#		"You've got to think about tomorrow.",
-		#		"You will be surprised by a loud noise.",
-		#		"You will feel hungry again in another hour.",
-		#		"You might have mail.",
-		#		"You cannot kill time without injuring eternity.",
-		#		"Computers are not intelligent. They only think they are.")
-
-	def incomingConnection(self, socketDescriptor):
-		#fortune = self.fortunes[random.randint(0, len(self.fortunes) - 1)]
-
-		#try:
-		#	# Python v3.
-		#	fortune = bytes(fortune, encoding='ascii')
-		#except:
-		#	# Python v2.
-		#	pass
-
-		thread = FortuneThread(socketDescriptor, self)#(socketDescriptor, fortune, self)
-		thread.finished.connect(thread.deleteLater)
-		thread.start()
-
-class Client(QObject):
-	#connected = pyqtSignal()
-	#disconnected = pyqtSignal()
-	#readyRead = pyqtSignal()
-	def __init__(self, parent=None):
-		QObject.__init__(self)
-		#QThreadPool.globalInstance().setMaxThreadCount(15)
-
-	def SetSocket(self, Descriptor):
-		self.socket = QTcpSocket(self)
-		self.socket.connected.connect(self.connected)
-		self.socket.disconnected.connect(self.disconnected)
-		self.socket.readyRead.connect(self.readyRead)
-		#self.connect(self.socket, SIGNAL("connected()"), SLOT(self.connected()))
-		#self.connect(self.socket, SIGNAL("disconnected()"), SLOT(self.disconnected()))
-		#self.connect(self.socket, SIGNAL("readyRead()"), SLOT(self.readyRead()))
-
-		self.socket.setSocketDescriptor(Descriptor)
-		print("Client Connected from IP %s" % self.socket.peerAddress().toString())
-
-	def connected(self):
-		print("Client Connected Event")
-
-	def disconnected(self):
-		print("Client Disconnected")
-
-	def readyRead(self):
-		msg = self.socket.readAll()
-		print(msg)
-	
-class Server(QObject):
-	def __init__(self, parent=None):
-		QObject.__init__(self)
-
-	def incomingConnection(self, handle):
-		print("incoming")
-		self.client = Client(self)
-		self.client.SetSocket(handle)
-
-	def StartServer(self):
-		self.server = QTcpServer()
-		if self.server.listen(QHostAddress(''), 30005):
-			print("Server is awake")   
-		else:
-			print("Server couldn't wake up")
-		self.server.incomingConnection = self.incomingConnection
-			
-'''			
-class Server(QObject):
-	def __init__(self, parent=None):
-		QObject.__init__(self)
-		QThreadPool.globalInstance().setMaxThreadCount(15)
-		self.clients = []
-
-	def setup_client_socket(self):
-		print("incoming")
-		client = Client(self)
-		client.socket = self.server.nextPendingConnection()
-		#self.client.socket.nextBlockSize = 0
-		client.connects()
-		self.clients.append(client)
-
-	def StartServer(self):
-		self.server = QTcpServer()
-		self.server.listen(QHostAddress.LocalHost, 30005)
-		#self.server.listen(QHostAddress(''), 30005)
-		print(self.server.isListening(), self.server.serverAddress().toString(), self.server.serverPort())	
-		i = 1
-		while i<=10:
-			print(self.server.isListening())
-			print(self.server.nextPendingConnection())
-			time.sleep(1)
-			i+=1
-		self.server.newConnection.connect(self.setup_client_socket)	
-		
-class Client(QObject):
-	#connected = pyqtSignal()
-	#disconnected = pyqtSignal()
-	#readyRead = pyqtSignal()
-	def connects(self):
-		self.socket.connected.connect(self.connected)
-		self.socket.disconnected.connect(self.disconnected)
-		self.socket.readyRead.connect(self.readyRead)
-		#self.connect(self.socket, SIGNAL("connected()"), SLOT(self.connected()))
-		#self.connect(self.socket, SIGNAL("disconnected()"), SLOT(self.disconnected()))
-		#self.connect(self.socket, SIGNAL("readyRead()"), SLOT(self.readyRead()))
-		#self.socket.error.connect(self.error)
-		print("Client Connected from IP %s" % self.socket.peerAddress().toString())
-
-	def error(self):
-		print("error somewhere")
-
-	def connected(self):
-		print("Client Connected Event")
-
-	def disconnected(self):
-		self.readyRead()
-		print("Client Disconnected")
-
-	def readyRead(self):
-		print("reading")
-		msg = self.socket.readAll()
-		print(QString(msg), len(msg))
-		n = Notification(QString(msg))
-		n.show()	
-'''
-
-class ServerThread(QThread):
-	def __init__(self, parent = None):
-		super(ServerThread, self).__init__(parent)
-		self.server = QTcpServer()
-		self.server.newConnection.connect(self.setup_client_socket)
-		
-	def run(self):
-		self.server.listen(QHostAddress.LocalHost, 30005)
-		#self.server.newConnection.connect(self.setup_client_socket)
-	
-	#def StartServer(self):
-		#self.server.listen(QHostAddress.LocalHost, 30005)
-		#self.server.listen(QHostAddress(''), 30005)
-		#print(self.server.isListening(), self.server.serverAddress().toString(), self.server.serverPort())	
-		#i = 1
-		#while i<=10:
-		#	print(self.server.isListening())
-		#	print(self.server.nextPendingConnection())
-		#	time.sleep(1)
-		#	i+=1
-			
-				
-	def setup_client_socket(self):
-		print("incoming")
-		client = Client(self)
-		client.socket = self.server.nextPendingConnection()
-		#self.client.socket.nextBlockSize = 0
-		client.connects()
-		self.clients.append(client)
-	
-	
-class TcpServer(QTcpServer):
-
-	def __init__(self, parent=None):
-		super(TcpServer, self).__init__(parent)
-
-	def incomingConnection(self, socketId):
-		self.thread = Thread(socketId, self)
-		self.thread.start()	
-	
-class Thread(QThread):
-
-	#lock = QReadWriteLock()
-	
-	def __init__(self, socketId, parent):
-		super(Thread, self).__init__(parent)
-		self.socketId = socketId
-
-	def run(self):
-		####asyncio.get_event_loop().create_server(IncomingServer, '', int(self.portin.text()))
-		self.socket = QTcpSocket()
-		print(self.socket)
-	
-		self.socket.connected.connect(self.connected)
-		self.socket.disconnected.connect(self.disconnected)
-		self.socket.readyRead.connect(self.readyRead)
-
-			
-	def connected(self):
-		print("Client Connected Event")
-
-	def disconnected(self):
-		print("Client Disconnected")
-
-	def readyRead(self):
-		msg = self.socket.readAll()
-		print(msg)		
+	def release(self):
+		self.sock.close()
+		self.client_sock.close()
+					
 
 
 #Class for listening for client connections from the DSM
@@ -3167,547 +2826,7 @@ class IncomingServer(asyncio.Protocol):
 		
 		#Decode data into a string
 		datain = data.decode(encoding='utf-8')
-		processData(datain)
-		
-	def processData(self, datain):
-		try: ui.statusindicatorlabel.setText('Data is being received from {}'.format(self.peername))
-		except: pass
-		
-		#Update front panel with data that has just been received
-		try: ui.datafromdsm.setText(str(datain).replace(",", ", "))
-		except: pass
-		
-		#Null string just in case
-		dataout = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-		
-		#If data looks does not produce error (i.e. not a header) then proceed. 
-		#	Otherwise, print header or error prone input to graphical interface
-		try: #if datain[0] != 'N' :
-			input = datain.split(',')
-			input = [float(i) for i in input]
-			
-			#self.calvalues is the array with all of the calibrations
-			#	The first 16 rows contain C0, C1, C2 in their respective columns
-			#	The next 5 rows contain RHOD, CVTBL, CVTBR, cvoff1, and LTip in the first column
-			#	The next 4 rows contain C0, C1, C2, and C3
-			C0 = np.r_[ui.calvalues[:16,0,ui.calversionlist.currentIndex()]]
-			C1 = np.r_[ui.calvalues[:16,1,ui.calversionlist.currentIndex()]]
-			C2 = np.r_[ui.calvalues[:16,2,ui.calversionlist.currentIndex()]]
-			more = np.r_[ui.calvalues[16:21,0,ui.calversionlist.currentIndex()]]
-			tdl_cals = np.c_[ui.calvalues[21:25,0,ui.calversionlist.currentIndex()], ui.calvalues[21:25,1,ui.calversionlist.currentIndex()], ui.calvalues[21:25,2,ui.calversionlist.currentIndex()], ui.calvalues[21:25,3,ui.calversionlist.currentIndex()]]
-			opc_cals = np.r_[ui.calvalues[25,0,ui.calversionlist.currentIndex()],ui.calvalues[25,1,ui.calversionlist.currentIndex()]]
-			tdl_cals = np.transpose(tdl_cals)
-			####MAY NEED TO TRANSPOSE TDL_CALS######
-			
-			#File operations for "rollover" file. File is used to carry previous data
-			#	from prior program runs to replace "bad" data with previously "good" data
-			if not os.path.isfile(ui.basedir+ui.tmpfile):
-				#Formats data in a good way to be saved
-				rolloverinput = input
-				inputstring = [ "{:11.10g}".format(x) for x in rolloverinput ]
-				inputstring = ','.join(inputstring)
-				inputstring += '\n'
-				#Create rollover file since it does not already exist
-				os.makedirs(os.path.dirname(ui.basedir+ui.tmpfile), exist_ok=True)
-				with open(ui.basedir+ui.tmpfile, "w") as f:
-					f.write(inputstring)
-					f.close()
-			#If file already exists, grab previous data to potentially overwrite with
-			else:
-				with open(ui.basedir + ui.tmpfile, "rb") as f:
-					first = f.readline()      # Read the first line.
-					f.close()
-				rolloverinput = first.decode('utf-8').split(',')#('\t')
-			
-			#Format rollover data in preparation for overwriting of "bad" data
-			rolloverinput = [float(x) for x in rolloverinput]
-			
-			#Conditional checks for "bad" data. If data is "bad",
-			#	it is replaced with the rollover data
-			for i in range(3,19):
-				if input[i] <= -99: input[i] = (rolloverinput[i])
-			#if tdl_data <= -1, use stored value from before, except for TDLzero which if equal to -99.99, use stored value.
-			#	TDL_ZERO is index 6 (index 25 of input)
-			for i in [19,20,21,22,23,24,26,27,28] :
-				if input[i] <= -1: input[i] = (rolloverinput[i])
-			if input[25] == -99.99: input[25] = (rolloverinput[25])
-			
-			#Windspeed (WSPD) overwrite
-			if input[1] < 4 or input[1] > 300 :
-				input[1] = rolloverinput[1]
-			
-			#Formatting corrected new data into string to be ready to 
-			#	overwrite as new rollover data for future use
-			rolloverinput = input
-			inputstring = [ "{:11.10g}".format(x) for x in rolloverinput ]
-			inputstring = ','.join(inputstring)
-			inputstring += '\n'
-			#Open file and write rollover data
-			with open(ui.basedir+ui.tmpfile, "w") as f:
-				f.write(inputstring)
-				f.close()
-			
-			'''
-			Code just in case we want to add a timestamp to the rollover data.
-			tmptimestamp = 	time.strftime("%Y %b %d %H:%M:%S",time.gmtime())
-			'''
-			
-			#Taking the null signals from the display
-			nullsignals = [0]*16
-			for i in range(0,len(ui.signalnulls)):
-				nullsignals[i] = int(ui.MainWindow.findChild(QtWidgets.QPushButton,"Null"+str(i)).isChecked())
-
-			#Taking the internal instrument flows from the display
-			#for i in range(0,4):
-				#if ui.MainWindow.findChild(QtWidgets.QLineEdit,ui.flowedit[i]).text() != '': 
-					#ui.flowlimits[i] = float(ui.MainWindow.findChild(QtWidgets.QLineEdit,ui.flowedit[i]).text())
-				
-			#Taking the instrument configuration data from the display
-			for i in range(0,4):
-				for j in range(1,len(ui.auxdevtoggleslist)):
-					if j in [0,2,5]:
-						tmpobject = ui.MainWindow.findChild(QtWidgets.QLineEdit,'cvfx'+str(i+5)+ui.auxdevtoggleslist[j])
-						if tmpobject.text() != '': ui.cvfxoptions[j][i] = float(tmpobject.text())
-					else:
-						tmpobject = ui.MainWindow.findChild(QtWidgets.QPushButton,'cvfx'+str(i+5)+ui.auxdevtoggleslist[j])
-						ui.cvfxoptions[j][i] = int(tmpobject.isChecked())
-
-			#Connection status of individual channels	
-			ui.cvfxoptions[0][0] = int(ui.v1.isChecked())
-			ui.cvfxoptions[0][1] = int(ui.v2.isChecked())
-			ui.cvfxoptions[0][2] = int(ui.v3.isChecked())
-			ui.cvfxoptions[0][3] = int(ui.v4.isChecked())
-
-
-			'''
-				PRIMARY COMPUTATION
-			'''
-
-			#############################################################################
-			#############################################################################
-			#############################################################################
-			#########################BEGIN COMPUTATION ROUTINE###########################
-			#############################################################################
-			#############################################################################
-			#############################################################################
-			
-			#OLD REFERENCE FOR WHEN COMPUTATION ROUTINE WAS SEPARATE
-			#output, calibrated = cvioutput( input , ui.flowlimits, ui.cfexcess, ui.cvfxoptions, nullsignals, ui.flowio.isChecked(), ui.cvimode.isChecked(), C0, C1, C2, more, tdl_cals, opc_cals)
-			
-			
-			'''
-			#INPUT array is of the form
-			#	time, cvtas, counts, cvf1, cvfx0, cvfx1, cvfx2, cvfx3, cvfx4, 
-			#	cvfx5, cvfx6, cvfx7, cvfx8, cvpcn, cvtt, cvtp, cvts, cvtcn, cvtai, 
-			#	H2OR, ptdlR, ttdlR, TDLsignal, TDLlaser, TDLline, TDLzero, TTDLencl, 
-			#	TTDLtec, TDLtrans, opc_cnts, opc_flow_raw, opc_pres_raw, ext1, ext2, 
-			#	H2O-PIC, 18O, HDO
-	
-	
-			#"data" and "calibrated" arrays are of the form:
-			#	cvf1, cvfx0, cvfx1, cvfx2, cvfx3, cvfx4, 
-			#	cvfx5, cvfx6, cvfx7, cvfx8, cvpcn, cvtt, 
-			#	cvtp, cvts, cvtcn, cvtai
-
-	
-			#calcoeffs array is of the form (23 elements), parenthesis denote separate naming
-			#	C0cvf1, C1cvf1, C2cvf1, C0cvfx0, C1cvfx0, C2cvfx0, 
-			#	C0cvfx1, C1cvfx1, C2cvfx1, C0cvfx2, C1cvfx2, C2cvfx2, 
-			#	C0cvfx3, C1cvfx3, C2cvfx3, C0cvfx4, C1cvfx4, C2cvfx4, 
-			#	RHOD (rhod), CVTBL (cvtbl), CVTBR (cvtbr), CVOFF1 (cvoff1), CVOFF2 (LTip)	
-	
-			#tdl_data is as follows
-			#	H2OR, ptdlR, ttdlR, TDLsignal, TDLlaser, TDLline, TDLzero, TTDLencl, TTDLtec, TDLtrans
-	
-			#opc_data is as follows:
-			#	opc_cnts, opc_flow_raw, opc_pres_raw, ext1
-	
-			#zerocorrectedflows are the pressure and temperature corrected flows of the form.
-			#	cvfx0c, cvfx1c, cvfx2c, cvfx3c, cvfx4c, 
-			#	cvfx5c, cvfx6c, cvfx7c, cvfx8c, cvf1Z
-			'''
-
-			#Input values 3 -> 18 is composed of the "data" values above
-			data = input[3:19] ; tdl_data = input[19:29] ; opc_data = input[29:33]
-	
-			#opc_cal input from files
-			opc_press = opc_cals[0] + opc_cals[1]*opc_data[2] #opc_data[2] corresponds to opc_pres_raw	
-	
-			#Array to hold calibration coefficients for flows from inputs
-			calcoeffs = [0]*23
-			for i in range(0,6):
-				calcoeffs[i*3] = C0[i]; calcoeffs[(i*3)+1] = C1[i]; calcoeffs[(i*3)+2] = C2[i]
-				#clusters of three are, #c0cvf1...c2cvf1, #c0cvfx0..c2cvfx0, 
-				#	.............., #c0cvfx4..c2cvfx4
-		
-			#Append "more" calibration coefficients to array
-			#	This is RHOD, CVTBL, ...
-			for i in range(18,23): calcoeffs[i] = more[i-18]
-		
-			#Perform default calibration of flows, pressures, temps, etc.
-			calibrated = [0]*16	
-			for i in range(0,16): calibrated[i] = C0[i] + C1[i]*data[i] + C2[i]*data[i]**2
-		
-			#cvfxtemp ~ default temps; #cvfxtempsource ~ 1 is cnt1, 0 usrinput; 
-			#	cvfsw ~ is instrument connected; cvfxmode ~ 1 is calculated, 0 is usrinput;  
-			#	cvfxdatatype ~ 0 is Mass, 1 is Volume; #cvfxalt ~ USER INPUT FLOWS		
-			cvfxtemp = ui.cvfxoptions[5][:]; cvfxtempsource = ui.cvfxoptions[4][:]; cvfxsw = ui.cvfxoptions[0][:]
-			cvfxmode = ui.cvfxoptions[1][:]; cvfxalt = ui.cvfxoptions[2][:]; cvfxdatatype = ui.cvfxoptions[3][:]	
-	
-			#Modifications to the flow based on if there are data, mass vs. volume input, etc.
-			for i in range(0,4):
-				if cvfxtempsource[i] == 1 : cvfxtemp[i] = calibrated[14]
-				if cvfxsw[i] == 0 : calibrated[i+6] = 0
-				else:
-					if cvfxmode[i] == 1 : calibrated[i+6] = C0[i+6] + C1[i+6]*data[i+6] + C2[i+6]*data[i+6]**2
-					else: calibrated[i+6] = cvfxalt[i] #USER ENTERED FLOW
-					if cvfxdatatype[i] == 1 : calibrated[i+6] = calibrated[i+6]*(calibrated[10]/1013.23)*(294.26/(cvfxtemp[i]+273.15)) #calibrated[10] is cvpcn				
-
-			#Calibration of opc_data parameters and cvfx4
-			#opc_flow = C0[5] + opc_data[1]*C1[5] #opc_data[1] corresponds to opc_flow_raw	
-			#calibrated[5] = opc_flow*(calibrated[10]/1013.23)*(294.26/(cvfxtemp[1]+273.15)) #cvfxtemp[i] corresponds to cvfx6temp (user input)
-
-			calibrated[5] = C0[5]+C1[5]*data[5]+C2[5]*data[5]**2
-
-			#For nulling of signals
-			for i in range(0,16):
-				if nullsignals[i] == 1: calibrated[i] = 0
-	
-			#H is the upper limit of airspeed, L is the lower limit
-			shroud = 1; H = 300; L = 4; location = 1
-	
-			#Pull windspeed from dsm string
-			wspd = input[1]
-	
-			#cvtascc appears to be the corrected total airspeed
-			cvtascc = 0
-	
-			#If the wspd adjusted for the shroud is within the bounds of H and L
-			#	then proceed with corrected total airspeed (TAS) calculation
-			if shroud*location*wspd >= L and shroud*location*wspd <= H : cvtascc = shroud*location*wspd*100
-		
-			#Added to prevent dividing by zero
-			#	NEEDS MODIFICATION TO JUST USE DEFAULT?
-			if cvtascc <= 0 : cvtascc = 0.0001
-	
-			#Zero Corrected Flows are the flows that have been corrected for
-			#	Temp and Pres AND have been filtered for values less than 0.
-			zerocorrectedflows = [0]*10
-	
-			#Initialization of flow summing parameters
-			summedzerocorrectedflow = 0; summedflow = 0
-	
-			#Iteration of flows to correct for pressure and temperature
-			#	IF the pressure is reported correctly.
-			#	ALSO performs the flow summations.
-			for i in range(1,10):
-				if calibrated[10] > 0 : zerocorrectedflows[i] = ( calibrated[i]*(1013.25/calibrated[10])*((calibrated[14]+273.15)/294.26))
-				else : zerocorrectedflows[i] = ( calibrated[i]*(1013.25/0.0001)*((calibrated[14]+273.15)/294.26))
-				if zerocorrectedflows[i] < 0 : zerocorrectedflows[i] = 0.0001
-				summedflow = summedflow + calibrated[i]
-				summedzerocorrectedflow = summedzerocorrectedflow + zerocorrectedflows[i]	
-		
-			#Shift in index to place cvf1c at the beginning
-			#	DOES NOT REQUIRE PRESSURE AND TEMP CORRECTION
-			zerocorrectedflows[0] = calibrated[0]
-			if zerocorrectedflows[0] < 0 : zerocorrectedflows[0] = 0.0001
-
-			#IF the pressure is greater than 0,
-			#	THEN perform calculation of cvftc, otherwise use 0.0001 for pressure
-			if calibrated[10] > 0 : cvftc = summedzerocorrectedflow - ( calcoeffs[21]*(1013.25/calibrated[10])*((calibrated[14]+273.15)/294.26))
-			else : cvftc = summedzerocorrectedflow - ( calcoeffs[21]*(1013.25/0.0001)*((calibrated[14]+273.15)/294.26))
-	
-			#Calculation of the enhancement factor?
-			cvcfact=(cvtascc*math.pi*(calcoeffs[20]**2))/(cvftc*1000.0/60) #calcoeffs[20] corresponds to cvtbr;
-			if cvcfact<1 : cvcfact=1
-		
-			#cutsize (NOT SURE IF NECESSARY))
-			cutsize = 0#5	
-		
-			#Miscellaneous calculations, #NEEDS DEFINITIONS
-			rhoa=calibrated[10]/(2870.12*(calibrated[11]+273.15)) #calibrated[10 & 11] correspond to cvpcn and cvtt respectively
-			gnu=(0.0049*calibrated[11]+1.718)*0.0001
-			cvrNw=cutsize*10**(-4)
-			reNw=(2*cvrNw*cvtascc*rhoa)/gnu
-	
-			#NEEDS DEFINITIONS
-			cvl = calcoeffs[19]*(zerocorrectedflows[0] - summedflow)/zerocorrectedflows[0]
-
-			#Prevent calculation of greater cut size radii
-			cutsizelooplimit = 10
-	
-			#Code for presumably calculating cut size radius
-			for cvrad in range(1,cutsizelooplimit*10+1):
-				cvri=(cvrad/10)*10**(-4); rei= 2 * cvtascc * cvri * rhoa/gnu
-				if rei <= 0 : rei = 0.0001
-				cvli=(cvri*14.6969*calcoeffs[18] * ((0.408248*rei**(1/3)) + math.atan(2.44949*rei**(-1/3)) - 0.5*math.pi)/(3*rhoa))-calcoeffs[22]
-				if cvli >= cvl:
-					break
-			cvrad = cvrad/10
-			cvft=summedflow-calcoeffs[21]
-		
-			#tdl_data[1] corresponds to press, #tdl_data[2] corresponds to temp, 
-			#	calcoeffs[20] corresponds to cvtbr;
-			cvcfact_tdl=(cvtascc*math.pi*(calcoeffs[20]**2))/((cvft*1000.0/60)*(1013.23/tdl_data[1])*((tdl_data[2]+273.15)/294.26))
-			if cvcfact_tdl<1 : cvcfact_tdl=1;
-
-			#calibration of tdl coefficients based on temperature and pressure
-			tdl_poly_coeffs = [0]*4
-			tdl_poly_coeffs[0]=tdl_cals[0][0]+tdl_cals[0][1]*tdl_data[1]+tdl_cals[0][2]*tdl_data[1]*tdl_data[1]+tdl_cals[0][3]*tdl_data[1]*tdl_data[1]*tdl_data[1]
-			tdl_poly_coeffs[1]=tdl_cals[1][0]+tdl_cals[1][1]*tdl_data[1]+tdl_cals[1][2]*tdl_data[1]*tdl_data[1]+tdl_cals[1][3]*tdl_data[1]*tdl_data[1]*tdl_data[1]
-			tdl_poly_coeffs[2]=tdl_cals[2][0]+tdl_cals[2][1]*tdl_data[1]+tdl_cals[2][2]*tdl_data[1]*tdl_data[1]+tdl_cals[2][3]*tdl_data[1]*tdl_data[1]*tdl_data[1]
-			tdl_poly_coeffs[3]=tdl_cals[3][0]+tdl_cals[3][1]*tdl_data[1]+tdl_cals[3][2]*tdl_data[1]*tdl_data[1]+tdl_cals[3][3]*tdl_data[1]*tdl_data[1]*tdl_data[1]
-	
-			#NEEDS DEFINITION
-			cvrho_tdl=tdl_poly_coeffs[0]+tdl_poly_coeffs[1]*tdl_data[0]+tdl_poly_coeffs[2]*tdl_data[0]*tdl_data[0]+tdl_poly_coeffs[3]*tdl_data[0]*tdl_data[0]*tdl_data[0]
-			RHOO_TDL=cvrho_tdl/cvcfact_tdl	
-	
-			#FIRST CALCULATION (CVRH just goes to output file) , 
-			#	CVRH is CVI relative humidity in the TDL line
-			TTDLK=tdl_data[2]+273.15
-			#SATVP is saturation vapor pressure (g/m3) from Goff-Gratch and RAF Bull. 9
-			SATVP=10**(23.832241-5.02808*math.log10(TTDLK)-1.3816E-7*(10**(11.334-0.0303998*TTDLK))+0+8.1328E-2*(10**(3.49149-1302.8844/TTDLK))-2949.076/TTDLK)
-	
-			#NEED DEFINITION
-			cvrh=100*cvrho_tdl*TTDLK/(SATVP*216.68)
-
-			#NEEDS DEFINITION
-			if cvrho_tdl<=  0.0 : Z= -10
-			else : Z = math.log(((tdl_data[2]+273.15))*cvrho_tdl/1322.3)
-
-			#CVDP is CVI Dew Point, Z is intermediate variable
-			cvdp = 273.0*Z/(22.51-Z) 
-			
-			#Indicator in LabView
-			cvrhoo_tdl=cvrho_tdl/cvcfact_tdl
-			if cvrhoo_tdl>50  : cvrhoo_tdl=99
-			if cvrhoo_tdl<-50 : cvrhoo_tdl=-99
-	
-			#NEEDS DEFINITION
-			opc_press_mb = (opc_press*10)
-			opcc = (opc_data[0]*60)/(opc_data[1]*1000); opcc_Pcor = opcc*calibrated[10]/opc_press
-			opcco = opcc/cvcfact; opcco_Pcor = opcco*calibrated[10]/opc_press
-
-			#NEEDS DEFINITION
-			cvf3 = calibrated[0] - summedflow
-
-			#NEEDS DEFINITION
-			cvcnc1 = (input[2]/(zerocorrectedflows[2]*1000/60))
-			cvcnc1 = cvcnc1*math.exp(cvcnc1*zerocorrectedflows[2]*4.167*10**(-6))
-	
-			#NEEDS DEFINITION
-			cvcnc01 = cvcnc1/cvcfact
-	
-			#If lower <= flow <= Upper, flow set point from before, #	Otherwise, recalculate
-			if ui.flowio.isChecked():
-				#print(ui.internalFlows)
-				if (zerocorrectedflows[1] > (ui.internalFlows[0] + 0.05)) or (zerocorrectedflows[1] < (ui.internalFlows[0] - 0.05)) :
-					cvfxnw = ui.internalFlows[0]*(calibrated[10]/1013.25)*(294.26/(calibrated[14]+273.15))
-					ui.internalflowsetpts[0] = (cvfxnw-calcoeffs[3])/calcoeffs[4] #will be 6 and 7 on next iteration.
-				#else: #cvfxwr[0] = 0.0 #Needs to be left as older value. #Nothing is done so flow is as before.
-				#Starting at cvfx2 to cvfx4 (index 2 to 3 on calibrated)
-				for i in range(1,4) : # int i = 1 ; i < 4; i++ ) {
-					if (zerocorrectedflows[i+2] > ui.internalFlows[i] + 0.05) or (zerocorrectedflows[i+2] < ui.internalFlows[i] - 0.05) :
-						cvfxnw = ui.internalFlows[i] * (calibrated[10]/1013.25)*(294.26/(calibrated[14] + 273.15))
-						#cvfx0wr = ( cvfxnw – c0cvfx0) / c1cvfx0;
-						ui.internalflowsetpts[i] = ( cvfxnw - calcoeffs[(i+2)*3] ) / calcoeffs[(i+2)*3+1] #will be 9 (12) and 10 (13) on next iteration.			
-					#else : 	#cvfxwr[i] = 0.0; #REPLACE WITH OLDER VALUE
-			else: ui.internalflowsetpts = [0.00]*4
-	
-			#CVI MODE AND FLOW ON/OFF OPTIONS
-			if ui.flowio.isChecked() and not ui.cvimode.isChecked() :
-				cfexcess_cor=ui.cfexcess*(calibrated[10]/1013.25)*294.26/(calibrated[14]+273.15)
-				cfsummed=cfexcess_cor + summedflow + calcoeffs[21]# - calibrated[5]  #cvoff1 is equivalent to calcoeffs[21]
-				cvf1wr=( cfsummed - calcoeffs[0])/calcoeffs[1]
-			else: cvf1wr = 0.0
-
-			#Checks to make sure counterflow voltage is not greater than 5
-			if cvf1wr >= 5.0 : cvf1wr = 5.0
-			
-			if( input[34] != -99.99 ) : input[34] = calibrated[10]/(calibrated[14]+273.15) * 0.000217 * input[34]
-	
-			#Creates large data array that will be later saved after minor updates
-			output = np.r_[input[0], 0, 0, 0, input[3:19], calibrated[10:16], zerocorrectedflows[:], #ENDS AT INDEX 35, next line is 36
-				cvl, cvrhoo_tdl, cvrho_tdl, cvrad, cvcfact_tdl,  #ENDS AT 40, next line 41
-				cvf3, input[1], cvcnc1, cvcnc01, cvcfact,  cvftc, cvrh, cvdp, #ENDS at 48, next line 49
-				ui.internalflowsetpts[0:4], cvf1wr, input[2], tdl_data[:], opcc, opcco, opc_data[0:2], 
-				opcc_Pcor, opcco_Pcor, opc_press_mb, input[34:37]]		
-			
-			#############################################################################
-			#############################################################################
-			#############################################################################
-			###########################END COMPUTATION ROUTINE###########################
-			#############################################################################
-			#############################################################################
-			#############################################################################
-
-			#Adjustment to parameter based on number of external
-			#	instrument addition/removals have been made
-			output[3] = ui.numchanges
-
-			#cvl is at index 36?, #cvf3 is at index 41, 
-			#	cvfxwr0 is at index 49, #opcc_Pcor is at index 69
-			flowbyte = (2*int(ui.v1.isChecked()))**3+(2*int(ui.v2.isChecked()))**2+(2*int(ui.v3.isChecked()))**1+int(ui.v4.isChecked())
-			output[2] = flowbyte
-			
-			#FLOW OUTPUTS ARE DECIDED IN THE CONNECTION SEQUENCE
-			dataout = np.round(np.r_[ output[0], output[49:54], 
-				int(ui.v1.isChecked()), int(ui.v2.isChecked()), int(ui.v3.isChecked()), int(ui.v4.isChecked()), 
-				int(ui.cvimode.isChecked()), flowbyte, ui.numchanges, 
-				output[39], output[45], output[47:49], output[37] ],3)
-			
-			zerocorrectedflows = output[26:36]
-			#calibrated = np.r_[output[26:36], output[20:26]]
-			
-			extra = np.r_[output[41], output[43:45], output[38], output[37], output[65:67]]
-			#extra = [cvf3, cvcnc1, cvcnc01, cvrho_tdl, cvrhoo_tdl, opcc, opcco]
-			
-			#Checked to see if user input or calculated mode is selected
-			#	and proceed to populate output array accordingly
-			#	IF FLOW IS CHECKED, THEN EVERYTHING IS CALCULATED!!!!
-			if ui.flowsource.isChecked():
-				for i in range(0,len(ui.cvfManVoltLabels)):
-					MainWindow.findChild(QtWidgets.QLineEdit,ui.cvfManVoltLabels[i]).setText(str(dataout[i+1]))
-					#ui.cvfx0wr.setText(str(dataout[1]))
-					#ui.cvfx2wr.setText(str(dataout[2]))
-					#ui.cvfx3wr.setText(str(dataout[3]))
-					#ui.cvfx4wr.setText(str(dataout[4]))
-					#ui.cvf1wr.setText(str(dataout[5]))
-			else:
-				for i in range(0,len(ui.cvfManVoltLabels)):
-					if MainWindow.findChild(QtWidgets.QLineEdit,ui.cvfManVoltLabels[i]).text() != "" :
-						dataout[i+1] = float(MainWindow.findChild(QtWidgets.QLineEdit,ui.cvfManVoltLabels[i]).text())
-					else:
-						dataout[i+1] = 0.00
-				'''
-				if ui.cvfx0wr.text() != "" : dataout[1] = float(ui.cvfx0wr.text())
-				else: dataout[1] = 0.00
-				if ui.cvfx2wr.text() != "" : dataout[2] = float(ui.cvfx2wr.text())
-				else: dataout[2] = 0.00
-				if ui.cvfx3wr.text() != "" : dataout[3] = float(ui.cvfx3wr.text())
-				else: dataout[3] = 0.00
-				if ui.cvfx4wr.text() != "" : dataout[4] = float(ui.cvfx4wr.text())
-				else: dataout[4] = 0.00
-				if ui.cvf1wr.text() != "" : dataout[5] = float(ui.cvf1wr.text())
-				else: dataout[5] = 0.00	
-				'''
-			
-			#Added for populating raw input/output data table
-			_translate = QtCore.QCoreApplication.translate
-			#for i in range(0,min(len(ui.rawtablerowlabels),len(input))):
-			ui.rawInOutData[:,0] = np.r_[input[i]]
-			#for i in range(0,len(dataout)):
-			ui.rawInOutData[:,1] = np.r_[dataout[i]]
-
-			#for i in range(0,len(dataout)):
-			#	item = ui.tableWidget.item(i, 1)
-			#	item.setText(_translate("MainWindow",str(self.dataout[i])))
-
-			#Sample dataout for testing
-			#dataout = [dataout[0],-0.081,1.059,1.968,79.022,0.029,0,1,0,1,0,0,0,10.000,1.000,0.000,-83.974,0.000]
-
-			#Convert array back into a byte string with an
-			#	endline character
-			dataout = [ "{:.3f}".format(x) for x in dataout ]
-			dataout = ','.join(dataout)
-			dataout+='\n'			
-			dataout = bytes(dataout,'utf_8')
-			
-			#float_formatter = lambda x: "%.3f" % x
-			
-			#Command formats all elements in array to a string
-			#array of specified precision.
-			#[ "{:0.2f}".format(elem) for elem in array ]
-			#[ "{:11.5g}".format(x) for x in a ]
-			
-			'''
-			Order of file save?
-			Header = 'dsmtime, INLET, FXflows,  valve_changes, cvf1R, cvfx0R, cvfx1R, cvfx2R,  cvfx3R, cvfx4R, cvfx5R, cvfx6R, cvfx7R, cvfx8R, cvpcnR, cvttR, cvtpR, cvtsR, cvtcnR, cvtaiR, cvpcnC, cvttC, cvtpC, cvtsC, cvtcnC, cvtaiC, cvf1, cvfx0c, cvfx1c, cvfx2c,  cvfx3c, cvfx4c, cvfx5c, cvfx6c,  cvfx7c, cvfx8c, cvl, cvrhoo_tdl,   cvrho_tdl, cvrad, cvcfact_tdl,  cvf3, cvtas, cvcnc1, cvcno1, cvcfact,  cvftc, cvrh, cvdp, cvfx0WR, cvfx2WR, cvfx3WR,  cvfx4WR, cvfx1WR, cnt1, H2O_TDL,  pTDL, tTDL, TDLsignalL,TDLlaser, TDLline, TDLzero, TTDLencl, TTDLtec,TDLtrans, opcc, opcco, opcnts, opcflow, opcc_Pcor, opcco_Pcor, opcc_pres_mb, H2O_PIC_cvrtd, 180, HDO'
-			
-			File order sould be
-			[input[0], input[3:19], calibrated[10:16], calibrated[0:10], 
-			
-			dsmtime, INLET, FXflows, valve_changes, 
-			cvf1R, cvfx0R, cvfx1R, cvfx2R, cvfx3R, cvfx4R, cvfx5R, cvfx6R, cvfx7R, cvfx8R, cvpcnR, 
-			cvttR, cvtpR, cvtsR, cvtcnR, cvtaiR, cvpcnC, cvttC, 
-			cvtpC, cvtsC, cvtcnC, cvtaiC, cvf1, cvfx0c, 
-			cvfx1c,	cvfx2c,	cvfx3c,	cvfx4c,	cvfx5c,	cvfx6c,	cvfx7c,	cvfx8c,	cvl, 
-			cvrhoo_tdl,	cvrho_tdl, cvrad, cvcfact_tdl, cvf3, cvtas, cvcnc1, 
-			cvcno1, cvcfact, cvftc, cvrh, cvdp, cvfx0WR, cvfx2WR, cvfx3WR, cvfx4WR, cvfx1WR, cnt1, 
-			H2O_TDL, pTDL, tTDL, TDLsignalL, TDLlaser, TDLline, TDLzero, TTDLencl, TTDLtec, TDLtrans, 
-			opcc, opcco, opcnts, opcflow, opcc_Pcor, opcco_Pcor, opcc_pres_mb, H2O_PIC_cvrtd, 180, HDO 
-			'''
-			
-			#Send off the new data to the DSM
-			#self.client_sock.send(dataout)	
-			
-			#Update front panel with data sent to dsm
-			ui.datatodsm.setText(str(dataout).replace(",", ", "))	
-			
-			ui.tabledata = np.c_[input[3:19], calibrated[0:16], np.r_[zerocorrectedflows[:], [np.nan]*6]]
-			try:
-				#If array has -9999 in first slot (i.e. initialized
-				#	but does not contain data), replace data with
-				#	with the new stuff.
-				#else if number of data points is greater than 900 (15 minutes)
-				#	cut off first value, add new end value
-				#else add new value to end
-				
-				#SHOULD BE REPLACED WITH EXCEPTION ROUTINE
-				newdata = np.r_[input[0],input[19:22], extra[:]]
-				for i in range(1,len(newdata)):
-					if (newdata[i] <= 0): newdata[i] = np.nan
-				if( ui.dim[1] == 1 and ui.plotdata[0] == -9999 ):
-					ui.plotdata = np.c_[newdata] #Appends the column b onto a
-				elif (ui.dim[1] >= 900):
-					ui.plotdata = np.c_[ui.plotdata[:,-899:], newdata ]
-				else:
-					ui.plotdata = np.c_[ui.plotdata,  newdata]
-			except NameError:
-				print ("There was a problem in the plotting")
-			finally:
-				#determine size of new array
-				ui.dim = ui.plotdata.shape
-				
-			#Originally had C:\data\
-			#	Appended to project title (i.e. IDEAS2013\)
-			#	The file name then listed as
-			#	YYMMDDHH.MM with 'q' on the end
-			#	Full file name could be YYMMDDHH.MMq
-			#	In certain directory.
-			outputstring = [ "{:11.5g}".format(x) for x in output ]
-			outputstring = ','.join(outputstring)
-			outputstring += '\n'
-			
-			#Save data to project path
-			ui.dataSave(0, outputstring, ui.header)
-			#if not os.path.isfile(ui.path+ui.dataFile):
-			#	os.makedirs(os.path.dirname(ui.path+ui.dataFile), exist_ok=True)
-			#	with open(ui.path+ui.dataFile, "w") as f:
-			#		f.write(ui.header)
-			#		f.write(outputstring)
-			#		f.close()
-			#else:
-			#	with open(ui.path+ui.dataFile, "a") as f:
-			#		f.write(outputstring)
-			#		f.close()
-					
-		#Exception to print data header or error data to DSM
-		#	header text box on display
-		#except:
-		except:#else:
-			try:
-				if datain[0] == 'N' :
-					ui.dsmheader.setText(str(datain))
-				else:
-					ui.errorHandler(3)
-			except:	pass
-			
-		#Kept for testing purposes; however, unecessary with DSM
-		#Removed because CVI does not need an echo.
-		#self.transport.write(data)
-		#print('Close the client socket')
-		#self.transport.close()	
+		ui.processData(datain, self.client_sock)
 			
 	#@asyncio.coroutine
 	def connection_lost(self, exc): #Added after CVI test worked 11-2-16
@@ -3733,28 +2852,5 @@ if __name__ == "__main__":
 	ui.setupUi(MainWindow)
 	#MainWindow.show()
 	MainWindow.showMaximized()
-	
-	#Begin Event Loop
-	
-	#loop =  QEventLoop(app)
-	#asyncio.set_event_loop(loop)
-	#future_1 = asyncio.Future()
-	#future_2 = asyncio.Future()
-	
-	#tasks = [
-	#	asyncio.async(task_1(future_1)),
-	#	asyncio.async(task_2(future_2))]
 
-	#window.show()  # erst jetzt werden die Widgets instanziert!
-
-	#loop.run_until_complete(asyncio.wait(tasks))
-	#loop.run_forever()
-	#loop.close()
-	
-	
-	#loop = asyncio.get_event_loop()
-	#asyncio.ensure_future(app.exec_())
-	#asyncio.ensure_future(ui.server_loop_in_thread)	
-	#loop.run_forever() 
-	app.exec_()
-	#sys.exit(app.exec_())
+	sys.exit(app.exec_())
