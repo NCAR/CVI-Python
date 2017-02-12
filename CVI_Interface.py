@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 import sys
 import socket
+import select
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtNetwork
 
@@ -35,7 +36,7 @@ from quamash import QEventLoop
 #Incorporates Select()
 import eventlet
 
-from eventlet.green import socket
+#from eventlet.green import socket
 
 #For plotting within pyqt
 import pyqtgraph
@@ -2060,16 +2061,18 @@ class Ui_MainWindow(QObject):
 		#Create server loop
 #		self.server_loop = asyncio.get_event_loop()
 
+#		self.dataReceived.connect(self.processData)
 		#Implement parallel thread for server	
 #		self.server_thread = threading.Thread(target=self.server_loop_in_thread, args = ())#args = (self,))#, args=(loop,))
 		###self.server_thread = Process(target=self.server_loop_in_thread, args = ())
 		###self.server_thread.daemon = True
 #		self.server_thread.start()	
 		
-		self.CVI_Server = myServer()
-		self.CVI_Server.start()
-		
 		self.dataReceived.connect(self.processData)
+		#self.CVI_Server = myServer()
+		#self.CVI_Server = myServer('',30005,30006)
+		self.CVI_Server = myServer(self.ipaddress.text(),int(self.portin.text()),int(self.portout.text()))
+		self.CVI_Server.start()
 	
 		#Update network status indicator
 		self.statusindicatorlabel.setText("Incoming data server has been established")	
@@ -2102,13 +2105,17 @@ class Ui_MainWindow(QObject):
 			#self.server_loop.run_until_complete(self.server.wait_closed())
 		
 			#del(self.CVI_Server)
-			self.CVI_Server.release
+			
+			self.CVI_Server.stop()
+			
+			#self.CVI_Server.release
+			#self.CVI_Server.quit()
 			#del(self.CVI_Server)
 		
 			#Display success message
 			self.statusindicatorlabel.setText("Disconnect Successful")
 			self.runconnection = False
-			self.disconnect.setDisabled(True)
+			#self.disconnect.setDisabled(True)
 			
 	#function for replotting the data based on which data
 	#selection has been chosen
@@ -2132,6 +2139,7 @@ class Ui_MainWindow(QObject):
 
 		for i in range(0,len(self.rawtablerowlabels)):
 			ui.rawtableWidget.item(i,0).setText(_translate("MainWindow",str(self.rawInOutData[i,0])))
+			ui.rawtableWidget.item(i,1).setText(_translate("MainWindow",str(self.rawInOutData[i,1])))
 
 		#Update base plots based on first dropdown list positions
 		self.CVIplot.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist.currentIndex()+1,:], clear = True,pen=pyqtgraph.mkPen(color=(255,255,255), width=1))
@@ -2180,6 +2188,17 @@ class Ui_MainWindow(QObject):
 		#If data looks does not produce error (i.e. not a header) then proceed. 
 		#	Otherwise, print header or error prone input to graphical interface
 		try: #if datain[0] != 'N' :
+			a=1
+		except: pass#else:
+		if datain[0] != 'N':
+			#print(datain)
+			try:
+				if datain[0] == 'N' :
+					self.dsmheader.setText(str(datain))
+				else:
+					self.errorHandler(3)
+			except:	pass		
+		
 			input = datain.split(',')
 			input = [float(i) for i in input]
 			
@@ -2528,7 +2547,7 @@ class Ui_MainWindow(QObject):
 				cvl, cvrhoo_tdl, cvrho_tdl, cvrad, cvcfact_tdl,  #ENDS AT 40, next line 41
 				cvf3, input[1], cvcnc1, cvcnc01, cvcfact,  cvftc, cvrh, cvdp, #ENDS at 48, next line 49
 				self.internalflowsetpts[0:4], cvf1wr, input[2], tdl_data[:], opcc, opcco, opc_data[0:2], 
-				opcc_Pcor, opcco_Pcor, opc_press_mb, input[34:37]]		
+				opcc_Pcor, opcco_Pcor, opc_press_mb, input[34:37]]			
 			
 			#############################################################################
 			#############################################################################
@@ -2557,7 +2576,7 @@ class Ui_MainWindow(QObject):
 			#calibrated = np.r_[output[26:36], output[20:26]]
 			
 			extra = np.r_[output[41], output[43:45], output[38], output[37], output[65:67]]
-			#extra = [cvf3, cvcnc1, cvcnc01, cvrho_tdl, cvrhoo_tdl, opcc, opcco]
+			#extra = [cvf3, cvcnc1, cvcnc01, cvrho_tdl, cvrhoo_tdl, opcc, opcco]		
 			
 			#Checked to see if user input or calculated mode is selected
 			#	and proceed to populate output array accordingly
@@ -2643,6 +2662,7 @@ class Ui_MainWindow(QObject):
 			'''
 			
 			#Send off the new data to the DSM
+			print(client_sock)
 			if client_sock != '': client_sock.send(dataout)	
 			
 			#Update front panel with data sent to dsm
@@ -2660,9 +2680,8 @@ class Ui_MainWindow(QObject):
 				#SHOULD BE REPLACED WITH EXCEPTION ROUTINE
 				
 				newdata = np.r_[input[0],input[19:22], extra[:]]
-				for i in range(1,len(newdata)):
-					if (newdata[i] <= 0): newdata[i] = np.nan
-				
+				#for i in range(1,len(newdata)):
+				#	if (newdata[i] <= 0): newdata[i] = np.nan
 				try:
 					try:
 						self.plotdata = np.c_[self.plotdata[:,-899:], newdata]
@@ -2711,16 +2730,10 @@ class Ui_MainWindow(QObject):
 		#Exception to print data header or error data to DSM
 		#	header text box on display
 		#except:
-		except:#else:
-			try:
-				if datain[0] == 'N' :
-					self.dsmheader.setText(str(datain))
-				else:
-					self.errorHandler(3)
-			except:	pass
-		finally:
-			try: self.CVIreplot()
-			except: pass
+		
+		#finally:
+		try: self.CVIreplot()
+		except: pass
 			
 		#Kept for testing purposes; however, unecessary with DSM
 		#Removed because CVI does not need an echo.
@@ -2736,61 +2749,78 @@ class myServer(QThread):
 	#class FortuneServer(QtNetwork.QTcpServer):
 	#def __init__(self, parent=None):
 	#	super(FortuneServer, self).__init__(parent)
-	def __init__(self, parent=None):#(self, socketDescriptor, fortune, parent):
+	def __init__(self, host, portin, portout, parent=None):#(self, socketDescriptor, fortune, parent):
 		super(myServer, self).__init__(parent)
+		self.host = host
+		self.portin = portin
+		self.portout = portout
+		
+		self.stopFlag = False
 
 		# Create a TCP/IP socket
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		#self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		
 		#Then bind() is used to associate the socket with the server address. In this case, the address is localhost, referring to the current server, and the port number is 10000.		
 		# Bind the socket to the port
-		server_address = ('', 30005)
-		#print(sys.stderr, 'starting up on %s port %s' % server_address)
-		self.sock.bind(server_address)
-		#Calling listen() puts the socket into server mode, and accept() waits for an incoming connection.
+		#server_address = ('', 30005)
+		self.server_address = ('', self.portin)
+		self.client_address = ('localhost',self.portout)#self.host, self.portout)
+		#print(sys.stderr, 'starting up on %s port %s' % self.server_address)
 		
+		self.sock.bind(self.server_address)
+
 		# Listen for incoming connections
 		self.sock.listen(1)
+		self.sock.setblocking(False)
 		
-	def run(self):
-		while True:
-			print(sys.stderr, 'waiting for a connection')
-			connection, client_address = self.sock.accept()
-			#accept() returns an open connection between the server and client, along with the address of the client. The connection is actually a different socket on another port (assigned by the kernel). Data is read from the connection with recv() and transmitted with sendall().
-			
-			print(client_address)
-			
-			try:
-				print(sys.stderr, 'connection from', client_address)
-				
-				try:
-					self.client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-					self.client_sock.connect(('localhost', 30006))
-				except:
-					self.client_sock = ''
-				
-				# Receive the data in small chunks and retransmit it
-				while True:
-					data = connection.recv(1024)
-					#print(sys.stderr, 'received "%s"' % data)
-					if data:
-						#print(sys.stderr, 'sending data back to the client')
-						#connection.sendall(data)
+	def run(self):		
+		server_socket = self.sock
+		read_list = [server_socket]
+		write_list = []
+		while not self.stopFlag:
+			readable, writable, errored = select.select(read_list, write_list, [], 0.1)
+			for s in readable:
+				if s is server_socket:
+					client_socket, address = server_socket.accept()
+					read_list.append(client_socket)
+					print("Connection from", address)
+				else:
+					data = s.recv(1024)
+					if data: 
 						datain = data.decode(encoding='utf-8')
-						ui.dataReceived.emit(datain, self.client_sock)
-						#ui.processData(datain)
+						ui.dataReceived.emit(datain, self.tcpOut)
 					else:
-						print(sys.stderr, 'no more data from', client_address)
-						break
-            
-			finally:
-				# Clean up the connection
-				connection.close()	
-
-	def release(self):
-		self.sock.close()
-		self.client_sock.close()
-					
-
+						#print('closed connection')
+						s.close()
+						read_list.remove(s)
+			
+				if len(write_list)==0:
+					try:
+						self.tcpOut = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+						self.tcpOut.connect(self.client_address)
+						self.tcpOut.setblocking(0)
+						write_list = [self.tcpOut]
+						#write_list.append(self.tcpOut)
+					except: pass
+				if len(writable) == 0:
+					try: self.tcpOut.close()
+					except: pass
+					self.tcpOut = ''
+					write_list = []
+						
+		for w in write_list:
+			w.close()
+		for r in read_list:
+			r.close()
+		
+	def stop(self):
+		self.stopFlag = True
+	
+	def __del__(self):
+		self.quit()
+		self.wait()		
+		
 
 #Class for listening for client connections from the DSM
 class IncomingServer(asyncio.Protocol):
@@ -2811,7 +2841,8 @@ class IncomingServer(asyncio.Protocol):
 		#to send data back to the DSM
 		#self.client_sock = socket.socket()
 
-		#self.client_sock.connect((ui.ipaddress.text(), int(ui.portout.text())))	
+		#self.client_sock.connect((ui.ipaddress.text(), int(ui.portout.text())))
+		self.client_sock = ''
 
 	#@asyncio.coroutine
 	def data_received(self, data):
@@ -2826,6 +2857,7 @@ class IncomingServer(asyncio.Protocol):
 		
 		#Decode data into a string
 		datain = data.decode(encoding='utf-8')
+		#ui.dataReceived.emit(datain, self.client_sock)
 		ui.processData(datain, self.client_sock)
 			
 	#@asyncio.coroutine
