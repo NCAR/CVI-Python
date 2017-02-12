@@ -59,6 +59,14 @@ import shutil
 class Ui_MainWindow(QObject):
 
 	dataReceived = pyqtSignal(object,object)
+	
+	def __init__(self, parent=None):
+		super(Ui_MainWindow, self).__init__(parent)
+		#MainWindow.btnExit.clicked.connect(self.close)
+		#MainWindow.actionExit.triggered.connect(self.close)
+
+		# when you want to destroy the dialog set this to True
+		#self._want_to_close = False
 
 	#def _init_(self, parent=None):
 	#	super(Ui_MainWindow, self)._init_(parent)
@@ -2056,22 +2064,15 @@ class Ui_MainWindow(QObject):
 		self.statusindicatorlabel.setText("Initiating Connection . . . . . . . .")
 		self.runconnection = True
 		
-		#asyncio.ensure_future(self.server_loop_in_thread)
-		
+		self.dataReceived.connect(self.processData)
+
 		#Create server loop
 #		self.server_loop = asyncio.get_event_loop()
-
-#		self.dataReceived.connect(self.processData)
 		#Implement parallel thread for server	
 #		self.server_thread = threading.Thread(target=self.server_loop_in_thread, args = ())#args = (self,))#, args=(loop,))
-		###self.server_thread = Process(target=self.server_loop_in_thread, args = ())
-		###self.server_thread.daemon = True
 #		self.server_thread.start()	
 		
-		self.dataReceived.connect(self.processData)
-		#self.CVI_Server = myServer()
-		#self.CVI_Server = myServer('',30005,30006)
-		self.CVI_Server = myServer(self.ipaddress.text(),int(self.portin.text()),int(self.portout.text()))
+		self.CVI_Server = QServer(self.ipaddress.text(),int(self.portin.text()),int(self.portout.text()))
 		self.CVI_Server.start()
 	
 		#Update network status indicator
@@ -2097,20 +2098,8 @@ class Ui_MainWindow(QObject):
 			self.statusindicatorlabel.setText("No connection to disconnect")
 		else :
 			self.statusindicatorlabel.setText("Initiating Disconnect . . . . . . .")
-
-			#Close the server
-		#	self.server_loop.stop()
-		#	self.server.close()
-		#	self.server_thread.join()
-			#self.server_loop.run_until_complete(self.server.wait_closed())
-		
-			#del(self.CVI_Server)
 			
 			self.CVI_Server.stop()
-			
-			#self.CVI_Server.release
-			#self.CVI_Server.quit()
-			#del(self.CVI_Server)
 		
 			#Display success message
 			self.statusindicatorlabel.setText("Disconnect Successful")
@@ -2165,15 +2154,8 @@ class Ui_MainWindow(QObject):
 		
 		#Force GUI to update display
 		app.processEvents()
-
-	#def closeEvent(self, event):
-	#	reply = QtGui.QMessageBox.warning(MainWindow, 'WARNING',\
-	#		 "Are you sure you want to close the program?", QtGui.QMessageBox.Yes, \
-	#		QtGui.QMessageBox.No)#, QtGui.QMessageBox.Warning)
-	#	if not reply:
-	#		event.ignore()
-
-
+		
+		
 	def processData(self, datain, client_sock = ''):
 		try: self.statusindicatorlabel.setText('Data is being received from {}'.format(self.peername))
 		except: pass
@@ -2662,9 +2644,13 @@ class Ui_MainWindow(QObject):
 			'''
 			
 			#Send off the new data to the DSM
-			print(client_sock)
-			if client_sock != '': client_sock.send(dataout)	
-			
+			#print(client_sock)
+			try: 
+				client_sock.send(dataout)
+				self.CVI_Server.sendSuccess = True
+			except: 
+				print('client socket failed')#		if client_sock != '': client_sock.send(dataout)	
+				self.CVI_Server.sendSuccess = False
 			#Update front panel with data sent to dsm
 			self.datatodsm.setText(str(dataout).replace(",", ", "))	
 			
@@ -2734,28 +2720,18 @@ class Ui_MainWindow(QObject):
 		#finally:
 		try: self.CVIreplot()
 		except: pass
-			
-		#Kept for testing purposes; however, unecessary with DSM
-		#Removed because CVI does not need an echo.
-		#self.transport.write(data)
-		#print('Close the client socket')
-		#self.transport.close()					
 
-class myServer(QThread):
-	
-	#dataReceived = pyqtSignal()
 
-	#error = QtCore.pyqtSignal(QtNetwork.QTcpSocket.SocketError)
-	#class FortuneServer(QtNetwork.QTcpServer):
-	#def __init__(self, parent=None):
-	#	super(FortuneServer, self).__init__(parent)
+class QServer(QThread):
+
 	def __init__(self, host, portin, portout, parent=None):#(self, socketDescriptor, fortune, parent):
-		super(myServer, self).__init__(parent)
+		super(QServer, self).__init__(parent)
 		self.host = host
 		self.portin = portin
 		self.portout = portout
-		
 		self.stopFlag = False
+		
+		self.sendSuccess = False
 
 		# Create a TCP/IP socket
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -2778,13 +2754,20 @@ class myServer(QThread):
 		server_socket = self.sock
 		read_list = [server_socket]
 		write_list = []
+		
+		#except:
+		#	self.tcpOut = ''
+		self.tcpOut = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		
 		while not self.stopFlag:
-			readable, writable, errored = select.select(read_list, write_list, [], 0.1)
-			for s in readable:
+			readable, writable, errored = select.select(read_list, write_list, [], 0.01)
+			
+			for s in readable:			
 				if s is server_socket:
 					client_socket, address = server_socket.accept()
 					read_list.append(client_socket)
 					print("Connection from", address)
+					
 				else:
 					data = s.recv(1024)
 					if data: 
@@ -2793,21 +2776,22 @@ class myServer(QThread):
 					else:
 						#print('closed connection')
 						s.close()
+						#try: self.tcpOut.close()
+						#except: pass
 						read_list.remove(s)
-			
-				if len(write_list)==0:
+				
+				#if self.tcpOut == '' : self.tcpOut = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+				if not self.sendSuccess:
 					try:
 						self.tcpOut = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 						self.tcpOut.connect(self.client_address)
 						self.tcpOut.setblocking(0)
-						write_list = [self.tcpOut]
-						#write_list.append(self.tcpOut)
-					except: pass
-				if len(writable) == 0:
-					try: self.tcpOut.close()
-					except: pass
-					self.tcpOut = ''
-					write_list = []
+					except:
+						print('no good')
+						#self.tcpOut = ''
+				#else:
+					#try: self.tcpOut.close()
+					#except: pass
 						
 		for w in write_list:
 			w.close()
@@ -2871,6 +2855,17 @@ class IncomingServer(asyncio.Protocol):
 		except: pass
 		#ui.server.close()
 		#ui.disconnecting(MainWindow)
+		
+		
+class MyWindow(QtGui.QMainWindow):
+	def closeEvent(self,event):
+		result = QtGui.QMessageBox.warning(MainWindow, 'WARNING',\
+			 "Are you sure you want to close the program?", QtGui.QMessageBox.Yes, \
+			QtGui.QMessageBox.No)
+		event.ignore()
+
+		if result == QtGui.QMessageBox.Yes:
+			event.accept()	
 			
 if __name__ == "__main__":
 
@@ -2879,10 +2874,10 @@ if __name__ == "__main__":
 	
 	#Initialize GUI
 	app = QtWidgets.QApplication(sys.argv)
-	MainWindow = QtWidgets.QMainWindow()#QMainWindow()
+	#MainWindow = QtWidgets.QMainWindow()#QMainWindow()
+	MainWindow = MyWindow()
 	ui = Ui_MainWindow()
 	ui.setupUi(MainWindow)
-	#MainWindow.show()
 	MainWindow.showMaximized()
-
 	sys.exit(app.exec_())
+
