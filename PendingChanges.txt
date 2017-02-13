@@ -136,6 +136,15 @@ THINGS TO DO WITH A PREFLIGHT BUTTON
 	
 		
 
+		
+Something to fix:
+		
+Traceback (most recent call last):
+  File "CVI_Interface.py", line 2195, in processData
+    input = [float(i) for i in input]
+  File "CVI_Interface.py", line 2195, in <listcomp>
+    input = [float(i) for i in input]
+ValueError: could not convert string to float: '-99.9960001.5'
 	
 		
 		

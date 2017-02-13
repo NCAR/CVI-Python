@@ -59,6 +59,8 @@ import shutil
 class Ui_MainWindow(QObject):
 
 	dataReceived = pyqtSignal(object,object)
+	errorSignal = pyqtSignal(object)
+	logSignal = pyqtSignal(object)
 	
 	def __init__(self, parent=None):
 		super(Ui_MainWindow, self).__init__(parent)
@@ -283,7 +285,12 @@ class Ui_MainWindow(QObject):
 		self.commonNoteDropdown = QtWidgets.QComboBox(self.tab)
 		self.commonNoteDropdown.setObjectName("commonNoteDropdown")
 		self.tabLayout_1.addWidget(self.commonNoteDropdown, 22, 10, 3, 20)
-		self.commonNoteDropdown.setDisabled(True)
+		#self.commonNoteDropdown.setDisabled(True)
+		
+		self.commonNotes = ["Common Notes","Saw a cloud"
+			,"Didn't see a cloud"]
+		self.commonNoteDropdown.addItems(self.commonNotes)
+		self.commonNoteDropdown.activated.connect(lambda: self.addCommonNote(MainWindow))
 		
 		#Push to add custom note?
 		self.customNoteButton = QtWidgets.QPushButton(self.tab)
@@ -291,7 +298,9 @@ class Ui_MainWindow(QObject):
 		self.tabLayout_1.addWidget(self.customNoteButton, 22, 30, 3, 10)
 		self.customNoteButton.setStyleSheet("background-color: red")
 		self.customNoteButton.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
-		self.customNoteButton.setDisabled(True)
+		#self.customNoteButton.setDisabled(True)
+		self.customNoteButton.setText("User Entered Note")
+		self.customNoteButton.clicked.connect(lambda: self.userNote(MainWindow))
 		
 		#Widget for displaying file that is being saved to
 		self.currentfilelabel = QtWidgets.QLabel(self.tab)
@@ -303,21 +312,23 @@ class Ui_MainWindow(QObject):
 		self.currentfile.setDisabled(True)		
 					
 		#Status indicator for instructional display and current operation of instrument
-		self.mainstatus = QtWidgets.QTextEdit()
+		self.mainstatus = QtWidgets.QTextBrowser()#QTextEdit()
 		self.mainstatus.setObjectName("mainstatus")
 		self.mainstatus.setAlignment(Qt.AlignTop)
 		self.mainstatus.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
 		self.tabLayout_1.addWidget(self.mainstatus, 4, 11, 18, 28)
+		self.mainstatus.verticalScrollBar().setValue(self.mainstatus.verticalScrollBar().maximum())
+		#self.mainstatus.ensureCursorVisible()
 		
 		#Error indicator for alerting if there is a problem
-		self.errorstatus = QtWidgets.QTextEdit()
+		self.errorstatus = QtWidgets.QTextBrowser()#QTextEdit()
 		self.errorstatus.setObjectName("errorstatus")
 		self.errorstatus.setAlignment(Qt.AlignTop)
 		self.errorstatus.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
 		self.errorstatus.setStyleSheet("color: rgb(255, 0, 0);")
 		self.errorstatus.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Expanding)
 		self.tabLayout_1.addWidget(self.errorstatus,45,0,5,40)
-		
+		self.errorstatus.verticalScrollBar().setValue(self.mainstatus.verticalScrollBar().maximum())
 		
 		#Create Table for Viewing uncorrected, corrected, and calibrated flows
 		self.tableWidget = QtWidgets.QTableWidget(self.tab)
@@ -594,53 +605,6 @@ class Ui_MainWindow(QObject):
 			self.tabLayout_2.addWidget(tmpobject, 48, 10*i, 2, 10)
 			tmpobject.valueChanged.connect(lambda: self.syncSliders(MainWindow))
 
-		'''
-		#User input flows and labels for cvfx0,cvfx2,cvfx3,cvfx4,cvf1
-		self.cvfx0wrlabel = QtWidgets.QLabel(self.tab_2)
-		self.cvfx0wrlabel.setObjectName("cvfx0wrlabel")		
-		self.tabLayout_2.addWidget(self.cvfx0wrlabel, 46, 0, 2, 10)
-		self.cvfx0wr = QtWidgets.QLineEdit(self.tab_2)
-		self.cvfx0wr.setObjectName("cvfx0wr")
-		self.tabLayout_2.addWidget(self.cvfx0wr, 48, 0, 2, 10)		
-		self.cvfx2wrlabel = QtWidgets.QLabel(self.tab_2)
-		self.cvfx2wrlabel.setObjectName("cvfx2wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx2wrlabel, 46, 10, 2, 10)
-		self.cvfx2wr = QtWidgets.QLineEdit(self.tab_2)
-		self.cvfx2wr.setObjectName("cvfx2wr")
-		self.tabLayout_2.addWidget(self.cvfx2wr, 48, 10, 2, 10)
-		self.cvfx3wrlabel = QtWidgets.QLabel(self.tab_2)
-		self.cvfx3wrlabel.setObjectName("cvfx3wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx3wrlabel, 46, 20, 2, 10)
-		self.cvfx3wr = QtWidgets.QLineEdit(self.tab_2)
-		self.cvfx3wr.setObjectName("cvfx3wr")
-		self.tabLayout_2.addWidget(self.cvfx3wr, 48, 20, 2, 10)
-		self.cvfx4wrlabel = QtWidgets.QLabel(self.tab_2)
-		self.cvfx4wrlabel.setObjectName("cvfx4wrlabel")			
-		self.tabLayout_2.addWidget(self.cvfx4wrlabel, 46, 30, 2, 10)
-		self.cvfx4wr = QtWidgets.QLineEdit(self.tab_2)
-		self.cvfx4wr.setObjectName("cvfx4wr")
-		self.tabLayout_2.addWidget(self.cvfx4wr, 48, 30, 2, 10)
-		self.cvf1wrlabel = QtWidgets.QLabel(self.tab_2)
-		self.cvf1wrlabel.setObjectName("cvf1wrlabel")			
-		self.tabLayout_2.addWidget(self.cvf1wrlabel, 46, 40, 2, 10)
-		self.cvf1wr = QtWidgets.QLineEdit(self.tab_2)
-		self.cvf1wr.setObjectName("cvf1wr")
-		self.tabLayout_2.addWidget(self.cvf1wr, 48, 40, 2, 10)
-		'''
-		'''
-		self.cvfx0wrSlider = QSlider(Qt.Horizontal, self.tab_2)
-		self.cvfx0wrSlider.setMinimum(0)
-		self.cvfx0wrSlider.setMaximum(50)
-		self.cvfx0wrSlider.setValue(0)
-		self.cvfx0wrSlider.setTickPosition(QSlider.TicksBelow)
-		self.cvfx0wrSlider.setTickInterval(10)
-		self.tabLayout_2.addWidget(self.cvfx0wrSlider, 47, 40, 2, 10)		
-		self.cvfx0wrSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow))
-		'''
-		
-		
-		#size = self.sl.value()
-		
 		#Button for updating saved calibrations based on populated tables
 		self.saveCals = QtWidgets.QPushButton(self.tab_2)
 		self.saveCals.setObjectName("saveCals")
@@ -1142,7 +1106,7 @@ class Ui_MainWindow(QObject):
 		self.path = self.basedir + '/' + self.project + '/'
 		self.dataFile = time.strftime("%y%m%d%H.%Mq")
 		self.errorFile = self.dataFile + '_errorlog'
-		self.logFile = self.dataFile + '_errorlog'
+		self.logFile = self.dataFile + '_log'
 		
 		self.preflightPrefix = ''
 						
@@ -1235,6 +1199,13 @@ class Ui_MainWindow(QObject):
 		self.saveCals.clicked.connect(lambda: self.savecalibrations(MainWindow))
 		self.deleteCals.clicked.connect(lambda: self.deleteCalibrations(MainWindow))
 		self.refreshCals.clicked.connect(lambda: self.readcalsfromfiles(MainWindow))
+			
+		#User Defined Signals
+		self.dataReceived.connect(self.processData)
+		self.errorSignal.connect(self.errorLog)
+		self.logSignal.connect(self.mainLog)
+		
+		#self.errorSignal.emit(*arg)
 		
 		# creates a server and starts listening to TCP connections
 		self.runconnection = False
@@ -1250,55 +1221,78 @@ class Ui_MainWindow(QObject):
 		#self.CVIreplot()
 		
 		#Create server loop
-		#self.server_loop = asyncio.get_event_loop()	
+		#self.server_loop = asyncio.get_event_loop()
+	
+	def addCommonNote(self, MainWindow):
+		#self.commonNoteDropdown.activated.connect(lambda: self.addCommonNote(MainWindow))
+		if self.commonNoteDropdown.currentIndex() != 0:
+			self.logSignal.emit(self.commonNoteDropdown.currentText())
+			self.commonNoteDropdown.setCurrentIndex(0)
+		
+	def userNote(self, MainWindow):
+		userNote, contupdate = QInputDialog.getText(MainWindow, 'Custom Note', 'Please enter a note to be added to the log file .... or press cancel')
+		if contupdate:
+			self.logSignal.emit(userNote)
 
 	def preflightChecklist(self, MainWindow):
-		calupdatetext, contupdate = QInputDialog.getText(MainWindow, 'Updating Preflight Prefix', 'Please enter a directory prefix for the flight (e.g. RF01)')		
+		preflighttext, contupdate = QInputDialog.getText(MainWindow, 'Updating Preflight Prefix', 'Please enter a directory prefix for the flight (e.g. RF01)')		
 		if contupdate:
-			self.preflightPrefix = '/'+calupdatetext+'/'
+			self.preflightPrefix = '/'+preflighttext+'/'
 		self.preflightButton.setDisabled(True)
+		self.dataSave()
 		
-	def errorHandler(self, errorCode):
+	def errorLog(self, errorString):#errorCode):
 		#Code for populating error status on first tab
 		if self.mainerrorlist[0] in self.errorstatus.toPlainText():
-			self.errorstatus.setText(self.mainerrorlist[errorCode])
-		elif not self.mainerrorlist[errorCode] in self.errorstatus.toPlainText():
-			self.errorstatus.append(self.mainerrorlist[errorCode])
-		self.dataSave(2, time.strftime("%x %X\t")+self.mainerrorlist[errorCode]+'\n')
-		#self.dataSave(2, self.mainerrorlist[errorCode])			
+			self.errorstatus.setText(errorString)
+		else:#elif not errorString in self.errorstatus.toPlainText():#self.mainerrorlist[errorCode] in self.errorstatus.toPlainText():
+			self.errorstatus.append(errorString)
+		self.dataSave(2, time.strftime("%x %X\t")+errorString+'\n')			
 		
-	def mainLog(self, logCode):
-		self.mainstatus.append('\n')
-		self.mainstatus.append(time.strftime("%x %X\t")+self.mainstatuslist[logCode])
-		self.dataSave(1, time.strftime("%x %X\t")+self.mainstatuslist[logCode]+'\n')
+	def mainLog(self, logString):#logCode):
+		if self.mainstatuslist[0] in self.mainstatus.toPlainText():
+			self.mainstatus.setText(time.strftime("%x %X\t")+logString+'\n')
+		else:
+			self.mainstatus.append(time.strftime("%x %X\t")+logString+'\n')#self.mainstatuslist[logCode])
+		self.dataSave(1, time.strftime("%x %X\t")+logString+'\n')#self.mainstatuslist[logCode]+'\n')
 		
-	def dataSave(self, saveCode, data, header=''):
+	def dataSave(self, saveCode = -1, data = '', header=''):
 		if saveCode == 0: saveFile = self.dataFile
 		if saveCode == 1: saveFile = self.logFile
 		if saveCode == 2: saveFile = self.errorFile
+		
+		oldDir = self.basedir+'/'+self.project+'/'#+saveFile
+		newDir = self.basedir+'/'+self.project+'/'+self.preflightPrefix+'/'#+saveFile
+		
+		oldDir = oldDir.replace('\\','/')
+		newDir = newDir.replace('\\','/')
+		while True:
+			if oldDir.replace('//','/') == oldDir and newDir.replace('//','/') == newDir : break
+			oldDir = oldDir.replace('//','/')
+			newDir = newDir.replace('//','/')
+		
 		if (len(self.preflightPrefix) != 0):
-			if os.path.isfile(self.basedir+'/'+self.project+'/'+saveFile):
-				if not os.path.exists(self.basedir+'/'+self.project+'/'+self.preflightPrefix):
-					os.makedirs(os.path.dirname(self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile))
-				#os.rename(self.basedir+'/'+self.project+'/'+saveFile, self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile)
-				shutil.move(self.basedir+'/'+self.project+'/'+saveFile,\
-					self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile)
-				#os.remove(self.basedir+'/'+self.project+'/'+saveFile)
-				#os.remove(self.basedir+'/'+self.project+'/'+saveFile)
+			if not os.path.exists(os.path.dirname(newDir)):
+				os.makedirs(os.path.dirname(newDir))
+			if os.path.isfile(oldDir+self.dataFile):
+				shutil.move(oldDir+self.dataFile,newDir+self.dataFile) #os.rename
+			if os.path.isfile(oldDir+self.logFile):
+				shutil.move(oldDir+self.logFile, newDir+self.logFile)
+			if os.path.isfile(oldDir+self.errorFile):
+				shutil.move(oldDir+self.errorFile, newDir+self.errorFile)
 				
-		if not os.path.isfile(self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile):
-			if not os.path.exists(self.basedir+'/'+self.project+'/'+self.preflightPrefix):
-				os.makedirs(os.path.dirname(self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile))
-			if(header != ''):
-				with open(self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile, 'a') as f:
-					f.write(header)
-				
-		with open(self.basedir+'/'+self.project+'/'+self.preflightPrefix+saveFile,'a') as f:
-			f.write(data)
-		#os.rename("path/to/current/file.foo", "path/to/new/desination/for/file.foo")
-		#shutil.move("path/to/current/file.foo", "path/to/new/destination/for/file.foo")
-
-		self.currentfile.setText(str(self.basedir+'/'+self.project+'/'+self.preflightPrefix+self.dataFile))
+		if saveCode != -1:
+			newDir = newDir + saveFile
+			if not os.path.isfile(newDir):
+				if not os.path.exists(os.path.dirname(newDir)):
+					os.makedirs(os.path.dirname(newDir))
+				if(header != ''):
+					with open(newDir, 'a') as f:
+						f.write(header)		
+			with open(newDir,'a') as f:
+				f.write(data)
+			
+		self.currentfile.setText(str(newDir))
 
 
 	def syncSliders(self, MainWindow, widget = None):
@@ -1399,7 +1393,7 @@ class Ui_MainWindow(QObject):
 		#	If found, the program begins loading parameters, otherwise it creates a template
 		#	file and displays an error message
 		if not os.path.isfile(ui.basedir+ui.programdefaults):
-			self.errorHandler(2)
+			self.errorLog(self.mainerrorlist[2])
 			#Code for populating error status on first tab
 			#if self.mainerrorlist[0] in self.errorstatus.toPlainText():
 			#	self.errorstatus.setText(self.mainerrorlist[2])
@@ -1407,7 +1401,7 @@ class Ui_MainWindow(QObject):
 			#	self.errorstatus.append(self.mainerrorlist[2])
 
 			#Template default file that is saved if file is not found
-			inputstring = ('#\tProgram Defaults for Python Code\r\n'+'#\t\tBE CAREFUL WITH SPACES, ENSURE ONE SPACE AFTER COLON\r\n'
+			inputstring = ('#\tProgram Defaults for Python Code\r\n'
 				+'#\r\n'
 				+'#\r\n'+'#\tDirectory for which all branching directories form (DO NOT CHANGE)\r\n'+'Base Directory: ~/CVI/\r\n'
 				+'#\r\n'+'#\tA directory name which contains project data\r\n'+'Project Name: Testing\r\n'
@@ -1454,30 +1448,38 @@ class Ui_MainWindow(QObject):
 					#	then recognize it as a line of data
 					if (lines[0] != '#' and len(lines[0].replace(" ","")) != 0) :
 						#Creates and dynamically builds the array
+						try: lines = lines.split(':',1)[1]
+						except: pass
+						while True:
+							if lines.replace(" ","").replace("\n","").replace("\r","") == lines:
+								break
+							lines = lines.replace(" ","").replace("\n","").replace("\r","")							
 						try:
 							programdefaultstrings.extend([lines])
 						except:
 							programdefaultstrings = [lines]
-			
-			#print(programdefaultstrings[0].split(': ')[1].replace(" ",""))
-			#print(os.path.expanduser(programdefaultstrings[0].split(': ')[1].replace(" ","").replace("\n","").replace("\r","")).replace('\\','/'))						
 
 			#Populates front panel and appropriate variables with default data
 			#Directory and network information
-			self.basedir = os.path.expanduser(programdefaultstrings[0].split(': ')[1].replace(" ","").replace("\n","").replace("\r","")).replace('\\','/')#
+
+			self.basedir = os.path.expanduser(programdefaultstrings[0]).replace("\\","/")
+			while True:
+				if self.basedir.replace("//","/") == self.basedir: break
+				self.basedir = self.basedir.replace("//","/")
 			self.basedirval.setText(self.basedir)
-			self.project = programdefaultstrings[1].split(': ')[1].replace(" ","").replace("\n","").replace("\r","")
+			
+			self.project = programdefaultstrings[1]
 			self.projectdirval.setText(self.project)
-			self.calname = programdefaultstrings[2].split(': ')[1].replace(" ","").replace("\n","").replace("\r","")
+			self.calname = programdefaultstrings[2]
 			self.caldirval.setText(self.calname)
-			self.ipaddress.setText(programdefaultstrings[3].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))
-			self.portin.setText(programdefaultstrings[4].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))
-			self.portout.setText(programdefaultstrings[5].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))
+			self.ipaddress.setText(programdefaultstrings[3])
+			self.portin.setText(programdefaultstrings[4])
+			self.portout.setText(programdefaultstrings[5])
 			
 			#Default valve and flow information
-			self.valvepositions = programdefaultstrings[6].split(': ')[1].replace(" ","").replace("\n","").replace("\r","").split(',')
+			self.valvepositions = programdefaultstrings[6].split(',')
 			self.valvepositions = [float(x) for x in self.valvepositions]
-			self.internalFlows = programdefaultstrings[7].split(': ')[1].replace(" ","").replace("\n","").replace("\r","").split(',')
+			self.internalFlows = programdefaultstrings[7].split(',')
 			self.internalFlows = [float(x) for x in self.internalFlows]
 			for i in range(0,len(self.flowedit)):
 				MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[i])\
@@ -1485,29 +1487,33 @@ class Ui_MainWindow(QObject):
 				MainWindow.findChild(QtWidgets.QSlider,self.flowedit[i]+'Slider')\
 					.setValue(int(self.internalFlows[i]*10.0))
 				
-			self.valvesource.setChecked(int(programdefaultstrings[8].split(': ')[1].replace(" ","").replace("\n","").replace("\r","")))
-			self.flowsource.setChecked(int(programdefaultstrings[9].split(': ')[1].replace(" ","").replace("\n","").replace("\r","")))
+			self.valvesource.setChecked(int(programdefaultstrings[8]))
+			self.flowsource.setChecked(int(programdefaultstrings[9]))
 
 			#External instrument addition/removal parameters
-			self.cvf3cw.setText(programdefaultstrings[10].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))
-			self.cvf3cwSlider.setValue(int(float(programdefaultstrings[10].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))*10.0))
-			self.offset.setText(programdefaultstrings[11].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))
-			self.offsetSlider.setValue(int(float(programdefaultstrings[11].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))*10.0))
-			self.delay.setText(programdefaultstrings[12].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))
-			self.delaySlider.setValue(int(float(programdefaultstrings[12].split(': ')[1].replace(" ","").replace("\n","").replace("\r",""))*10.0))
+			self.cvf3cw.setText(programdefaultstrings[10])
+			self.cvf3cwSlider.setValue(int(float(programdefaultstrings[10])*10.0))
+			self.offset.setText(programdefaultstrings[11])
+			self.offsetSlider.setValue(int(float(programdefaultstrings[11])*10.0))
+			self.delay.setText(programdefaultstrings[12])
+			self.delaySlider.setValue(int(float(programdefaultstrings[12])*10.0))
 			
 			#Full external instrument configurations
 			for i in range(0,4):
 				for j in range(0, len(self.auxdevtoggleslist)):
 					if j in [0,2,5]:
-						MainWindow.findChild(QtWidgets.QLineEdit,"cvfx"+str(i+5)+self.auxdevtoggleslist[j]).setText(programdefaultstrings[13+i].split(': ')[1].replace(" ","").split(',')[j].replace("\n","").replace("\r",""))
+						MainWindow.findChild(QtWidgets.QLineEdit,\
+							"cvfx"+str(i+5)+self.auxdevtoggleslist[j])\
+							.setText(programdefaultstrings[13+i].split(',')[j])
 					else:
-						MainWindow.findChild(QtWidgets.QPushButton,"cvfx"+str(i+5)+self.auxdevtoggleslist[j]).setChecked(int(programdefaultstrings[13+i].split(': ')[1].replace(" ","").split(',')[j].replace("\n","").replace("\r","")))
+						MainWindow.findChild(QtWidgets.QPushButton,\
+							"cvfx"+str(i+5)+self.auxdevtoggleslist[j])\
+							.setChecked(int(programdefaultstrings[13+i].split(',')[j]))
 						
 			#Null channel configurations
 			for i in range(0, len(self.signalnulls)):
 				MainWindow.findChild(QtWidgets.QPushButton,"Null"+str(i))\
-					.setChecked(int(programdefaultstrings[17].split(': ')[1].replace(" ","").split(',')[i].replace("\n","").replace("\r","")))
+					.setChecked(int(programdefaultstrings[17].split(',')[i]))
 				
 	#Addition of external instruments to the counterflow calculation
 	#	Only runs once the connect button is clicked
@@ -1810,7 +1816,7 @@ class Ui_MainWindow(QObject):
 			
 		#Exception throws error message and instructions to the front panel
 		except:
-			self.errorHandler(1)
+			self.errorLog(self.mainerrorlist[1])
 			#if self.mainerrorlist[0] in self.errorstatus.toPlainText():
 			#	self.errorstatus.setText(self.mainerrorlist[1])
 			#elif not self.mainerrorlist[1] in self.errorstatus.toPlainText():
@@ -1881,7 +1887,7 @@ class Ui_MainWindow(QObject):
 			
 			#Exception throws error message and instructions to the front panel
 			except:
-				self.errorHandler(1)
+				self.errorLog(self.mainerrorlist[1])
 				#if self.mainerrorlist[0] in self.errorstatus.toPlainText():
 				#	self.errorstatus.setText(self.mainerrorlist[1])
 				#elif not self.mainerrorlist[1] in self.errorstatus.toPlainText():
@@ -2063,8 +2069,6 @@ class Ui_MainWindow(QObject):
 		self.statusindicatorlabel.setText("Ensuring Disconnection . . . . . . . ")
 		self.statusindicatorlabel.setText("Initiating Connection . . . . . . . .")
 		self.runconnection = True
-		
-		self.dataReceived.connect(self.processData)
 
 		#Create server loop
 #		self.server_loop = asyncio.get_event_loop()
@@ -2169,87 +2173,90 @@ class Ui_MainWindow(QObject):
 		
 		#If data looks does not produce error (i.e. not a header) then proceed. 
 		#	Otherwise, print header or error prone input to graphical interface
-		try: #if datain[0] != 'N' :
-			a=1
-		except: pass#else:
-		if datain[0] != 'N':
-			#print(datain)
+		#try: #if datain[0] != 'N' :
+		calcError = False
+		try: #if datain[0] != 'N':
 			try:
-				if datain[0] == 'N' :
-					self.dsmheader.setText(str(datain))
-				else:
-					self.errorHandler(3)
-			except:	pass		
-		
-			input = datain.split(',')
-			input = [float(i) for i in input]
+				input = datain.split(',')
+				input = [float(i) for i in input]
+			except:
+				self.errorSignal.emit("Error in tcp string")
+				return
+			#	calcError = True
+			#if calcError: break
 			
 			#self.calvalues is the array with all of the calibrations
 			#	The first 16 rows contain C0, C1, C2 in their respective columns
 			#	The next 5 rows contain RHOD, CVTBL, CVTBR, cvoff1, and LTip in the first column
 			#	The next 4 rows contain C0, C1, C2, and C3
-			C0 = np.r_[self.calvalues[:16,0,self.calversionlist.currentIndex()]]
-			C1 = np.r_[self.calvalues[:16,1,self.calversionlist.currentIndex()]]
-			C2 = np.r_[self.calvalues[:16,2,self.calversionlist.currentIndex()]]
-			more = np.r_[self.calvalues[16:21,0,self.calversionlist.currentIndex()]]
-			tdl_cals = np.c_[self.calvalues[21:25,0,self.calversionlist.currentIndex()], self.calvalues[21:25,1,self.calversionlist.currentIndex()], self.calvalues[21:25,2,self.calversionlist.currentIndex()], self.calvalues[21:25,3,self.calversionlist.currentIndex()]]
-			opc_cals = np.r_[self.calvalues[25,0,self.calversionlist.currentIndex()],self.calvalues[25,1,self.calversionlist.currentIndex()]]
-			tdl_cals = np.transpose(tdl_cals)
+			
+			try:
+				C0 = np.r_[self.calvalues[:16,0,self.calversionlist.currentIndex()]]
+				C1 = np.r_[self.calvalues[:16,1,self.calversionlist.currentIndex()]]
+				C2 = np.r_[self.calvalues[:16,2,self.calversionlist.currentIndex()]]
+				more = np.r_[self.calvalues[16:21,0,self.calversionlist.currentIndex()]]
+				tdl_cals = np.c_[self.calvalues[21:25,0,self.calversionlist.currentIndex()], self.calvalues[21:25,1,self.calversionlist.currentIndex()], self.calvalues[21:25,2,self.calversionlist.currentIndex()], self.calvalues[21:25,3,self.calversionlist.currentIndex()]]
+				opc_cals = np.r_[self.calvalues[25,0,self.calversionlist.currentIndex()],self.calvalues[25,1,self.calversionlist.currentIndex()]]
+				tdl_cals = np.transpose(tdl_cals)
+			except:
+				self.errorSignal.emit("Error in parsing calibration tables")
+				return
+				
 			####MAY NEED TO TRANSPOSE TDL_CALS######
 			
 			#File operations for "rollover" file. File is used to carry previous data
 			#	from prior program runs to replace "bad" data with previously "good" data
-			if not os.path.isfile(self.basedir+self.tmpfile):
-				#Formats data in a good way to be saved
+			try:
+				if not os.path.isfile(self.basedir+self.tmpfile):
+					#Formats data in a good way to be saved
+					rolloverinput = input
+					inputstring = [ "{:11.10g}".format(x) for x in rolloverinput ]
+					inputstring = ','.join(inputstring)
+					inputstring += '\n'
+					#Create rollover file since it does not already exist
+					os.makedirs(os.path.dirname(self.basedir+self.tmpfile), exist_ok=True)
+					with open(self.basedir+self.tmpfile, "w") as f:
+						f.write(inputstring)
+						f.close()
+				#If file already exists, grab previous data to potentially overwrite with
+				else:
+					with open(self.basedir + self.tmpfile, "rb") as f:
+						first = f.readline()      # Read the first line.
+						f.close()
+					rolloverinput = first.decode('utf-8').split(',')#('\t')			
+				#Format rollover data in preparation for overwriting of "bad" data
+				rolloverinput = [float(x) for x in rolloverinput]
+				#Conditional checks for "bad" data. If data is "bad",
+				#	it is replaced with the rollover data
+				for i in range(3,19):
+					if input[i] <= -99: input[i] = (rolloverinput[i])
+				#if tdl_data <= -1, use stored value from before, except for TDLzero which if equal to -99.99, use stored value.
+				#	TDL_ZERO is index 6 (index 25 of input)
+				for i in [19,20,21,22,23,24,26,27,28] :
+					if input[i] <= -1: input[i] = (rolloverinput[i])
+				if input[25] == -99.99: input[25] = (rolloverinput[25])
+			
+				#Windspeed (WSPD) overwrite
+				if input[1] < 4 or input[1] > 300 :
+					input[1] = rolloverinput[1]
+				#Formatting corrected new data into string to be ready to 
+				#	overwrite as new rollover data for future use
 				rolloverinput = input
 				inputstring = [ "{:11.10g}".format(x) for x in rolloverinput ]
 				inputstring = ','.join(inputstring)
 				inputstring += '\n'
-				#Create rollover file since it does not already exist
-				os.makedirs(os.path.dirname(self.basedir+self.tmpfile), exist_ok=True)
+				#Open file and write rollover data
 				with open(self.basedir+self.tmpfile, "w") as f:
 					f.write(inputstring)
 					f.close()
-			#If file already exists, grab previous data to potentially overwrite with
-			else:
-				with open(self.basedir + self.tmpfile, "rb") as f:
-					first = f.readline()      # Read the first line.
-					f.close()
-				rolloverinput = first.decode('utf-8').split(',')#('\t')
-			
-			#Format rollover data in preparation for overwriting of "bad" data
-			rolloverinput = [float(x) for x in rolloverinput]
-			
-			#Conditional checks for "bad" data. If data is "bad",
-			#	it is replaced with the rollover data
-			for i in range(3,19):
-				if input[i] <= -99: input[i] = (rolloverinput[i])
-			#if tdl_data <= -1, use stored value from before, except for TDLzero which if equal to -99.99, use stored value.
-			#	TDL_ZERO is index 6 (index 25 of input)
-			for i in [19,20,21,22,23,24,26,27,28] :
-				if input[i] <= -1: input[i] = (rolloverinput[i])
-			if input[25] == -99.99: input[25] = (rolloverinput[25])
-			
-			#Windspeed (WSPD) overwrite
-			if input[1] < 4 or input[1] > 300 :
-				input[1] = rolloverinput[1]
-			
-			#Formatting corrected new data into string to be ready to 
-			#	overwrite as new rollover data for future use
-			rolloverinput = input
-			inputstring = [ "{:11.10g}".format(x) for x in rolloverinput ]
-			inputstring = ','.join(inputstring)
-			inputstring += '\n'
-			#Open file and write rollover data
-			with open(self.basedir+self.tmpfile, "w") as f:
-				f.write(inputstring)
-				f.close()
+			except:
+				self.errorSignal.emit("Error in parsing rollover data")
+				return	
 			
 			'''
 			Code just in case we want to add a timestamp to the rollover data.
 			tmptimestamp = 	time.strftime("%Y %b %d %H:%M:%S",time.gmtime())
 			'''
-			
 			#Taking the null signals from the display
 			nullsignals = [0]*16
 			for i in range(0,len(self.signalnulls)):
@@ -2260,27 +2267,30 @@ class Ui_MainWindow(QObject):
 				#if self.MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[i]).text() != '': 
 					#self.flowlimits[i] = float(self.MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[i]).text())
 				
-			#Taking the instrument configuration data from the display
-			for i in range(0,4):
-				for j in range(1,len(self.auxdevtoggleslist)):
-					if j in [0,2,5]:
-						tmpobject = self.MainWindow.findChild(QtWidgets.QLineEdit,'cvfx'+str(i+5)+self.auxdevtoggleslist[j])
-						if tmpobject.text() != '': self.cvfxoptions[j][i] = float(tmpobject.text())
-					else:
-						tmpobject = self.MainWindow.findChild(QtWidgets.QPushButton,'cvfx'+str(i+5)+self.auxdevtoggleslist[j])
-						self.cvfxoptions[j][i] = int(tmpobject.isChecked())
-
+			try:
+				#Taking the instrument configuration data from the display
+				for i in range(0,4):
+					for j in range(1,len(self.auxdevtoggleslist)):
+						if j in [0,2,5]:
+							tmpobject = self.MainWindow.findChild(QtWidgets.QLineEdit,'cvfx'+str(i+5)+self.auxdevtoggleslist[j])
+							if tmpobject.text() != '': self.cvfxoptions[j][i] = float(tmpobject.text())
+						else:
+							tmpobject = self.MainWindow.findChild(QtWidgets.QPushButton,'cvfx'+str(i+5)+self.auxdevtoggleslist[j])
+							self.cvfxoptions[j][i] = int(tmpobject.isChecked())
+			except:
+				self.errorSignal.emit("Error in parsing external instrument configurations")
+				return
+							
 			#Connection status of individual channels	
 			self.cvfxoptions[0][0] = int(self.v1.isChecked())
 			self.cvfxoptions[0][1] = int(self.v2.isChecked())
 			self.cvfxoptions[0][2] = int(self.v3.isChecked())
 			self.cvfxoptions[0][3] = int(self.v4.isChecked())
 
-
 			'''
 				PRIMARY COMPUTATION
 			'''
-
+			
 			#############################################################################
 			#############################################################################
 			#############################################################################
@@ -2291,7 +2301,6 @@ class Ui_MainWindow(QObject):
 			
 			#OLD REFERENCE FOR WHEN COMPUTATION ROUTINE WAS SEPARATE
 			#output, calibrated = cvioutput( input , self.flowlimits, self.cfexcess, self.cvfxoptions, nullsignals, self.flowio.isChecked(), self.cvimode.isChecked(), C0, C1, C2, more, tdl_cals, opc_cals)
-			
 			
 			'''
 			#INPUT array is of the form
@@ -2399,8 +2408,11 @@ class Ui_MainWindow(QObject):
 			#	IF the pressure is reported correctly.
 			#	ALSO performs the flow summations.
 			for i in range(1,10):
-				if calibrated[10] > 0 : zerocorrectedflows[i] = ( calibrated[i]*(1013.25/calibrated[10])*((calibrated[14]+273.15)/294.26))
-				else : zerocorrectedflows[i] = ( calibrated[i]*(1013.25/0.0001)*((calibrated[14]+273.15)/294.26))
+				if calibrated[10] > 0 : 
+					zerocorrectedflows[i] = ( calibrated[i]*(1013.25/calibrated[10])*((calibrated[14]+273.15)/294.26))
+				else : 
+					zerocorrectedflows[i] = ( calibrated[i]*(1013.25/0.0001)*((calibrated[14]+273.15)/294.26))
+					self.errorSignal.emit("Pressure reading invalid")
 				if zerocorrectedflows[i] < 0 : zerocorrectedflows[i] = 0.0001
 				summedflow = summedflow + calibrated[i]
 				summedzerocorrectedflow = summedzerocorrectedflow + zerocorrectedflows[i]	
@@ -2417,7 +2429,9 @@ class Ui_MainWindow(QObject):
 	
 			#Calculation of the enhancement factor?
 			cvcfact=(cvtascc*math.pi*(calcoeffs[20]**2))/(cvftc*1000.0/60) #calcoeffs[20] corresponds to cvtbr;
-			if cvcfact<1 : cvcfact=1
+			if cvcfact<1 : 
+				cvcfact=1
+				self.errorSignal.emit("Enhancement factor forecd to unity")
 		
 			#cutsize (NOT SURE IF NECESSARY))
 			cutsize = 0#5	
@@ -2566,29 +2580,12 @@ class Ui_MainWindow(QObject):
 			if self.flowsource.isChecked():
 				for i in range(0,len(self.cvfManVoltLabels)):
 					MainWindow.findChild(QtWidgets.QLineEdit,self.cvfManVoltLabels[i]).setText(str(dataout[i+1]))
-					#self.cvfx0wr.setText(str(dataout[1]))
-					#self.cvfx2wr.setText(str(dataout[2]))
-					#self.cvfx3wr.setText(str(dataout[3]))
-					#self.cvfx4wr.setText(str(dataout[4]))
-					#self.cvf1wr.setText(str(dataout[5]))
 			else:
 				for i in range(0,len(self.cvfManVoltLabels)):
 					if MainWindow.findChild(QtWidgets.QLineEdit,self.cvfManVoltLabels[i]).text() != "" :
 						dataout[i+1] = float(MainWindow.findChild(QtWidgets.QLineEdit,self.cvfManVoltLabels[i]).text())
 					else:
 						dataout[i+1] = 0.00
-				'''
-				if self.cvfx0wr.text() != "" : dataout[1] = float(self.cvfx0wr.text())
-				else: dataout[1] = 0.00
-				if self.cvfx2wr.text() != "" : dataout[2] = float(self.cvfx2wr.text())
-				else: dataout[2] = 0.00
-				if self.cvfx3wr.text() != "" : dataout[3] = float(self.cvfx3wr.text())
-				else: dataout[3] = 0.00
-				if self.cvfx4wr.text() != "" : dataout[4] = float(self.cvfx4wr.text())
-				else: dataout[4] = 0.00
-				if self.cvf1wr.text() != "" : dataout[5] = float(self.cvf1wr.text())
-				else: dataout[5] = 0.00	
-				'''
 			
 			#Added for populating raw input/output data table
 			_translate = QtCore.QCoreApplication.translate
@@ -2599,14 +2596,6 @@ class Ui_MainWindow(QObject):
 			#print(self.rawInOutData)
 			for i in range(0,len(dataout)):
 				self.rawInOutData[i,1] = dataout[i]
- 			
-			#self.rawInOutData[:,0] = np.r_[input[i]]
-			#for i in range(0,len(dataout)):
-			#self.rawInOutData[:,1] = np.r_[dataout[i]]
-
-			#for i in range(0,len(dataout)):
-			#	item = self.tableWidget.item(i, 1)
-			#	item.setText(_translate("MainWindow",str(self.dataout[i])))
 
 			#Sample dataout for testing
 			#dataout = [dataout[0],-0.081,1.059,1.968,79.022,0.029,0,1,0,1,0,0,0,10.000,1.000,0.000,-83.974,0.000]
@@ -2649,25 +2638,16 @@ class Ui_MainWindow(QObject):
 				client_sock.send(dataout)
 				self.CVI_Server.sendSuccess = True
 			except: 
-				print('client socket failed')#		if client_sock != '': client_sock.send(dataout)	
+				self.errorSignal.emit("Failed to send feedback signal to DSM")
+				#print('client socket failed')#		if client_sock != '': client_sock.send(dataout)	
 				self.CVI_Server.sendSuccess = False
+				
 			#Update front panel with data sent to dsm
 			self.datatodsm.setText(str(dataout).replace(",", ", "))	
 			
 			self.tabledata = np.c_[input[3:19], calibrated[0:16], np.r_[zerocorrectedflows[:], [np.nan]*6]]
 			try:
-				#If array has -9999 in first slot (i.e. initialized
-				#	but does not contain data), replace data with
-				#	with the new stuff.
-				#else if number of data points is greater than 900 (15 minutes)
-				#	cut off first value, add new end value
-				#else add new value to end
-				
-				#SHOULD BE REPLACED WITH EXCEPTION ROUTINE
-				
 				newdata = np.r_[input[0],input[19:22], extra[:]]
-				#for i in range(1,len(newdata)):
-				#	if (newdata[i] <= 0): newdata[i] = np.nan
 				try:
 					try:
 						self.plotdata = np.c_[self.plotdata[:,-899:], newdata]
@@ -2675,51 +2655,38 @@ class Ui_MainWindow(QObject):
 						self.plotdata = np.c_[self.plotdata, newdata]
 				except:
 					self.plotdata = np.c_[newdata]
-				#newdata = np.r_[input[0],input[19:22], extra[:]]
-				#for i in range(1,len(newdata)):
-				#	if (newdata[i] <= 0): newdata[i] = np.nan
-				#if( self.dim[1] == 1 and self.plotdata[0] == -9999 ):
-				#	self.plotdata = np.c_[newdata] #Appends the column b onto a
-				#elif (self.dim[1] >= 900):
-				#	self.plotdata = np.c_[self.plotdata[:,-899:], newdata ]
-				#else:
-				#	self.plotdata = np.c_[self.plotdata,  newdata]
 			except NameError:
-				print ("There was a problem in the plotting")
-			#finally:
-				#determine size of new array
-				#self.dim = self.plotdata.shape
+				self.errorSignal.emit("There was an error in the plotting data")
+				#print ("There was a problem in the plotting")
 				
-			#Originally had C:\data\
-			#	Appended to project title (i.e. IDEAS2013\)
-			#	The file name then listed as
-			#	YYMMDDHH.MM with 'q' on the end
-			#	Full file name could be YYMMDDHH.MMq
-			#	In certain directory.
-			outputstring = [ "{:11.5g}".format(x) for x in output ]
-			outputstring = ','.join(outputstring)
-			outputstring += '\n'
+			try:	
+				#Originally had C:\data\
+				#	Appended to project title (i.e. IDEAS2013\)
+				#	The file name then listed as
+				#	YYMMDDHH.MM with 'q' on the end
+				#	Full file name could be YYMMDDHH.MMq
+				#	In certain directory.
+				outputstring = [ "{:11.5g}".format(x) for x in output ]
+				outputstring = ','.join(outputstring)
+				outputstring += '\n'
 			
-			#Save data to project path
-			self.dataSave(0, outputstring, self.header)
-			#if not os.path.isfile(self.path+self.dataFile):
-			#	os.makedirs(os.path.dirname(self.path+self.dataFile), exist_ok=True)
-			#	with open(self.path+self.dataFile, "w") as f:
-			#		f.write(self.header)
-			#		f.write(outputstring)
-			#		f.close()
-			#else:
-			#	with open(self.path+self.dataFile, "a") as f:
-			#		f.write(outputstring)
-			#		f.close()
-					
+				#Save data to project path
+				self.dataSave(0, outputstring, self.header)
+			except: self.errorSignal.emit("Error in saving data")
+
 		#Exception to print data header or error data to DSM
 		#	header text box on display
-		#except:
-		
-		#finally:
-		try: self.CVIreplot()
-		except: pass
+		except:
+			if datain[0] == 'N' :
+				self.dsmheader.setText(str(datain))
+			else:
+				self.errorSignal.emit("General error in flow calculation")
+				#self.errorSignal.emit(self.mainerrorlist[3])
+				#self.errorLog(self.mainerrorlist[3])
+				
+		finally:
+			try: self.CVIreplot()
+			except: self.errorSignal.emit("Error in plotting")
 
 
 class QServer(QThread):
@@ -2739,10 +2706,10 @@ class QServer(QThread):
 		
 		#Then bind() is used to associate the socket with the server address. In this case, the address is localhost, referring to the current server, and the port number is 10000.		
 		# Bind the socket to the port
-		#server_address = ('', 30005)
-		self.server_address = ('', self.portin)
+		self.server_address = ('localhost', self.portin)
 		self.client_address = ('localhost',self.portout)#self.host, self.portout)
 		#print(sys.stderr, 'starting up on %s port %s' % self.server_address)
+		ui.logSignal.emit(str('Starting up local server on %s port %s' % self.server_address))
 		
 		self.sock.bind(self.server_address)
 
@@ -2760,39 +2727,40 @@ class QServer(QThread):
 		self.tcpOut = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		
 		while not self.stopFlag:
-			readable, writable, errored = select.select(read_list, write_list, [], 0.01)
+			readable, writable, errored = select.select(read_list, write_list, [], 0)
 			
-			for s in readable:			
+			for s in readable:		
 				if s is server_socket:
 					client_socket, address = server_socket.accept()
 					read_list.append(client_socket)
-					print("Connection from", address)
-					
+					#print("Connection from", address)
+					ui.logSignal.emit("Connection from"+str(address))
+					break
+					break
 				else:
 					data = s.recv(1024)
 					if data: 
 						datain = data.decode(encoding='utf-8')
 						ui.dataReceived.emit(datain, self.tcpOut)
 					else:
-						#print('closed connection')
+						ui.logSignal.emit("Connection FROM CVI DSM was lost")
+						ui.errorSignal.emit("Connection FROM CVI DSM was lost")
 						s.close()
-						#try: self.tcpOut.close()
-						#except: pass
 						read_list.remove(s)
-				
-				#if self.tcpOut == '' : self.tcpOut = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-				if not self.sendSuccess:
+				if not self.sendSuccess:# or self.sendSuccess != None:
 					try:
 						self.tcpOut = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 						self.tcpOut.connect(self.client_address)
 						self.tcpOut.setblocking(0)
+						ui.logSignal.emit("Successful client connection TO CVI DSM at %s port %s" % self.client_address)
+						#The following line presents a potential threading conflict
+						#	It is used to prevent a double client connection to DSM
+						# 	before the calculation thread can catch up
+						self.sendSuccess = True
 					except:
-						print('no good')
-						#self.tcpOut = ''
-				#else:
-					#try: self.tcpOut.close()
-					#except: pass
-						
+						ui.logSignal.emit("Client connection TO CVI DSM Failed")#Failed to connect to CVI server")
+						ui.errorSignal.emit("Client connection TO CVI DSM Failed")
+					
 		for w in write_list:
 			w.close()
 		for r in read_list:
@@ -2800,6 +2768,7 @@ class QServer(QThread):
 		
 	def stop(self):
 		self.stopFlag = True
+		ui.logSignal.emit("Local server closed by user")
 	
 	def __del__(self):
 		self.quit()
