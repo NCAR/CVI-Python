@@ -5,48 +5,53 @@ COMPLETE * Need to add blank list for raw input output list to front panel...
 		NOTE: Header only added for left side, consider removing output list
 COMPLETE * Duplicate second plot changes to the first plot...
 COMPLETE * Improve color schemes on plots and modify font sizes...
-PARTIAL * Expand instructional interface on front panel...
+COMPLETE * Expand instructional interface on front panel...
 COMPLETE Add full interfacing of Auxiliary device configurations...
 COMPLETE * Encompass configuration file into program defaults...
 COMPLETE * Create Error Status Indicator on Front panel (IN RED) appended to instructional list.
 COMPLETE * Add Error code blocks to populate Error Status Indicator on Front Panel
-PARTIAL * Populate error code array and disperse to various exception blocks
+COMPLETE * Populate error code array and disperse to various exception blocks
 COMPLETE * Reimplement linux variant with the aforementioned updates.
 	Linux Variant Requires:
 		self.basedir = os.path.expanduser('~/CVI/')	 #Full path required; however, os.path.expanduser will allow use of ~
-PENDING * Change Defaults file for linux path '~/CVI/'
+COMPLETE * Change Defaults file for linux path '~/CVI/'
 COMPLETE * Rectify Issue with counterflow reduction overshooting.
 COMPLETE * Provide error instructions for if any files are not found.
-PARTIAL * CLEAN UP AND COMMENT CODE
 COMPLETE * Identify issue with segmentation faults occuring in linux and NOT windows
-	* Correct Linux thread.join() issue. Currently disabled which can cause problems in future
+	COMPLETE * Correct Linux thread.join() issue. Currently disabled which can cause problems in future
 COMPLETE * Add DSM header box on calibrations panel
 COMPLETE * Add calibration coefficient version dropdown
 
-* Add rolling save files for main status and error status indicators
-	* Potentially add buttons (dropdown list) for conditions (saw a cloud, went to restroom, etc.)
-PARTIAL * Correct calibration saving routine such that it will actually update
-PARTIAL * Allow realtime updating for reading calibration coefficients from tables
+COMPLETE * Add rolling save files for main status and error status indicators
+COMPLETE * Correct calibration saving routine such that it will actually update
+UNECESSARY * Allow realtime updating for reading calibration coefficients from tables
 COMPLETE * Add delete button for deleting certain coefficients
 COMPLETE * Add update button to reread calibrations from files
-UNECESSARY * Add ability to prevent rapid updates to text entry fields so that a . is not read, etc. (check if field is being entered?)
+COMPLETE * Add ability to prevent rapid updates to text entry fields so that a . is not read, etc. (check if field is being entered?)
 COMPLETE * Remove DSM Header printout to terminal
 UNECESSARY * Add wrap text and scrollable to dsm header box.
 * Verify why flow can be "off" and yet the user input voltages will still output.
-PARTIAL * Correct raw input/output indicator updating (and labeling)
+COMPLETE * Correct raw input/output indicator updating (and labeling)
 COMPLETE * Correct Display scaling for program
 COMPLETE * Verify that when instrument add routine is cancelled, valves are reverted and things are reversed.
-PARTIAL * Add sliders to everything!!!
+COMPLETE * Add sliders to everything!!!
 * Add counterflow excess increase button for just in case moments
 * Allow cvfx0, cvfx2, cvfx3, cvfx4 to independently increased while allowing other flows to compensate.
 	cvfx0 would compensate for any changes to the other ones (autopilot button?)
 COMPLETE * Grey out the connect and disconnect buttons after the connect button is pressed.
-* Add checklist that pops up upon request that allows you to set a data folder prefix for flight, etc.
-* Add dropdown list for common notes to be added to the log
+COMPLETE * Add checklist that pops up upon request that allows you to set a data folder prefix for flight, etc.
+COMPLETE * Add dropdown list for common notes to be added to the log
+
+* Add notes for when toggles are changed
+PARTIAL * CLEAN UP AND COMMENT CODE
+PARTIAL * Check to make sure nothing references text fields
+	* Instrument configurations still reference fields, replace areas with exception handling
+* Continue updates to error log and main log
+* Use findChild method for most objects and then remove repetitive objects
+* Determine whether or not flows or manual voltage controls need to have negative values
 
 
 Miscellaneous Updates
-
 * Added exception handling for full feedback loop. Try to perform calculation, exception prints out raw data stream to terminal.
 
 
@@ -138,7 +143,9 @@ THINGS TO DO WITH A PREFLIGHT BUTTON
 
 		
 Something to fix:
-		
+
+	TEMPORARILY SOLVED WITH EXCEPTION HANDLING RETURN
+	
 Traceback (most recent call last):
   File "CVI_Interface.py", line 2195, in processData
     input = [float(i) for i in input]
