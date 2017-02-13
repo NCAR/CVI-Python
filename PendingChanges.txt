@@ -50,6 +50,9 @@ PARTIAL * Check to make sure nothing references text fields
 * Use findChild method for most objects and then remove repetitive objects
 * Determine whether or not flows or manual voltage controls need to have negative values
 
+COMPLETE * Correct NIDAS header output....
+* Correct text entry fields (manVolt) to be editingFinished...
+
 
 Miscellaneous Updates
 * Added exception handling for full feedback loop. Try to perform calculation, exception prints out raw data stream to terminal.
