@@ -53,6 +53,7 @@ PARTIAL * Check to make sure nothing references text fields
 COMPLETE * Correct NIDAS header output....
 * Correct text entry fields (manVolt) to be editingFinished...
 
+* Repair calibration coefficients dynamic array growth (currently capped at 20 versions)
 
 Miscellaneous Updates
 * Added exception handling for full feedback loop. Try to perform calculation, exception prints out raw data stream to terminal.
@@ -69,7 +70,6 @@ Log Events:
 	Error in calculation
 	Whenever anything is done with the instrument connection/disconnection routine
 	After each change in the preflight checklist.
-	
 
 CHECKLIST
 	Preflight check:
@@ -139,7 +139,7 @@ CHECKLIST
 		
 		
 THINGS TO DO WITH A PREFLIGHT BUTTON
-	Request what prefix to give the flight (RF01, TF92, etc.)
+COMPLETE * Request what prefix to give the flight (RF01, TF92, etc.)
 	Provide Preflight checklist and allow users to connect WIBS (single button?)
 	
 		

@@ -9,50 +9,24 @@ import sys
 import socket
 import select
 
-from PyQt5 import QtCore, QtGui, QtWidgets, QtNetwork
-
-from multiprocessing import Process
-
-#CVI code for performing all of the data manipulation
-#from crunchcvi import *
 import time
 import math
 
+#For File Writing
+import os
+import shutil
+
 #GUI imports
+from PyQt5 import QtCore, QtGui, QtWidgets, QtNetwork
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtNetwork import *
 
-#Following three imports appear to be the "newer" version of asyncore
-#Implemented; however, needs to be implemented as asynchronous I/O
-#As opposed to its current threading implementation
-import asyncio
-import asyncio.streams
-
-#from quamash import QEventLoop
-
-#For the simple non blocking tcp client output
-#Incorporates Select()
-#import eventlet
-
-#from eventlet.green import socket
-
 #For plotting within pyqt
 import pyqtgraph
 from pyqtgraph import PlotWidget, ViewBox
 import numpy as np
-
-#For creating parallel thread for server
-#import threading
-
-#For File WRiting
-import os
-import shutil
-
-#for scheduling replot (NO LONGER USED) 
-#from apscheduler.schedulers.background import BackgroundScheduler
-
 
 ####IF PROGRAM FAILS, RUN COMMAND "lsof -i" and kill the pid associated with python####
 
@@ -64,15 +38,7 @@ class Ui_MainWindow(QObject):
 	
 	def __init__(self, parent=None):
 		super(Ui_MainWindow, self).__init__(parent)
-		#MainWindow.btnExit.clicked.connect(self.close)
-		#MainWindow.actionExit.triggered.connect(self.close)
 
-		# when you want to destroy the dialog set this to True
-		#self._want_to_close = False
-
-	#def _init_(self, parent=None):
-	#	super(Ui_MainWindow, self)._init_(parent)
-	
 	def setupUi(self, MainWindow):
 		MainWindow.setObjectName("MainWindow")
 		self.MainWindow = MainWindow
@@ -239,7 +205,9 @@ class Ui_MainWindow(QObject):
 		self.autopilot.setObjectName("autopilot")
 		self.tabLayout_1.addWidget(self.autopilot, 2, 30, 2, 10)
 		self.autopilot.setCheckable(True)	
-		self.autopilot.setDisabled(True)
+		#self.autopilot.setDisabled(True)
+		self.autopilot.setText("Autopilot: OFF")
+		self.autopilot.clicked.connect(lambda: self.toggleswitched(MainWindow))
 		
 		#Internal flow control line edits
 		#self.flowlabels = ['cvfx0label','cvfx2label','cvfx3label','cvfx4label']
@@ -274,7 +242,7 @@ class Ui_MainWindow(QObject):
 		self.preflightButton = QtWidgets.QPushButton(self.tab)
 		self.preflightButton.setObjectName("preflightButton")
 		self.tabLayout_1.addWidget(self.preflightButton, 22, 0, 3, 10)
-		self.preflightButton.setStyleSheet("background-color: red")
+		self.preflightButton.setStyleSheet("background-color: lightblue")
 		self.preflightButton.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 		#self.preflightButton.setDisabled(True)
 		self.preflightButton.setText("Pre-Flight")
@@ -295,7 +263,7 @@ class Ui_MainWindow(QObject):
 		self.customNoteButton = QtWidgets.QPushButton(self.tab)
 		self.customNoteButton.setObjectName("customNoteButton")
 		self.tabLayout_1.addWidget(self.customNoteButton, 22, 30, 3, 10)
-		self.customNoteButton.setStyleSheet("background-color: red")
+		self.customNoteButton.setStyleSheet("background-color: lightblue")
 		self.customNoteButton.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 		#self.customNoteButton.setDisabled(True)
 		self.customNoteButton.setText("User Entered Note")
@@ -902,7 +870,7 @@ class Ui_MainWindow(QObject):
 		
 		#Setting the default text of buttons and labels
 		self.dsmiplabel.setText(_translate("MainWindow", "DSM IP Address"))
-		self.ipaddress.setText(_translate("MainWindow", "192.168.184.145"))#"localhost"))#"192.168.184.145"))#"192.168.0.1"))#"192.168.184.145"))
+		self.ipaddress.setText(_translate("MainWindow", "192.168.184.145"))
 		self.portin.setText(_translate("MainWindow", "30005"))
 		self.portout.setText(_translate("MainWindow", "30006"))
 		self.portinlabel.setText(_translate("MainWindow", "Incoming Port"))
@@ -971,18 +939,6 @@ class Ui_MainWindow(QObject):
 			MainWindow.findChild(QtWidgets.QLabel,self.cvfManVoltLabels[i]+'label').setText(_translate("MainWindow",self.cvfManVoltLabels[i]))
 			MainWindow.findChild(QtWidgets.QLineEdit,self.cvfManVoltLabels[i]).setText(_translate("MainWindow",str(0.00)))
 			self.updateSliders(MainWindow)
-		'''
-		self.cvfx0wrlabel.setText(_translate("MainWindow", "    cvfx0wr"))
-		self.cvfx2wrlabel.setText(_translate("MainWindow", "    cvfx2wr"))
-		self.cvfx3wrlabel.setText(_translate("MainWindow", "    cvfx3wr"))
-		self.cvfx4wrlabel.setText(_translate("MainWindow", "    cvfx4wr"))
-		self.cvf1wrlabel.setText(_translate("MainWindow", "     cvf1wr"))
-		self.cvfx0wr.setText(_translate("MainWindow","0.00"))
-		self.cvfx2wr.setText(_translate("MainWindow","0.00"))
-		self.cvfx3wr.setText(_translate("MainWindow","0.00"))
-		self.cvfx4wr.setText(_translate("MainWindow","0.00"))
-		self.cvf1wr.setText(_translate("MainWindow","0.00"))
-		'''
 		
 		#Initializing default internal device flow values
 		#self.flowvalues = [0.00,2.00,5.00,2.00]
@@ -1715,7 +1671,6 @@ class Ui_MainWindow(QObject):
 								except:
 									self.calvalues = np.repeat(self.calvalues[:, :, None], 20, axis=2)
 									self.calvalues[i,:,calcounter] = calinput
-									#self.calvalues[i,:,calcounter] = calinput
 								#if (i==0):	print(self.calvalues[i,:])
 							#Increment counter to indicate that a new calibration version
 							#	has been found
@@ -1756,26 +1711,17 @@ class Ui_MainWindow(QObject):
 		#Exception throws error message and instructions to the front panel
 		except:
 			self.errorLog(self.mainerrorlist[1])
-			#if self.mainerrorlist[0] in self.errorstatus.toPlainText():
-			#	self.errorstatus.setText(self.mainerrorlist[1])
-			#elif not self.mainerrorlist[1] in self.errorstatus.toPlainText():
-			#	self.errorstatus.append(self.mainerrorlist[1])
-				
+
 	def deleteCalibrations(self, MainWindow):
 		_translate = QtCore.QCoreApplication.translate
 		
 		#Defining calibration coefficients path
 		self.calpath = self.basedir + '/' + self.calname + '/' 
-		
-		#contupdate = QMessageBox#(MainWindow, 'Updating Calibrations', 'Please provide update comment. Press cancel to abort update')		
-
-		#contupdate = QInputDialog.getItem(MainWindow, 'Updating Calibrations', 'Please provide update comment. Press cancel to abort update',0,False,ok)	
-   
+ 
 		reply = QtGui.QMessageBox.warning(MainWindow, 'WARNING', 
                      "Are you sure you want to delete the currently selected calibration?", 
 					 QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)#, QtGui.QMessageBox.Warning)
 
-		#print(reply)
 		if reply == QtGui.QMessageBox.Yes:		
 			#Exception handling to ensure that all files are read as they should.
 			#	If exception is found, an error message is presented and
@@ -1797,10 +1743,8 @@ class Ui_MainWindow(QObject):
 						for lines in f:
 							#If the line does not contain a comment and is not empty
 							#	then proceed as if it is a calibration entry
-							#print(calcounter,self.calversionlist.currentIndex())
 							lines = lines.decode('utf-8')
 							if (calcounter!=self.calversionlist.currentIndex()):
-								#if(lines[0] != '#' and len(lines.replace(" ","").replace("\n","").replace("\r","")) != 0) :
 								#Archive each calibration line from the file
 								#	If first line, create array, otherwise
 								#	add to the array
@@ -1808,19 +1752,14 @@ class Ui_MainWindow(QObject):
 									tmparray.extend([lines.replace('\r','')])
 								except:
 									tmparray = [lines.replace('\r','')]
-								#print(lines)
-								#Increment counter to indicate that a new calibration version
-								#	has been found
+							#Increment counter to indicate that a new calibration version
+							#	has been found
 							if(lines[0] != '#' and len(lines.replace(" ","").replace("\n","").replace("\r","")) != 0) :
 								calcounter+=1
-							#Increment counter for knowing how many total lines have been read		
-							#tmpcounter += 1
 						with open(self.calpath + self.calarray[i]+'.dat',"w+") as f:
 							for lines in tmparray:
 								f.write(lines)
-												
-						#print(tmparray)
-				
+
 						tmparray = None
 						calcounter = 0
 			
@@ -1944,6 +1883,9 @@ class Ui_MainWindow(QObject):
 	#	the text will be updated for all of the toggles to ensure accuracy
 	#	and to avoid many reredundant functions
 	def toggleswitched(self,MainWindow):
+		if self.autopilot.isChecked() : self.autopilot.setText("Autopilot: ON")
+		else: self.autopilot.setText("Autopilot: OFF")
+	
 		if self.flowsource.isChecked() : self.flowsource.setText("Calculated")
 		else: self.flowsource.setText("User Input")
 		
@@ -1993,19 +1935,11 @@ class Ui_MainWindow(QObject):
 	#	replotting the data ~3 times a second.
 	def connecting(self, MainWindow):
 		#Check to make sure that connection was not attempted multiple times in succession
-		#self.disconnecting(MainWindow)
+		self.disconnecting(MainWindow)
 		
-		#self.connect.setDisabled(True)
-		#self.disconnect.setDisabled(True)
 		self.statusindicatorlabel.setText("Ensuring Disconnection . . . . . . . ")
 		self.statusindicatorlabel.setText("Initiating Connection . . . . . . . .")
 		self.runconnection = True
-
-		#Create server loop
-#		self.server_loop = asyncio.get_event_loop()
-		#Implement parallel thread for server	
-#		self.server_thread = threading.Thread(target=self.server_loop_in_thread, args = ())#args = (self,))#, args=(loop,))
-#		self.server_thread.start()	
 		
 		self.CVI_Server = QServer(self.ipaddress.text(),int(self.portin.text()),int(self.portout.text()))
 		self.CVI_Server.start()
@@ -2017,15 +1951,6 @@ class Ui_MainWindow(QObject):
 		#timer.timeout.connect(self.CVIreplot)
 		#timer.start(300)		
 
-		
-	#Server code to be established in parallel thread
-	def server_loop_in_thread(self):
-		asyncio.set_event_loop(self.server_loop)
-		self.server_coro = self.server_loop.create_server(IncomingServer, '', int(self.portin.text()))#(self.hostin.text()),int(self.portin.text()))#'127.0.0.1',8888)
-		self.server = self.server_loop.run_until_complete(self.server_coro)#greet_every_two_seconds)#self.coro)#greet_every_two_seconds())
-		#self.server_loop.run_until_complete(server.wait_closed())
-		self.server_loop.run_forever() #Is this necessary?
-			
 	#Code run when "disconnect" button is clicked.
 	#	Once clicked, server thread is joined and closed
 	def disconnecting(self, MainWindow):
@@ -2034,12 +1959,13 @@ class Ui_MainWindow(QObject):
 		else :
 			self.statusindicatorlabel.setText("Initiating Disconnect . . . . . . .")
 			
-			self.CVI_Server.stop()
+			try:
+				self.CVI_Server.stop()
+			except: pass
 		
 			#Display success message
 			self.statusindicatorlabel.setText("Disconnect Successful")
 			self.runconnection = False
-			#self.disconnect.setDisabled(True)
 			
 	#function for replotting the data based on which data
 	#selection has been chosen
@@ -2053,24 +1979,21 @@ class Ui_MainWindow(QObject):
 		_translate = QtCore.QCoreApplication.translate
 		#Update table in first tab displaying raw, calibrated, and crunched data
 		#	for each of the 16 main input channels
-		for i in range(0,len(self.tablerowlabels)):
-			item = ui.tableWidget.item(i, 0)
-			item.setText(_translate("MainWindow",str(self.tabledata[i,0])))
-			item = ui.tableWidget.item(i, 1)
-			item.setText(_translate("MainWindow",str(self.tabledata[i,1])))
-			item = ui.tableWidget.item(i, 2)
-			item.setText(_translate("MainWindow",str(self.tabledata[i,2])))
-
-		for i in range(0,len(self.rawtablerowlabels)):
-			ui.rawtableWidget.item(i,0).setText(_translate("MainWindow",str(self.rawInOutData[i,0])))
-			ui.rawtableWidget.item(i,1).setText(_translate("MainWindow",str(self.rawInOutData[i,1])))
-
-		#Update base plots based on first dropdown list positions
-		self.CVIplot.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist.currentIndex()+1,:], clear = True,pen=pyqtgraph.mkPen(color=(255,255,255), width=1))
-		self.CVIplot2.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist2.currentIndex()+1,:], clear = True,pen=pyqtgraph.mkPen(color=(255,255,255), width=1))
-		self.CVIplotline2.clear()
-		self.CVIplot2line2.clear()
 		
+		try:
+			for i in range(0,len(self.tablerowlabels)):
+				item = ui.tableWidget.item(i, 0)
+				item.setText(_translate("MainWindow",str(self.tabledata[i,0])))
+				item = ui.tableWidget.item(i, 1)
+				item.setText(_translate("MainWindow",str(self.tabledata[i,1])))
+				item = ui.tableWidget.item(i, 2)
+				item.setText(_translate("MainWindow",str(self.tabledata[i,2])))
+
+			for i in range(0,len(self.rawtablerowlabels)):
+				ui.rawtableWidget.item(i,0).setText(_translate("MainWindow",str(self.rawInOutData[i,0])))
+				ui.rawtableWidget.item(i,1).setText(_translate("MainWindow",str(self.rawInOutData[i,1])))
+		except: pass
+				
 		#Set appropriate titles and axes labels
 		self.CVIplot.setTitle(self.plottitles[self.dropdownlist.currentIndex()])
 		self.CVIplot.setLabel('left',text = self.ylabels[self.dropdownlist.currentIndex()])
@@ -2079,13 +2002,27 @@ class Ui_MainWindow(QObject):
 
 		#Form dual lines on each plot if opted for
 		if (self.dropdownlistline2.currentIndex() != 0) : 
-			self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlistline2.currentIndex(),:],clear = True,pen=pyqtgraph.mkPen(color=(150,150,255), width=1)))#,clear=True))
 			self.CVIplot.setTitle(self.plottitles[self.dropdownlist.currentIndex()]+' & '+self.plottitles[self.dropdownlistline2.currentIndex()-1])
 			self.CVIplot.getAxis('right').setLabel(self.ylabels[self.dropdownlistline2.currentIndex()-1])#, color = (150,150,255))#'#0000ff')
 		if (self.dropdownlist2line2.currentIndex() != 0) : 
-			self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex(),:],clear=True,pen=pyqtgraph.mkPen(color=(150,150,255), width=1)))#,pen='b',clear=True))
 			self.CVIplot2.setTitle(self.plottitles[self.dropdownlist2.currentIndex()]+' & '+self.plottitles[self.dropdownlist2line2.currentIndex()-1])
 			self.CVIplot2.getAxis('right').setLabel(self.ylabels[self.dropdownlist2line2.currentIndex()-1])#, color = (150,150,255))#'#0000ff')
+		
+		
+		try:
+			#Update base plots based on first dropdown list positions
+			self.CVIplot.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist.currentIndex()+1,:], clear = True,pen=pyqtgraph.mkPen(color=(255,255,255), width=1))
+			self.CVIplot2.plot(self.plotdata[0,:], self.plotdata[self.dropdownlist2.currentIndex()+1,:], clear = True,pen=pyqtgraph.mkPen(color=(255,255,255), width=1))
+			self.CVIplotline2.clear()
+			self.CVIplot2line2.clear()
+		
+			#Form dual lines on each plot if opted for
+			if (self.dropdownlistline2.currentIndex() != 0) : 
+				self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlistline2.currentIndex(),:],clear = True,pen=pyqtgraph.mkPen(color=(150,150,255), width=1)))#,clear=True))
+			if (self.dropdownlist2line2.currentIndex() != 0) : 
+				self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex(),:],clear=True,pen=pyqtgraph.mkPen(color=(150,150,255), width=1)))#,pen='b',clear=True))
+		except: pass
+		
 		
 		#Force GUI to update display
 		app.processEvents()
@@ -2529,8 +2466,6 @@ class Ui_MainWindow(QObject):
 					MainWindow.findChild(QtWidgets.QSlider,self.cvfManVoltLabels[i]+'Slider').setValue(int(dataout[i+1]*100.0))
 			else:
 				for i in range(0,len(self.cvfManVoltLabels)):
-					#if MainWindow.findChild(QtWidgets.QLineEdit,self.cvfManVoltLabels[i]).text() != "" :
-						#dataout[i+1] = float(MainWindow.findChild(QtWidgets.QLineEdit,self.cvfManVoltLabels[i]).text())
 					dataout[i+1] = float(MainWindow.findChild(QtWidgets.QSlider,self.cvfManVoltLabels[i]+'Slider').value())/100.0
 					#else:
 					#	dataout[i+1] = 0.00
@@ -2540,8 +2475,6 @@ class Ui_MainWindow(QObject):
 			#for i in range(0,min(len(self.rawtablerowlabels),len(input))):
 			
 			self.rawInOutData = (np.c_[input, input])
-			#print(self.rawInOutData[0:len(dataout),1])
-			#print(self.rawInOutData)
 			for i in range(0,len(dataout)):
 				self.rawInOutData[i,1] = dataout[i]
 
@@ -2632,9 +2565,6 @@ class Ui_MainWindow(QObject):
 				self.dsmheader.setText(str(datain))
 			else:
 				self.errorSignal.emit("General error in flow calculation")
-				#self.errorSignal.emit(self.mainerrorlist[3])
-				#self.errorLog(self.mainerrorlist[3])
-
 
 class QServer(QThread):
 
@@ -2643,19 +2573,19 @@ class QServer(QThread):
 		self.host = host
 		self.portin = portin
 		self.portout = portout
+		
+		#Flag to stop server loop
 		self.stopFlag = False
 		
+		#Flag to know whether or not to reconnect to client
 		self.sendSuccess = False
 
 		# Create a TCP/IP socket
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		#self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		
-		#Then bind() is used to associate the socket with the server address. In this case, the address is localhost, referring to the current server, and the port number is 10000.		
 		# Bind the socket to the port
-		#self.server_address = ('localhost', self.portin)
 		self.server_address = ('',self.portin)
-		#self.client_address = ('localhost',self.portout)#self.host, self.portout)
 		self.client_address = (self.host, self.portout)		
 		#print(sys.stderr, 'starting up on %s port %s' % self.server_address)
 		ui.logSignal.emit(str('Starting up local server on %s port %s' % self.server_address))
@@ -2671,10 +2601,11 @@ class QServer(QThread):
 		read_list = [server_socket]
 		write_list = []
 		
-		#except:
-		#	self.tcpOut = ''
+		#Initialize output socket
 		self.tcpOut = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		
+		#Begin server loop
+		#	For establishing in and outbound connections
 		while not self.stopFlag:
 			readable, writable, errored = select.select(read_list, write_list, [], 0)
 			
@@ -2682,11 +2613,11 @@ class QServer(QThread):
 				if s is server_socket:
 					client_socket, address = server_socket.accept()
 					read_list.append(client_socket)
-					#print("Connection from", address)
 					ui.logSignal.emit("Connection from"+str(address))
 					break
 					break
 				else:
+					#Read data and emit signal for processing if valid
 					data = s.recv(1024)
 					if data: 
 						datain = data.decode(encoding='utf-8')
@@ -2696,7 +2627,7 @@ class QServer(QThread):
 						ui.errorSignal.emit("Connection FROM CVI DSM was lost")
 						s.close()
 						read_list.remove(s)
-				if not self.sendSuccess:# or self.sendSuccess != None:
+				if not self.sendSuccess:
 					try:
 						self.tcpOut = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 						self.tcpOut.connect(self.client_address)
@@ -2710,6 +2641,7 @@ class QServer(QThread):
 						ui.logSignal.emit("Client connection TO CVI DSM Failed")#Failed to connect to CVI server")
 						ui.errorSignal.emit("Client connection TO CVI DSM Failed")
 					
+		#Close all connections once the server loop has halted
 		for w in write_list:
 			w.close()
 		for r in read_list:
@@ -2723,58 +2655,7 @@ class QServer(QThread):
 		self.quit()
 		self.wait()		
 		
-
-#Class for listening for client connections from the DSM
-class IncomingServer(asyncio.Protocol):
-	#@asyncio.coroutine
-	def connection_made(self, transport):
-		'''
-		Called when a connection is made.
-		The argument is the transport representing the pipe connection.
-		To receive data, wait for data_received() calls.
-		When the connection is closed, connection_lost() is called.
-		'''
-		self.peername = transport.get_extra_info('peername')
-		#print('Connection from {}'.format(self.peername))
-		self.transport = transport
-		#print(self.transport)
-		
-		#Now that the DSM has connected, a client can be established
-		#to send data back to the DSM
-		#self.client_sock = socket.socket()
-
-		#self.client_sock.connect((ui.ipaddress.text(), int(ui.portout.text())))
-		self.client_sock = ''
-
-	#@asyncio.coroutine
-	def data_received(self, data):
-		'''
-		Called when some data is received.
-		The argument is a bytes object.		
-		'''
-		#data is the byte string that came from DSM
-		
-		#Update status indicator to show connection
-		#print('Data received: {!r}'.format(message))
-		
-		#Decode data into a string
-		datain = data.decode(encoding='utf-8')
-		#ui.dataReceived.emit(datain, self.client_sock)
-		ui.processData(datain, self.client_sock)
-			
-	#@asyncio.coroutine
-	def connection_lost(self, exc): #Added after CVI test worked 11-2-16
-		'''
-		Called when the connection is lost or closed.
-		The argument is an exception object or None (the latter
-		meaning a regular EOF is received or the connection was aborted or closed).
-		'''
-		try: ui.statusindicatorlabel.setText('Connection Lost!!')
-		except: pass
-		#ui.server.close()
-		#ui.disconnecting(MainWindow)
-		
-		
+#Class for allowing a window close event to be intercepted
 class MyWindow(QtGui.QMainWindow):
 	def closeEvent(self,event):
 		result = QtGui.QMessageBox.warning(MainWindow, 'WARNING',\
@@ -2788,7 +2669,7 @@ class MyWindow(QtGui.QMainWindow):
 if __name__ == "__main__":
 
 	#Create time for plot updating
-	timer = QTimer();
+	#timer = QTimer();
 	
 	#Initialize GUI
 	app = QtWidgets.QApplication(sys.argv)
