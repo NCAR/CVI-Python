@@ -238,10 +238,29 @@ class Ui_MainWindow(QObject):
 			self.tabLayout_1.addWidget(tmpobject, 7+4*i, 0, 2, 10)
 			tmpobject.valueChanged.connect(lambda new, i=i: self.syncSliders(MainWindow, self.flowedit[i]))
 
+		self.cvf3cwlabel = QtWidgets.QLabel(self.tab)
+		self.cvf3cwlabel.setObjectName("cvf3cwlabel")		
+		self.tabLayout_1.addWidget(self.cvf3cwlabel, 21, 0, 2, 5)
+		self.cvf3cw = QtWidgets.QLineEdit(self.tab)
+		self.cvf3cw.setObjectName("cvf3cw")
+		self.tabLayout_1.addWidget(self.cvf3cw, 21, 5, 2, 5)	
+		#self.cvf3cwlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+		self.cvf3cw.editingFinished.connect(lambda: self.updateSliders(MainWindow, 'cvf3cw'))		
+
+		self.cvf3cwSlider = QSlider(Qt.Horizontal, self.tab)
+		self.cvf3cwSlider.setMinimum(-200)#0)
+		self.cvf3cwSlider.setMaximum(800)
+		self.cvf3cwSlider.setValue(0)
+		self.cvf3cwSlider.setTickPosition(QSlider.TicksBelow)
+		self.cvf3cwSlider.setTickInterval(100)
+		self.cvf3cwSlider.setObjectName('cvf3cwSlider')
+		self.tabLayout_1.addWidget(self.cvf3cwSlider, 23, 0, 2, 10)
+		self.cvf3cwSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow, 'cvf3cw'))	
+
 		#Preflight checklist
 		self.preflightButton = QtWidgets.QPushButton(self.tab)
 		self.preflightButton.setObjectName("preflightButton")
-		self.tabLayout_1.addWidget(self.preflightButton, 22, 0, 3, 10)
+		self.tabLayout_1.addWidget(self.preflightButton, 25, 0, 2, 10)
 		self.preflightButton.setStyleSheet("background-color: lightblue")
 		self.preflightButton.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 		#self.preflightButton.setDisabled(True)
@@ -270,9 +289,9 @@ class Ui_MainWindow(QObject):
 		self.customNoteButton.clicked.connect(lambda: self.userNote(MainWindow))
 		
 		#Widget for displaying file that is being saved to
-		self.currentfilelabel = QtWidgets.QLabel(self.tab)
-		self.currentfilelabel.setObjectName("currentfilelabel")
-		self.tabLayout_1.addWidget(self.currentfilelabel, 25, 0, 2, 10)
+		#self.currentfilelabel = QtWidgets.QLabel(self.tab)
+		#self.currentfilelabel.setObjectName("currentfilelabel")
+		#self.tabLayout_1.addWidget(self.currentfilelabel, 25, 0, 2, 10)
 		self.currentfile = QtWidgets.QLineEdit(self.tab)
 		self.currentfile.setObjectName("currentfile")
 		self.tabLayout_1.addWidget(self.currentfile, 25, 10, 2, 30)
@@ -752,7 +771,25 @@ class Ui_MainWindow(QObject):
 		self.offsetSlider.setObjectName('offsetSlider')
 		self.tabLayout_3.addWidget(self.offsetSlider, 7, 14, 2, 8)	
 		self.offsetSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow, 'offset'))	
+
+		self.cvf3cwIndicatorLabel = QtWidgets.QLabel(self.tab_3)
+		self.cvf3cwIndicatorLabel.setObjectName("cvf3cwIndicatorLabel")
+		self.cvf3cwIndicatorLabel.setText("Counterflow Excess")
+		self.cvf3cwIndicatorLabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+		self.tabLayout_3.addWidget(self.cvf3cwIndicatorLabel, 3, 22, 2, 12)
 		
+		self.cvf3cwIndicator = QtWidgets.QLineEdit(self.tab_3)
+		self.cvf3cwIndicator.setObjectName("cvf3cwIndicator")
+		self.tabLayout_3.addWidget(self.cvf3cwIndicator, 5, 22, 2, 12)	
+		self.cvf3cwIndicator.setDisabled(True)
+		#self.cvf3cw.editingFinished.connect(lambda: self.updateSliders(MainWindow, 'cvf3cw'))	
+
+		tmpobject = QtWidgets.QLabel(self.tab_3)
+		tmpobject.setText("From Operations Tab")
+		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+		self.tabLayout_3.addWidget(tmpobject, 7, 22, 2, 12)
+
+		'''
 		self.cvf3cwlabel = QtWidgets.QLabel(self.tab_3)
 		self.cvf3cwlabel.setObjectName("cvf3cwlabel")		
 		self.tabLayout_3.addWidget(self.cvf3cwlabel, 3, 22, 2, 12)
@@ -770,7 +807,8 @@ class Ui_MainWindow(QObject):
 		self.cvf3cwSlider.setTickInterval(100)
 		self.cvf3cwSlider.setObjectName('cvf3cwSlider')
 		self.tabLayout_3.addWidget(self.cvf3cwSlider, 7, 22, 2, 12)
-		self.cvf3cwSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow, 'cvf3cw'))	
+		self.cvf3cwSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow, 'cvf3cw'))
+		'''	
 		
 		#Device toggles for selection of which instruments to add/remove
 		self.auxdev1 = QtWidgets.QPushButton(self.tab_3)
@@ -904,7 +942,7 @@ class Ui_MainWindow(QObject):
 		self.caldirval.setText(_translate("MainWindow","Calibrations"))
 				
 		#Current saved file labeling
-		self.currentfilelabel.setText(_translate("MainWindow","Current Saved File"))
+		#self.currentfilelabel.setText(_translate("MainWindow","Current Saved File"))
 		self.currentfile.setText(_translate("MainWindow","Waiting to save data"))
 				
 		#Instrument connection labels: delay, offset, counterflow excess
@@ -912,9 +950,9 @@ class Ui_MainWindow(QObject):
 		self.delay.setText(_translate("MainWindow", "1"))
 		self.offsetlabel.setText(_translate("MainWindow","Flow Offset"))
 		self.offset.setText(_translate("MainWindow", "3"))
-		self.cvf3cwlabel.setText(_translate("MainWindow", "Counterflow Excess"))
+		self.cvf3cwlabel.setText(_translate("MainWindow", "cvf3"))#"Counterflow Excess"))
 		self.cvf3cw.setText(_translate("MainWindow", "0.5"))
-			
+				
 		#Auxiliary device labels
 		self.auxdev1.setText(_translate("MainWindow", "Dev1"))
 		self.auxdev2.setText(_translate("MainWindow", "Dev2"))
@@ -955,8 +993,11 @@ class Ui_MainWindow(QObject):
 		self.datatodsm.setText(_translate("MainWindow", "Awaiting Data to be sent. . . . ."))
 
 		#Plotting options
-		self.plottitles = ['H2O','ptdl','ttdl','cvf3','cvcnc1','cvcnc01','cvrho_tdl','cvrhoo_tdl','opcc','opcco']
-		self.ylabels = ['Concentration (g/m^3)','Pressure (mbar)','Temperature (C)','y','y','y','y','y','y','y']
+		#self.plottitles = ['H2O','ptdl','ttdl','cvf3','cvcnc1','cvcnc01','cvrho_tdl','cvrhoo_tdl','opcc','opcco']
+		self.plottitles = ['H2O','ptdl','ttdl','cvf3','cvcnc1','cvcnc01','cvrho_tdl',
+			'cvrhoo_tdl','opcc','opcco','cvfx5R','cvfx5c','cvts','cvtai','cvcfact']
+		#self.ylabels = ['Concentration (g/m^3)','Pressure (mbar)','Temperature (C)','y','y','y','y','y','y','y']
+		self.ylabels = ['Concentration (g/m^3)','Pressure (mbar)','Temperature (C)','y','y','y','y','y','y','y','y','y','y','y','y']
 		self.dropdownlist.addItems(self.plottitles)
 		self.dropdownlistline2.addItems([""]+self.plottitles)
 		self.dropdownlist2.addItems(self.plottitles)
@@ -1206,9 +1247,9 @@ class Ui_MainWindow(QObject):
 	def errorLog(self, errorString):#errorCode):
 		#Code for populating error status on first tab
 		if self.mainerrorlist[0] in self.errorstatus.toPlainText():
-			self.errorstatus.setText(errorString)
+			self.errorstatus.setText(time.strftime("%x %X\t")+errorString)
 		else:#elif not errorString in self.errorstatus.toPlainText():#self.mainerrorlist[errorCode] in self.errorstatus.toPlainText():
-			self.errorstatus.append(errorString)
+			self.errorstatus.append(time.strftime("%x %X\t")+errorString)
 		self.dataSave(2, time.strftime("%x %X\t")+errorString+'\n')			
 		
 	def mainLog(self, logString):#logCode):
@@ -1269,6 +1310,11 @@ class Ui_MainWindow(QObject):
 				.setText(str(MainWindow.findChild(QtWidgets.QSlider,widget+'Slider')\
 				.value()/100.0))
 			self.cfexcess = MainWindow.findChild(QtWidgets.QSlider,widget+'Slider').value()/100.0
+
+			MainWindow.findChild(QtWidgets.QLineEdit,widget+'Indicator')\
+				.setText(str(MainWindow.findChild(QtWidgets.QSlider,widget+'Slider')\
+				.value()/100.0))
+
 				
 	def updateSliders(self, MainWindow, widget = None):
 	
@@ -1277,7 +1323,6 @@ class Ui_MainWindow(QObject):
 				MainWindow.findChild(QtWidgets.QSlider,widget+'Slider')\
 					.setValue(int(float(MainWindow.findChild(QtWidgets.QLineEdit,widget).text())*100.0))
 			except: pass
-
 
 				
 	#Function for loading program defaults from base path
@@ -1397,6 +1442,7 @@ class Ui_MainWindow(QObject):
 						MainWindow.findChild(QtWidgets.QPushButton,\
 							"cvfx"+str(i+5)+self.auxdevtoggleslist[j])\
 							.setChecked(int(programdefaultstrings[13+i].split(',')[j]))
+
 						
 			#Null channel configurations
 			for i in range(0, len(self.signalnulls)):
@@ -1535,7 +1581,7 @@ class Ui_MainWindow(QObject):
 			self.auxdev4.setDisabled(False)
 			
 			#Display instructional interface
-			self.devinstruct.setText("Please select the instruments that are to be disconnected and press continue")
+			self.devinstruct.setText("Please deselect the instruments that are to be disconnected and press continue")
 
 		#Force gui events to be processed and connect continue signal/slots
 		app.processEvents()
@@ -2475,8 +2521,11 @@ class Ui_MainWindow(QObject):
 			#for i in range(0,min(len(self.rawtablerowlabels),len(input))):
 			
 			self.rawInOutData = (np.c_[input, input])
+			self.rawInOutData = np.around(self.rawInOutData,decimals=3)
 			for i in range(0,len(dataout)):
-				self.rawInOutData[i,1] = dataout[i]
+				self.rawInOutData[i,1] = np.around(dataout[i],decimals=3)
+			for i in range(len(dataout),len(input)):
+				self.rawInOutData[i,1] = np.nan
 
 			#Sample dataout for testing
 			#dataout = [dataout[0],-0.081,1.059,1.968,79.022,0.029,0,1,0,1,0,0,0,10.000,1.000,0.000,-83.974,0.000]
@@ -2527,8 +2576,16 @@ class Ui_MainWindow(QObject):
 			self.datatodsm.setText(str(dataout).replace(",", ", "))	
 			
 			self.tabledata = np.c_[input[3:19], calibrated[0:16], np.r_[zerocorrectedflows[:], [np.nan]*6]]
+			self.tabledata = np.around(self.tabledata,decimals=3)
+			#self.tabledata = ["{:.3f}".format(x) for x in self.tabledata]
+			#formattedList = ["%.2f" % member for member in theList]
 			try:
-				newdata = np.r_[input[0],input[19:22], extra[:]]
+				#When this is changed, also change the dropdown lists from above (~ line 1000, self.plottitles)
+				#H2O, ptdl, ttdl, cvf3, cvcnc1, cvcnc01, cvrho_tdl, cvrhoo_tdl, opcc, opcco
+				#New 2-24-17 	--- Added cvfx5r, cvfx5c, cvts, cvtai, cvcfact 
+				#		--- corresponding to input[9],cal[6],cal[13],cal[15], 
+				newdata = np.r_[input[0],input[19:22], extra[:],input[9],calibrated[6],calibrated[13],calibrated[15], cvcfact]
+				newdata = np.around(newdata,decimals=3)
 				try:
 					try:
 						self.plotdata = np.c_[self.plotdata[:,-899:], newdata]
@@ -2547,10 +2604,13 @@ class Ui_MainWindow(QObject):
 				#	YYMMDDHH.MM with 'q' on the end
 				#	Full file name could be YYMMDDHH.MMq
 				#	In certain directory.
-				outputstring = [ "{:11.5g}".format(x) for x in output ]
+				#outputstring = [ "{:11.5g}".format(x) for x in output ]
+				output = np.array(output)
+				output = np.around(output,decimals=5)
+				outputstring = list(map(str, output))
 				outputstring = ','.join(outputstring)
 				outputstring += '\n'
-			
+
 				#Save data to project path
 				self.dataSave(0, outputstring, self.header)
 			except: self.errorSignal.emit("Error in saving data")
