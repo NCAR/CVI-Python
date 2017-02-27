@@ -58,6 +58,29 @@ COMPLETE * Correct NIDAS header output....
 Miscellaneous Updates
 * Added exception handling for full feedback loop. Try to perform calculation, exception prints out raw data stream to terminal.
 
+Considerations
+* Fix input/output raw list for relabeling....
+* The common notes button is a little too close for comfort (accidentally hit)
+* The start and stop button is too close to the cvi mode button
+* Highlight the CVF3 slider to distinguish it
+COMPLETE * Fix the lower time series sizing
+* Add units to flows on front panel (or change to cvfx4c)
+* The connect wording needs to be changed for auxiliary instruments
+* Don't gray out the other tabs while flow is reducing
+COMPLETE * Fix cvimode boolean integer to second column of file.
+PARTIAL * Make notes window smaller to see more of the variables below
+* Automatic note taking
+* Create manual for changing the temperature controller set points
+* Fix output precision for data from dsm
+COMPLETE * Prevent plotting rescaling on x axis
+	* Create button to automatically readjust time series
+* Fix time delay on disconnect routine? (Readjusting the slots to be more understandable)
+* Adjust valve naming in instrument change routines to use labels from defaults file.
+
+
+
+
+
 
 Error Events:
 	Error in calculation

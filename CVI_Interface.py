@@ -50,9 +50,13 @@ class Ui_MainWindow(QObject):
 		
 		#MainWindow.sizePolicy.ignored()
 		#MainWindow.setWindowFlags(QtCore.Qt.FramelessWindowHint) #Removes window such that it cannot be closed.
-		MainWindow.setMinimumSize(1,1)
-		MainWindow.minimumSizeHint()
-		MainWindow.adjustSize()
+		MainWindow.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)		
+		#MainWindow.setMinimumSize(800,600)
+		#MainWindow.minimumSizeHint()
+		#MainWindow.adjustSize()
+
+		#self.errorstatus.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+		#self.errorstatus.setMinimumSize(1,1)
 		
 		#verticalLine 	=  QFrame()
 		#verticalLine.setFrameStyle(QFrame.VLine)
@@ -361,9 +365,13 @@ class Ui_MainWindow(QObject):
 		self.errorstatus.setAlignment(Qt.AlignTop)
 		self.errorstatus.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
 		self.errorstatus.setStyleSheet("color: rgb(255, 0, 0);")
-		self.errorstatus.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Expanding)
+		self.errorstatus.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+		self.errorstatus.setMinimumSize(1,1)
+		#self.errorstatus.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Expanding)
 		self.tabLayout_1.addWidget(self.errorstatus,45,0,5,40)
 		self.errorstatus.verticalScrollBar().setValue(self.mainstatus.verticalScrollBar().maximum())
+
+
 	
 
 		###############################################################################
@@ -484,10 +492,10 @@ class Ui_MainWindow(QObject):
 		self.dsmheaderlabel = QtWidgets.QLabel(self.tab_2)
 		self.dsmheaderlabel.setObjectName("dsmheaderlabel")
 		self.tabLayout_2.addWidget(self.dsmheaderlabel, 0, 20, 2, 30)
-		self.dsmheader = QtWidgets.QLabel(self.tab_2)
+		self.dsmheader = QtWidgets.QTextBrowser(self.tab_2)#QtWidgets.QLabel(self.tab_2)
 		self.dsmheader.setObjectName("dsmheader")
 		self.tabLayout_2.addWidget(self.dsmheader, 2, 20, 10, 30)
-		self.dsmheader.setWordWrap(True)
+		#self.dsmheader.setWordWrap(True)
 		self.dsmheader.setStyleSheet("""QLabel { border: 3px inset palette(dark); 
 			border-radius: 10px; background-color: white; color: #545454; }""")		
 		#self.dsmheader.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -498,24 +506,37 @@ class Ui_MainWindow(QObject):
 		self.datafromdsmlabel = QtWidgets.QLabel(self.tab_2)
 		self.datafromdsmlabel.setObjectName("datafromdsmlabel")
 		self.tabLayout_2.addWidget(self.datafromdsmlabel, 12, 0, 2, 40)
-		self.datafromdsm = QtWidgets.QLabel(self.tab_2)
+		self.datafromdsm = QtWidgets.QTextBrowser(self.tab_2)#QtWidgets.QLabel(self.tab_2)
 		self.datafromdsm.setObjectName("datafromdsm")
 		self.tabLayout_2.addWidget(self.datafromdsm, 14, 0, 10, 50)
-		self.datafromdsm.setWordWrap(True)
-		self.datafromdsm.setStyleSheet("""QLabel { border: 3px inset palette(dark); 
-			border-radius: 10px; background-color: white; color: #545454; }""")
+		#self.datafromdsm.setWordWrap(True)
+		#self.datafromdsm.setStyleSheet("""QLabel { border: 3px inset palette(dark); 
+			#border-radius: 10px; background-color: white; color: #545454; }""")
 		#self.datafromdsm.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.datafromdsm.setAlignment(Qt.AlignTop)
+
+
+		#Error indicator for alerting if there is a problem
+	#	self.errorstatus = QtWidgets.QTextBrowser()#QTextEdit()
+	#	self.errorstatus.setObjectName("errorstatus")
+	#	self.errorstatus.setAlignment(Qt.AlignTop)
+	#	self.errorstatus.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+	#	self.errorstatus.setMinimumSize(1,1)
+		#self.errorstatus.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Expanding)
+	#	self.tabLayout_1.addWidget(self.errorstatus,45,0,5,40)
+	#	self.errorstatus.verticalScrollBar().setValue(self.mainstatus.verticalScrollBar().maximum())
+
+
 
 		self.datatodsmlabel = QtWidgets.QLabel(self.tab_2)
 		self.datatodsmlabel.setObjectName("datatodsmlabel")
 		self.tabLayout_2.addWidget(self.datatodsmlabel, 24, 0, 2, 50)
-		self.datatodsm = QtWidgets.QLabel(self.tab_2)
+		self.datatodsm = QtWidgets.QTextBrowser(self.tab_2)#QtWidgets.QLabel(self.tab_2)
 		self.datatodsm.setObjectName("datafromdsm")
 		self.tabLayout_2.addWidget(self.datatodsm, 26, 0, 7, 50)
-		self.datatodsm.setWordWrap(True)
+		#self.datatodsm.setWordWrap(True)
 		self.datatodsm.setStyleSheet("""QLabel { border: 3px inset palette(dark); 
-			border-radius: 10px; background-color: white; color: #545454; }""")		
+			#border-radius: 10px; background-color: white; color: #545454; }""")		
 		#self.datatodsm.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.datatodsm.setAlignment(Qt.AlignTop)
 
@@ -707,12 +728,12 @@ class Ui_MainWindow(QObject):
 		self.tabLayout_3.addWidget(self.devdisconnect, 0, 20, 3, 14)
 		
 		#Text Box for displaying instructions for instrument connections
-		self.devinstruct = QtWidgets.QLabel(self.tab_3)
+		self.devinstruct = QtWidgets.QTextBrowser(self.tab_3)#QtWidgets.QLabel(self.tab_3)
 		self.devinstruct.setObjectName("devinstruct")
 		self.tabLayout_3.addWidget(self.devinstruct, 12, 6, 38, 28)
-		self.devinstruct.setWordWrap(True)
-		self.devinstruct.setStyleSheet("""QLabel { border: 3px inset palette(dark); 
-			border-radius: 10px; background-color: white; color: #545454; }""")
+		#self.devinstruct.setWordWrap(True)
+		#self.devinstruct.setStyleSheet("""QLabel { border: 3px inset palette(dark); 
+		#	border-radius: 10px; background-color: white; color: #545454; }""")
 		self.devinstruct.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.devinstruct.setAlignment(Qt.AlignTop)		
 		self.devinstruct.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))	
@@ -869,11 +890,11 @@ class Ui_MainWindow(QObject):
 					self.tmpobject.setCheckable(True)
 
 		#Text box displaying instructional interface for device configurations
-		self.auxoptions = QtWidgets.QLabel(self.tab_3)
+		self.auxoptions = QtWidgets.QTextBrowser(self.tab_3)#QtWidgets.QLabel(self.tab_3)
 		self.auxoptions.setObjectName("auxoptions")
 		self.tabLayout_3.addWidget(self.auxoptions, 21, 55, 29, 40)
-		self.auxoptions.setWordWrap(True)
-		self.auxoptions.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")
+		#self.auxoptions.setWordWrap(True)
+		#self.auxoptions.setStyleSheet("""QLabel { border: 3px inset palette(dark); border-radius: 10px; background-color: white; color: #545454; }""")
 		self.auxoptions.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.auxoptions.setAlignment(Qt.AlignTop)		
 		self.auxoptions.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
@@ -891,6 +912,12 @@ class Ui_MainWindow(QObject):
 				
 		###############################################################################
 		###############################################################################
+
+		#print(MainWindow.findChildren(QWidget))
+		#FORCES THE WIDGETS TO ADHERE TO CARTESIAN GRID
+		for tmpobject in MainWindow.findChildren(QWidget):#QObject):
+			tmpobject.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+			tmpobject.setMinimumSize(1,1)
 
 		#VERY IMPORTANT for establishing layout to be resized
 		self.gridLayout.addWidget(self.tabWidget, 1, 0, 1, 1)
@@ -1448,7 +1475,66 @@ class Ui_MainWindow(QObject):
 			for i in range(0, len(self.signalnulls)):
 				MainWindow.findChild(QtWidgets.QPushButton,"Null"+str(i))\
 					.setChecked(int(programdefaultstrings[17].split(',')[i]))
-				
+	
+	'''			
+	def devChangeRoutine(self, MainWindow, conn):
+		#Hides original buttons to prevent redundancy
+		self.devconnect.hide()
+		self.devdisconnect.hide()
+		
+		#Disables other tabs to prevent interference
+		self.tabWidget.setTabEnabled(0, False)
+		self.tabWidget.setTabEnabled(1, False)
+		
+		#Updates temporary instrument i/o buttons with actual states
+		self.auxdev1.setChecked(self.v1.isChecked())
+		self.auxdev2.setChecked(self.v2.isChecked())
+		self.auxdev3.setChecked(self.v3.isChecked())
+		self.auxdev4.setChecked(self.v4.isChecked())
+		
+		#Stores the initial counterflow value to reference to		
+		#self.initialcfexcess = float(self.cvf3cw.text())
+		self.initialcfexcess = float(self.cvf3cwSlider.value())/100.0
+		
+		#Stores the initial valve positions (just in case something is cancelled)
+		self.initialValvePositions = [int(self.v1.isChecked()),int(self.v2.isChecked()),int(self.v3.isChecked()),int(self.v4.isChecked())]
+		
+		#Offsets counterflow to allow external instrument changes
+		#	This also updates a parameter that is used within a separate
+		#	processor thread so that it is responds to function changes
+		self.cfexcess = self.initialcfexcess + float(self.offsetSlider.value())/100.0
+
+		#Waits for specified amount of time before allowing further input
+		time.sleep(float(self.delaySlider.value())/100.0)
+
+		if conn:
+			#Display instructions, force program to respond, and show continue/cancel buttons
+			self.devinstruct.setText("The Counterflow has been increased... \nPlease select the instruments that are to be connected and press continue")
+			app.processEvents()
+			self.devcontinue.show()
+			self.devcancel.show()
+		
+			#Need to show each of the device addition toggles (Should be hidden by default)
+			self.auxdev1.setDisabled(False)
+			self.auxdev2.setDisabled(False)
+			self.auxdev3.setDisabled(False)
+			self.auxdev4.setDisabled(False)
+		
+			#Link signal/slots for connect/cancel buttons
+			self.devcontinue.clicked.connect(lambda: self.updateinstruments(True))
+			self.devcancel.clicked.connect(lambda: self.gradualflowreduction(True, True))	
+		else:
+			#Display instructions, force program to respond, and show continue/cancel buttons
+			self.devinstruct.setText("The Counterflow has been increased!\n\nOperators may now begin performing operations. \n\nPress continue once completed")
+			app.processEvents()
+			self.devcontinue.show()
+			self.devcancel.show()
+		
+			#Link signal/slots for connect/cancel buttons		
+			self.devcontinue.clicked.connect(lambda: self.updateinstruments(False))
+			self.devcancel.clicked.connect(lambda: self.gradualflowreduction(False, True))	
+	'''
+
 	#Addition of external instruments to the counterflow calculation
 	#	Only runs once the connect button is clicked
 	def addinstruments(self, MainWindow):	
@@ -2021,7 +2107,13 @@ class Ui_MainWindow(QObject):
 		self.CVIplotline2.linkedViewChanged(self.CVIplot.plotItem.vb,self.CVIplotline2.XAxis)
 		self.CVIplot2line2.setGeometry(self.CVIplot2.plotItem.vb.sceneBoundingRect())
 		self.CVIplot2line2.linkedViewChanged(self.CVIplot2.plotItem.vb,self.CVIplot2line2.XAxis)
-		
+
+		#enableAutoRange(axis=None, enable=True, x=None, y=None)
+		self.CVIplot.enableAutoRange(axis=ViewBox.XAxis)
+		self.CVIplot.setMouseEnabled(x=False, y=True)
+		self.CVIplot2.enableAutoRange(axis=ViewBox.XAxis)
+		self.CVIplot.setMouseEnabled(x=False, y=True)		
+
 		_translate = QtCore.QCoreApplication.translate
 		#Update table in first tab displaying raw, calibrated, and crunched data
 		#	for each of the 16 main input channels
@@ -2481,6 +2573,9 @@ class Ui_MainWindow(QObject):
 			#############################################################################
 			#############################################################################
 			#############################################################################
+
+			#CVI mode indicator (0 for CVI, 1 for Total)
+			output[1] = int(self.cvimode.isChecked())
 
 			#Adjustment to parameter based on number of external
 			#	instrument addition/removals have been made
