@@ -277,8 +277,7 @@ class Ui_MainWindow(QObject):
 		self.tabLayout_1.addWidget(self.commonNoteDropdown, 22, 10, 3, 20)
 		#self.commonNoteDropdown.setDisabled(True)
 		
-		self.commonNotes = ["Common Notes","Saw a cloud"
-			,"Didn't see a cloud"]
+		self.commonNotes = ["Common Notes","Approaching Cloud", "In Cloud", "Exited Cloud"]
 		self.commonNoteDropdown.addItems(self.commonNotes)
 		self.commonNoteDropdown.activated.connect(lambda: self.addCommonNote(MainWindow))
 		
@@ -830,11 +829,21 @@ class Ui_MainWindow(QObject):
 		self.tabLayout_3.addWidget(self.cvf3cwSlider, 7, 22, 2, 12)
 		self.cvf3cwSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow, 'cvf3cw'))
 		'''	
-		
+
+		for i in range(1,5):
+			tmpobject = QtWidgets.QPushButton(self.tab_3)
+			tmpobject.setObjectName("auxdev"+str(i))
+			self.tabLayout_3.addWidget(tmpobject,9,6+(i-1)*7,3,7)
+			tmpobject.setStyleSheet("QPushButton {color:black; background-color:red}"
+				"QPushButton:checked {color:black; background-color: lightgreen}")
+			tmpobject.setCheckable(True)
+
+		'''
 		#Device toggles for selection of which instruments to add/remove
 		self.auxdev1 = QtWidgets.QPushButton(self.tab_3)
 		self.auxdev1.setObjectName("auxdev1")
 		self.tabLayout_3.addWidget(self.auxdev1, 9, 6, 3, 7)
+		self.auxdev1.setStyleSheet("QPushButton {color:black; background-color: red} QPushButton:checked {color:black; background-color: lightgreen}")
 		self.auxdev1.setCheckable(True)
 		self.auxdev2 = QtWidgets.QPushButton(self.tab_3)
 		self.auxdev2.setObjectName("auxdev2")
@@ -848,6 +857,7 @@ class Ui_MainWindow(QObject):
 		self.auxdev4.setObjectName("auxdev4")
 		self.tabLayout_3.addWidget(self.auxdev4, 9, 27, 3, 7)
 		self.auxdev4.setCheckable(True)
+		'''
 
 		#Toggles for nulling channels
 		self.signalnulls = self.caltablerowlabels
@@ -977,14 +987,17 @@ class Ui_MainWindow(QObject):
 		self.delay.setText(_translate("MainWindow", "1"))
 		self.offsetlabel.setText(_translate("MainWindow","Flow Offset"))
 		self.offset.setText(_translate("MainWindow", "3"))
-		self.cvf3cwlabel.setText(_translate("MainWindow", "cvf3"))#"Counterflow Excess"))
+		self.cvf3cwlabel.setText(_translate("MainWindow", "cvf3c"))#"Counterflow Excess"))
 		self.cvf3cw.setText(_translate("MainWindow", "0.5"))
 				
 		#Auxiliary device labels
-		self.auxdev1.setText(_translate("MainWindow", "Dev1"))
-		self.auxdev2.setText(_translate("MainWindow", "Dev2"))
-		self.auxdev3.setText(_translate("MainWindow", "Dev3"))
-		self.auxdev4.setText(_translate("MainWindow", "Dev4"))
+		#self.auxdev1.setText(_translate("MainWindow", "Dev1"))
+		#self.auxdev2.setText(_translate("MainWindow", "Dev2"))
+		#self.auxdev3.setText(_translate("MainWindow", "Dev3"))
+		#self.auxdev4.setText(_translate("MainWindow", "Dev4"))
+		for i in range(1,5):
+			self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i))\
+				.setText(_translate("MainWindow","Dev"+str(i)))
 
 		#Null button labels
 		for i in range(0,len(self.signalnulls)):
@@ -1008,12 +1021,12 @@ class Ui_MainWindow(QObject):
 		#Initializing default internal device flow values
 		#self.flowvalues = [0.00,2.00,5.00,2.00]
 		for i in range(0,len(self.flowedit)):
-			MainWindow.findChild(QtWidgets.QLabel,self.flowedit[i]+'label').setText(_translate("MainWindow",str(self.flowedit[i])))
+			MainWindow.findChild(QtWidgets.QLabel,self.flowedit[i]+'label').setText(_translate("MainWindow",str(self.flowedit[i])+'c'))
 		#	MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[i]).setText(_translate("MainWindow",str(self.flowvalues[i])))
 		#	self.updateSliders(MainWindow)
 		
 		#Disabling the editability of cvfx4
-		MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[3]).setDisabled(True)
+		#MainWindow.findChild(QtWidgets.QLineEdit,self.flowedit[3]).setDisabled(True)
 				
 		#Raw input/output data fields labels
 		self.datafromdsm.setText(_translate("MainWindow", "Awaiting Data to be received. . . . ."))
@@ -1116,8 +1129,12 @@ class Ui_MainWindow(QObject):
 		self.cfexcess = 0.5
 		
 		#Instrument addition/removal slots/signals
-		self.devconnect.clicked.connect(self.addinstruments)
-		self.devdisconnect.clicked.connect(self.removeinstruments)	
+		#self.devconnect.clicked.connect(self.addinstruments)
+		#self.devdisconnect.clicked.connect(self.removeinstruments)	
+
+		self.devconnect.clicked.connect(lambda: self.devChangeRoutine(True))
+		self.devdisconnect.clicked.connect(lambda: self.devChangeRoutine(False))
+
 		
 		#All calibration paramaters as their own files
 		self.calarray = ['cvf1','cvfx0','cvfx1','cvfx2','cvfx3','cvfx4','cvfx5','cvfx6','cvfx7','cvfx8',
@@ -1151,10 +1168,12 @@ class Ui_MainWindow(QObject):
 		self.valvesource.clicked.connect(lambda: self.toggleswitched(MainWindow))
 		
 		#Disabling ability to change instrument connections without going through routine
-		self.auxdev1.setDisabled(True)
-		self.auxdev2.setDisabled(True)
-		self.auxdev3.setDisabled(True)
-		self.auxdev4.setDisabled(True)
+		#self.auxdev1.setDisabled(True)
+		#self.auxdev2.setDisabled(True)
+		#self.auxdev3.setDisabled(True)
+		#self.auxdev4.setDisabled(True)
+		for i in range(1,5):
+			self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i)).setDisabled(True)
 		
 		#Connecting signal/slots of external instrument configuration options
 		for i in range(0,4):
@@ -1170,6 +1189,9 @@ class Ui_MainWindow(QObject):
 		#First index is the option, second index is the instrument
 		#mode,modeval,datatype,tmpsource,tempval,i/o
 		self.internalflowsetpts = [0.00]*4
+
+		#In order of flowio, cvimode, and each of the five flows, cvfx0, cvfx2, cvfx3, cvfx4, and cvf3
+		self.outputTracker = [0, False, False, 0,0,0,0,0]
 		
 		#Error and status lists for referencing to front panel from throughout the program
 		self.mainerrorlist = ['No Errors Detected',
@@ -1271,20 +1293,23 @@ class Ui_MainWindow(QObject):
 		self.preflightButton.setDisabled(True)
 		self.dataSave()
 		
+	#Old formatting code: %x %X
+	#New formatting code: %H:%M:%S
+
 	def errorLog(self, errorString):#errorCode):
 		#Code for populating error status on first tab
 		if self.mainerrorlist[0] in self.errorstatus.toPlainText():
-			self.errorstatus.setText(time.strftime("%x %X\t")+errorString)
+			self.errorstatus.setText(time.strftime("%H:%M:%S")+' ('+str(self.outputTracker[0])+')\t'+errorString)
 		else:#elif not errorString in self.errorstatus.toPlainText():#self.mainerrorlist[errorCode] in self.errorstatus.toPlainText():
-			self.errorstatus.append(time.strftime("%x %X\t")+errorString)
-		self.dataSave(2, time.strftime("%x %X\t")+errorString+'\n')			
-		
+			self.errorstatus.append(time.strftime("%H:%M:%S")+' ('+str(self.outputTracker[0])+')\t'+errorString)
+		self.dataSave(2, time.strftime("%H:%M:%S")+' ('+str(self.outputTracker[0])+')\t'+errorString+'\n')					
+
 	def mainLog(self, logString):#logCode):
 		if self.mainstatuslist[0] in self.mainstatus.toPlainText():
-			self.mainstatus.setText(time.strftime("%x %X\t")+logString+'\n')
+			self.mainstatus.setText(time.strftime("%H:%M:%S")+' ('+str(self.outputTracker[0])+')\t'+logString+'\n')
 		else:
-			self.mainstatus.append(time.strftime("%x %X\t")+logString+'\n')#self.mainstatuslist[logCode])
-		self.dataSave(1, time.strftime("%x %X\t")+logString+'\n')#self.mainstatuslist[logCode]+'\n')
+			self.mainstatus.append(time.strftime("%H:%M:%S")+' ('+str(self.outputTracker[0])+')\t'+logString+'\n')#self.mainstatuslist[logCode])
+		self.dataSave(1, time.strftime("%H:%M:%S")+' ('+str(self.outputTracker[0])+')\t'+logString+'\n')#self.mainstatuslist[logCode]+'\n')
 		
 	def dataSave(self, saveCode = -1, data = '', header=''):
 		if saveCode == 0: saveFile = self.dataFile
@@ -1476,283 +1501,193 @@ class Ui_MainWindow(QObject):
 				MainWindow.findChild(QtWidgets.QPushButton,"Null"+str(i))\
 					.setChecked(int(programdefaultstrings[17].split(',')[i]))
 	
-	'''			
-	def devChangeRoutine(self, MainWindow, conn):
-		#Hides original buttons to prevent redundancy
-		self.devconnect.hide()
-		self.devdisconnect.hide()
-		
-		#Disables other tabs to prevent interference
-		self.tabWidget.setTabEnabled(0, False)
-		self.tabWidget.setTabEnabled(1, False)
-		
-		#Updates temporary instrument i/o buttons with actual states
-		self.auxdev1.setChecked(self.v1.isChecked())
-		self.auxdev2.setChecked(self.v2.isChecked())
-		self.auxdev3.setChecked(self.v3.isChecked())
-		self.auxdev4.setChecked(self.v4.isChecked())
-		
-		#Stores the initial counterflow value to reference to		
-		#self.initialcfexcess = float(self.cvf3cw.text())
-		self.initialcfexcess = float(self.cvf3cwSlider.value())/100.0
-		
-		#Stores the initial valve positions (just in case something is cancelled)
-		self.initialValvePositions = [int(self.v1.isChecked()),int(self.v2.isChecked()),int(self.v3.isChecked()),int(self.v4.isChecked())]
-		
-		#Offsets counterflow to allow external instrument changes
-		#	This also updates a parameter that is used within a separate
-		#	processor thread so that it is responds to function changes
-		self.cfexcess = self.initialcfexcess + float(self.offsetSlider.value())/100.0
+	def devChangeRoutine(self, conn,  stage = 0, canc = False):
+			
+		if stage == 0:
 
-		#Waits for specified amount of time before allowing further input
-		time.sleep(float(self.delaySlider.value())/100.0)
+			if conn: self.logSignal.emit("Ancillary device connection routine started")
+			else: self.logSignal.emit("Ancillary device disconnection routine started")
 
-		if conn:
-			#Display instructions, force program to respond, and show continue/cancel buttons
-			self.devinstruct.setText("The Counterflow has been increased... \nPlease select the instruments that are to be connected and press continue")
+			#Increment the number of external instrument changes
+			self.numchanges += 1
+
+			#Hides original buttons to prevent redundancy
+			self.devconnect.hide()
+			self.devdisconnect.hide()
+		
+			#Disables other tabs to prevent interference
+			self.tabWidget.setTabEnabled(0, False)
+			self.tabWidget.setTabEnabled(1, False)
+			
+			#Updates temporary instrument i/o buttons with actual states, labels and colors
+			for i in range(1,5):
+				tmpobject = self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i))
+				tmpobject.setChecked(self.MainWindow.findChild(QtWidgets.QPushButton,'valve'+str(i)).isChecked())
+				tmpobject.setText(self.MainWindow.findChild(QtWidgets.QLineEdit,'cvfx'+str(i+4)+'Label').text())
+				#if tmpobject.isChecked(): tmpobject.setStyleSheet("background-color: green")
+				#else:	tmpobject.setStyleSheet("background-color: red")
+
+			#Stores the initial counterflow value to reference to		
+			self.initialcfexcess = float(self.cvf3cwSlider.value())/100.0
+		
+			#Stores the initial valve positions (just in case something is cancelled)
+			self.initialValvePositions = [int(self.v1.isChecked()),int(self.v2.isChecked()),int(self.v3.isChecked()),int(self.v4.isChecked())]
+		
+			#Offsets counterflow to allow external instrument changes
+			#	This also updates a parameter that is used within a parallel
+			#	routine so that it is responds to function changes
+			self.cfexcess = self.initialcfexcess + float(self.offsetSlider.value())/100.0
+
+			#Waits for specified amount of time before allowing further input
+			time.sleep(float(self.delaySlider.value())/100.0)
+
+			if conn:
+				#Display instructions, force program to respond, and show continue/cancel buttons
+				self.devinstruct.setText("The Counterflow has been increased... \nPlease select the instruments that are to be connected and press continue")
+		
+				#Need to show each of the device addition toggles (Should be hidden by default)
+				for i in range(1,5):
+					self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i))\
+						.setDisabled(False)
+
+			else:
+				#Display instructions, force program to respond, and show continue/cancel buttons
+				self.devinstruct.setText("The Counterflow has been increased!\n\nAncillary valves can be switched off. \n\nPress continue once completed")
+
 			app.processEvents()
 			self.devcontinue.show()
 			self.devcancel.show()
-		
-			#Need to show each of the device addition toggles (Should be hidden by default)
-			self.auxdev1.setDisabled(False)
-			self.auxdev2.setDisabled(False)
-			self.auxdev3.setDisabled(False)
-			self.auxdev4.setDisabled(False)
-		
+
 			#Link signal/slots for connect/cancel buttons
-			self.devcontinue.clicked.connect(lambda: self.updateinstruments(True))
-			self.devcancel.clicked.connect(lambda: self.gradualflowreduction(True, True))	
-		else:
-			#Display instructions, force program to respond, and show continue/cancel buttons
-			self.devinstruct.setText("The Counterflow has been increased!\n\nOperators may now begin performing operations. \n\nPress continue once completed")
+			self.devcontinue.clicked.connect(lambda: self.devChangeRoutine(conn,1))
+			self.devcancel.clicked.connect(lambda: self.devChangeRoutine(conn,2,True))
+
+		if stage == 1:
+			#Disable continue button to prevent rushing program
+			self.devcontinue.disconnect()
+		
+			#Boolean for deciding how to update the instruments.
+			#	If connecting, run connection routine,
+			#	otherwise, run disconnection routine
+			for i in range(1,5):
+				self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i))\
+					.setDisabled(conn)
+
+			if(conn) :
+				#Set valve positions based on selection. Emit signal for log file
+				tmparr = []
+				for i in range(1,5):
+					tmpobject = self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i))
+					self.MainWindow.findChild(QtWidgets.QPushButton,'valve'+str(i)).setChecked(tmpobject.isChecked())
+					#if tmpobject.isChecked():
+					#	tmparr.append(str(tmpobject.text()))#+','
+				
+					if int(tmpobject.isChecked()) != self.initialValvePositions[i-1]: tmparr.append(str(tmpobject.text()))
+				
+				tmparr = ', '.join(tmparr)
+				if len(tmparr) == 0: self.logSignal.emit('No valves opened')
+				else:	self.logSignal.emit(tmparr+' valves opened')		
+
+
+				#Wait for valves to change and then provide instructional interface
+				time.sleep(3)
+				self.devinstruct.setText("The CVI valves have been switched... \n\nAncillary valves can be opened. Once operators are finished, press continue")
+			else: 
+				#Display instructional interface
+				self.devinstruct.setText("Please deselect the instruments that are to be disconnected. Then press continue and wait for flow to return to normal")
+
+			#Force gui events to be processed and connect continue signal/slots
 			app.processEvents()
-			self.devcontinue.show()
-			self.devcancel.show()
-		
-			#Link signal/slots for connect/cancel buttons		
-			self.devcontinue.clicked.connect(lambda: self.updateinstruments(False))
-			self.devcancel.clicked.connect(lambda: self.gradualflowreduction(False, True))	
-	'''
+			self.devcontinue.clicked.connect(lambda: self.devChangeRoutine(conn, 2))
 
-	#Addition of external instruments to the counterflow calculation
-	#	Only runs once the connect button is clicked
-	def addinstruments(self, MainWindow):	
-		#Hides original buttons to prevent redundancy
-		self.devconnect.hide()
-		self.devdisconnect.hide()
-		
-		#Disables other tabs to prevent interference
-		self.tabWidget.setTabEnabled(0, False)
-		self.tabWidget.setTabEnabled(1, False)
-		
-		#Updates temporary instrument i/o buttons with actual states
-		self.auxdev1.setChecked(self.v1.isChecked())
-		self.auxdev2.setChecked(self.v2.isChecked())
-		self.auxdev3.setChecked(self.v3.isChecked())
-		self.auxdev4.setChecked(self.v4.isChecked())
-		
-		#Stores the initial counterflow value to reference to
-		#self.initialcfexcess = float(self.cvf3cw.text())
-		self.initialcfexcess = float(self.cvf3cwSlider.value())/100.0
+		if stage == 2:
+			#Disconnect button signal/slots to prevent rushing
+			self.devcontinue.disconnect()
+			self.devcancel.disconnect()
 
-		#Stores the initial valve positions (just in case something is cancelled)
-		self.initialValvePositions = [int(self.v1.isChecked()),int(self.v2.isChecked()),int(self.v3.isChecked()),int(self.v4.isChecked())]
+			if canc:
+				self.logSignal.emit('Connection routine cancelled, valves reverting if changed')	
+				for i in range(0,4):
+					self.MainWindow.findChild(QtWidgets.QPushButton,'valve'+str(i+1))\
+						.setChecked(self.initialValvePositions[i])
+					#self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i+1))\
+					#	.setChecked(self.initialValvePositions[i])
 
-		#Offsets counterflow to allow external instrument changes
-		#	This also updates a parameter that is used within a separate
-		#	processor thread so that it is responds to function changes
-		#self.cfexcess = self.initialcfexcess + float(self.offset.text())
-		self.cfexcess = self.initialcfexcess + float(self.offsetSlider.value())/100.0
+				time.sleep(3)
+				self.devinstruct.setText("The valves have been reverted to their original state")
+		
+			#If disconnecting instruments, this is the final routine to process
+			if(not conn):#connecting): 
+				tmparr = []
+				for i in range(1,5):
+					#Disabling of temporary valve i/o toggles
+					self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i))\
+						.setDisabled(True)
+					#Updating Actual Valves
+					tmpobject = self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i))
+					self.MainWindow.findChild(QtWidgets.QPushButton,'valve'+str(i)).setChecked(tmpobject.isChecked())
+					
+					if int(tmpobject.isChecked()) != self.initialValvePositions[i-1]: tmparr.append(str(tmpobject.text()))
+				
+				tmparr = ', '.join(tmparr)
+				if len(tmparr) == 0: ui.logSignal.emit('No valves closed')
+				else:	ui.logSignal.emit(tmparr+' valves closed')	
 
-		
-		#Waits for specified amount of time before allowing further input
-		#time.sleep(float(self.delay.text()))
-		time.sleep(float(self.delaySlider.value()/100.0))
+				
 
-		#Display instructions, force program to respond, and show continue/cancel buttons
-		self.devinstruct.setText("The Counterflow has been increased... \nPlease select the instruments that are to be connected and press continue")
-		app.processEvents()
-		self.devcontinue.show()
-		self.devcancel.show()
-		
-		#Need to show each of the device addition toggles (Should be hidden by default)
-		self.auxdev1.setDisabled(False)
-		self.auxdev2.setDisabled(False)
-		self.auxdev3.setDisabled(False)
-		self.auxdev4.setDisabled(False)
-		
-		#Link signal/slots for connect/cancel buttons
-		self.devcontinue.clicked.connect(lambda: self.updateinstruments(True))
-		self.devcancel.clicked.connect(lambda: self.gradualflowreduction(True, True))		
-		
-	#Removal of external instruments from the counterflow calculation
-	#	Only runs once the disconnect button is clicked
-	def removeinstruments(self, MainWindow):
-		#Hides original buttons to prevent redundancy
-		self.devconnect.hide()
-		self.devdisconnect.hide()
-		
-		#Disables other tabs to prevent interference
-		self.tabWidget.setTabEnabled(0, False)
-		self.tabWidget.setTabEnabled(1, False)
-		
-		#Updates temporary instrument i/o buttons with actual states
-		self.auxdev1.setChecked(self.v1.isChecked())
-		self.auxdev2.setChecked(self.v2.isChecked())
-		self.auxdev3.setChecked(self.v3.isChecked())
-		self.auxdev4.setChecked(self.v4.isChecked())
-		
-		#Stores the initial counterflow value to reference to		
-		#self.initialcfexcess = float(self.cvf3cw.text())
-		self.initialcfexcess = float(self.cvf3cwSlider.value())/100.0
-		
-		#Stores the initial valve positions (just in case something is cancelled)
-		self.initialValvePositions = [int(self.v1.isChecked()),int(self.v2.isChecked()),int(self.v3.isChecked()),int(self.v4.isChecked())]
-		
-		#Offsets counterflow to allow external instrument changes
-		#	This also updates a parameter that is used within a separate
-		#	processor thread so that it is responds to function changes
-		#self.cfexcess = self.initialcfexcess + float(self.offset.text())
-		self.cfexcess = self.initialcfexcess + float(self.offsetSlider.value())/100.0
-
-		#Waits for specified amount of time before allowing further input
-		#time.sleep(float(self.delay.text()))
-		time.sleep(float(self.delaySlider.value())/100.0)
-
-		#Display instructions, force program to respond, and show continue/cancel buttons
-		self.devinstruct.setText("The Counterflow has been increased!\n\nOperators may now begin performing operations. \n\nPress continue once completed")
-		app.processEvents()
-		self.devcontinue.show()
-		self.devcancel.show()
-		
-		#Link signal/slots for connect/cancel buttons		
-		self.devcontinue.clicked.connect(lambda: self.updateinstruments(False))
-		self.devcancel.clicked.connect(lambda: self.gradualflowreduction(False, True))
-		
-	def updateinstruments(self, connecting):
-		#Disable continue button to prevent rushing program
-		self.devcontinue.disconnect()
-		#time.sleep(3)
-		
-		#Increment the number of external instrument changes
-		self.numchanges += 1
-		
-		#Boolean for deciding how to update the instruments.
-		#	If connecting, run connection routine,
-		#	otherwise, run disconnection routine
-		if(connecting) : 
-			#ui.MainWindow.findChild(QtWidgets.QPushButton,'cvfx'+str(i+5)+self.auxdevtoggles[j]).clicked.connect(lambda: self.toggleswitched(MainWindow))
-
-			#Disabling temporary instrument i/o toggles
-			self.auxdev1.setDisabled(True)
-			self.auxdev2.setDisabled(True)
-			self.auxdev3.setDisabled(True)
-			self.auxdev4.setDisabled(True)
+				#Updating actual valve controls with temporary toggles
+				time.sleep(3)
 			
-			#Updating actual instrument valve positions with temporary toggles
-			self.v1.setChecked(self.auxdev1.isChecked())
-			self.v2.setChecked(self.auxdev2.isChecked())
-			self.v3.setChecked(self.auxdev3.isChecked())
-			self.v4.setChecked(self.auxdev4.isChecked())
+			#ADD NONBLOCKING SLEEP TIMER FOR LOOP BELOW
+
+			#Begin slowly stepping down the counterflow excess
+			#	back to the original level to prevent flow gulps
+			while self.cfexcess > self.initialcfexcess + 0.5:
+				#Step down flow
+				self.cfexcess = self.cfexcess - 0.5
 			
-			#Wait for valves to change and then provide instructional interface
-			time.sleep(3)
-			self.devinstruct.setText("The Valves have been switched... \n\nOnce operators are finished, press continue")
-		else: 
-			#Enabling temporary valve i/o toggles
-			self.auxdev1.setDisabled(False)
-			self.auxdev2.setDisabled(False)
-			self.auxdev3.setDisabled(False)
-			self.auxdev4.setDisabled(False)
-			
-			#Display instructional interface
-			self.devinstruct.setText("Please deselect the instruments that are to be disconnected and press continue")
-
-		#Force gui events to be processed and connect continue signal/slots
-		app.processEvents()
-		self.devcontinue.clicked.connect(lambda: self.gradualflowreduction(connecting, False))
-
-	#Function to be run if anything is cancelled at any point
-	#	or once addition/removal routines have been completed
-	def gradualflowreduction(self, connecting, cancelled):		
-		#Disconnect button signal/slots to prevent rushing
-		self.devcontinue.disconnect()
-		self.devcancel.disconnect()
-
-		if cancelled:
-			self.v1.setChecked(self.initialValvePositions[0])
-			self.v2.setChecked(self.initialValvePositions[1])
-			self.v3.setChecked(self.initialValvePositions[2])
-			self.v4.setChecked(self.initialValvePositions[3])
-			self.auxdev1.setChecked(self.initialValvePositions[0])
-			self.auxdev2.setChecked(self.initialValvePositions[1])
-			self.auxdev3.setChecked(self.initialValvePositions[2])
-			self.auxdev4.setChecked(self.initialValvePositions[3])
-
-		time.sleep(3)
-		self.devinstruct.setText("The valves have been reverted to their original state")
+				#Update instructional interface with new flow step
+				#	Force gui update and pause to allow instrument response
+				self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+str(self.cfexcess)+"\n  Goal: "+str(self.initialcfexcess))
+				app.processEvents()
+				time.sleep(2)
 		
-		#If disconnecting instruments, this is the final routine to process
-		if(not connecting): 
-			#Disabling of temporary valve i/o toggles
-			self.auxdev1.setDisabled(True)
-			self.auxdev2.setDisabled(True)
-			self.auxdev3.setDisabled(True)
-			self.auxdev4.setDisabled(True)
-			
-			#Updating actual valve controls with temporary toggles
-			self.v1.setChecked(self.auxdev1.isChecked())
-			self.v2.setChecked(self.auxdev2.isChecked())
-			self.v3.setChecked(self.auxdev3.isChecked())
-			self.v4.setChecked(self.auxdev4.isChecked())
-			time.sleep(3)
+			#Check to make sure flow is back to where it originally was
+			#	If it is, then great; otherwise, make final step
+			if self.cfexcess != self.initialcfexcess:
+				#Force final step
+				self.cfexcess = self.initialcfexcess	
+
+				#Update instructional interface with new flow step
+				#	Force gui update and pause to allow instrument response
+				self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+str(self.cfexcess)+"\n  Goal: "+str(self.initialcfexcess))
+				app.processEvents()
+				time.sleep(2)		
 		
-		#Begin slowly stepping down the counterflow excess
-		#	back to the original level to prevent flow gulps
-		while self.cfexcess > self.initialcfexcess + 0.5:
-			#Step down flow
-			self.cfexcess = self.cfexcess - 0.5
-			
-			#Update instructional interface with new flow step
-			#	Force gui update and pause to allow instrument response
-			self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+str(self.cfexcess)+"\n  Goal: "+str(self.initialcfexcess))
+			#Provide final display information and allow gui to respond
+			self.devinstruct.setText("Flow has returned to normal.\n\nYou may now resume normal operation")
 			app.processEvents()
-			time.sleep(2)
 		
-		#Check to make sure flow is back to where it originally was
-		#	If it is, then great; otherwise, make final step
-		if self.cfexcess != self.initialcfexcess:
-			#Force final step
-			self.cfexcess = self.initialcfexcess	
+			#Disable temporary valve i/o toggles
+			for i in range(1,5):
+				self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i))\
+					.setDisabled(True)
 
-			#Update instructional interface with new flow step
-			#	Force gui update and pause to allow instrument response
-			self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+str(self.cfexcess)+"\n  Goal: "+str(self.initialcfexcess))
-			app.processEvents()
-			time.sleep(2)		
+			ui.logSignal.emit('Ancillary valve change routine complete')
 		
-		#Provide final display information and allow gui to respond
-		self.devinstruct.setText("Flow has returned to normal.\n\nYou may now resume normal operation")
-		app.processEvents()
+			#Re-enable tabs and reset buttons to original states
+			self.tabWidget.setTabEnabled(0, True)
+			self.tabWidget.setTabEnabled(1, True)
+			self.devcontinue.hide()
+			self.devcancel.hide()	
+			self.devconnect.show()
+			self.devdisconnect.show()
 		
-		#Disable temporary valve i/o toggles
-		self.auxdev1.setDisabled(True)
-		self.auxdev2.setDisabled(True)
-		self.auxdev3.setDisabled(True)
-		self.auxdev4.setDisabled(True)
-		
-		#Re-enable tabs and reset buttons to original states
-		self.tabWidget.setTabEnabled(0, True)
-		self.tabWidget.setTabEnabled(1, True)
-		self.devcontinue.hide()
-		self.devcancel.hide()	
-		self.devconnect.show()
-		self.devdisconnect.show()
-		
-		#Reset instructional interface with default text
-		self.devinstruct.setText(self.defaultdevinstruct)
-		
+			#Reset instructional interface with default text
+			self.devinstruct.setText(self.defaultdevinstruct)
+
+
+
 	#Function for loading calibration coefficients from NIDAS files
 	#	Will run once when the program is first started and populate
 	#	all calibration tables and will carry a 3 dimensional array
@@ -2067,7 +2002,11 @@ class Ui_MainWindow(QObject):
 	#	replotting the data ~3 times a second.
 	def connecting(self, MainWindow):
 		#Check to make sure that connection was not attempted multiple times in succession
-		self.disconnecting(MainWindow)
+		#self.disconnecting(MainWindow)
+		try:
+			if self.runconnection:
+				return
+		except: pass
 		
 		self.statusindicatorlabel.setText("Ensuring Disconnection . . . . . . . ")
 		self.statusindicatorlabel.setText("Initiating Connection . . . . . . . .")
@@ -2161,7 +2100,6 @@ class Ui_MainWindow(QObject):
 				self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex(),:],clear=True,pen=pyqtgraph.mkPen(color=(150,150,255), width=1)))#,pen='b',clear=True))
 		except: pass
 		
-		
 		#Force GUI to update display
 		app.processEvents()
 		
@@ -2171,7 +2109,14 @@ class Ui_MainWindow(QObject):
 		except: pass
 		
 		#Update front panel with data that has just been received
-		try: self.datafromdsm.setText(str(datain).replace(",", ", "))
+		try: 
+		#	testoutput = str(datain).replace(' ','').replace('\n','').replace('\r','').split(',')
+			#print(testoutput)
+		#	testoutput = np.around(np.r_[testoutput],decimals=4)
+		#	print(testoutput)
+		#	testoutput = ', '.join(testoutput)
+		#	print(testoutput)
+			self.datafromdsm.setText(str(datain).replace("\n","").replace("\r","").replace(",","\t"))#str(datain).replace(",", ", "))
 		except: pass
 		
 		#Null string just in case
@@ -2181,11 +2126,12 @@ class Ui_MainWindow(QObject):
 		#	Otherwise, print header or error prone input to graphical interface
 		#try: #if datain[0] != 'N' :
 		calcError = False
+		#NESTED TRY STATEMENTS ARE PROBLEMATIC
 		try: #if datain[0] != 'N':
 			if datain[0] == 'N': raise Exception('This is the exception you expect to handle')
 
 			try:
-				input = datain.split(',')
+				input = datain.replace(" ","").replace("\n","").replace("\r","").split(',')
 				input = [float(i) for i in input]
 			except:
 				self.errorSignal.emit("Error in tcp string")
@@ -2519,7 +2465,6 @@ class Ui_MainWindow(QObject):
 				for i in range(0, len(self.flowedit)):
 					self.internalFlows[i] = float(MainWindow.findChild(QtWidgets.QSlider, self.flowedit[i]+'Slider')\
 						.value()/100.0)
-			
 
 				#Defualt flow bounds were 0.05 (i.e. self.internalFlows[i] + 0.05).
 				#	These were changed to 0.01 to add more sensitivity in flow adjustments
@@ -2662,6 +2607,32 @@ class Ui_MainWindow(QObject):
 			try: 
 				client_sock.send(dataout)
 				self.CVI_Server.sendSuccess = True
+
+				#self.logSignal.emit('No valves closed')
+				#self.outputTracker(dsmtime,flowio,cvimode,cvfx0,2,3,4,cvf3)
+				try:
+					tmpdata = [input[0], bool(self.flowio.isChecked()),bool(self.cvimode.isChecked())]
+					for i in range(0,4):
+						tmpdata.append(self.internalFlows[i])
+					tmpdata.append(self.cfexcess)
+					tmparr = []
+					if self.outputTracker[1] != tmpdata[1]: 
+						if tmpdata[1]: self.logSignal.emit("Flow has been turned on")
+						else: self.logSignal.emit("Flow has been turned off")
+					if self.outputTracker[2] != tmpdata[2]:
+						if tmpdata[2]: self.logSignal.emit("CVI Mode set to Total")
+						else: self.logSignal.emit("CVI Mode set to CVI")
+					tmplabels = ['cvfx0','cvfx2','cvfx3','cvfx4','cvf3']
+					for i in range(3,len(self.outputTracker)):
+						if self.outputTracker[i] != tmpdata[i]: 
+							tmparr.append(str(tmplabels[i-3])+' set to '+str(tmpdata[i])+' vlpm')
+					for i in range(0,len(self.outputTracker)):
+						self.outputTracker[i] = tmpdata[i]
+					tmparr = ', '.join(tmparr)
+					if len(tmparr)!= 0: self.logSignal.emit(str(tmparr))
+				except: 
+					#self.errorSignal('Unable to detect changes to flows sent to DSM')
+					pass		
 			except: 
 				self.errorSignal.emit("Failed to send feedback signal to DSM")
 				#print('client socket failed')#		if client_sock != '': client_sock.send(dataout)	
