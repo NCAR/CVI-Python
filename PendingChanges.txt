@@ -62,7 +62,6 @@ ARISTO Updates
 * Fix input/output raw list for relabeling....
 * The common notes button is a little too close for comfort (accidentally hit)
 * The start and stop button is too close to the cvi mode button
-* Highlight the CVF3 slider to distinguish it
 COMPLETE * Fix the lower time series sizing
 COMPLETE * Add units to flows on front panel (or change to cvfx4c)
 COMPLETE * The connect wording needs to be changed for auxiliary instruments
@@ -79,12 +78,28 @@ COMPLETE * Adjust valve naming in instrument change routines to use labels from 
 COMPLETE * Creat shortcut on desktop for CVI folder
 COMPLETE * Adjust TDL calibration coefficients to older values
 	-0.2	1.33676	-0.03415	0.00145
-* Manual entries on plots not working...
 COMPLETE * Add seconds from midnight to notes and error logs (remove date?)
 
 PARTIAL * Core dump after start is pressed in double succession (Address was already allocated)
 
 * Various cosmetic changes
+
+* Put Stop button in upper right corner if possible, currently too close to comment window. Would be bad to accidentally hit it in turbulence
+COMPLETE * You can't read start file name at all when it's bright as it was yesterday and tends to be at high altitude.
+* Time series: * Need to type in Manual Yaxis setpoints as we've discussed
+	COMPLETE * Remove Y2 scale when not being used to avoid confusion
+	VOID (cals are 1:1) * CVFX5R and CVFX5C seem to be the same
+	COMPLETE * Change light blue to bright green or something more prominent. 
+COMPLETE * Default start values: Time series start with rhoo_tdl on top and cvcnco1 on bottom.
+COMPLETE * cvf3c at 0.3, cvfx0c at 2.0.
+COMPLETE (Changed to "CF_Excess") * Can you make CVf3C setting more prominent, and/or move it to top, and label it "cntrflow"?
+COMPLETE (appended _CVI.dat) * Think it's time to change the data file name from nn.nnq to nn.nvCVI.dat or nn.nvCVI.txt
+COMPLETE * User Notes to add: Taxi, Takeoff, Heaters ON, Landed
+
+* Change units corresponding to ['H2O','ptdl','ttdl','cvf3','cvcnc1','cvcnc01','cvrho_tdl',
+              'cvrhoo_tdl','opcc','opcco','cvfx5R','cvfx5c','cvts','cvtai','cvcfact'
+	to  [g m-3, mb, C, vlpm (or slpm?), # cm-3, # cm-3, g m-3, g m-3, # cm-3, # cm-3, slpm, vlpm, C, C, unitless]
+
 
 Error Events:
 	Error in calculation

@@ -213,6 +213,32 @@ class Ui_MainWindow(QObject):
 		self.autopilot.setText("Autopilot: OFF")
 		self.autopilot.clicked.connect(lambda: self.toggleswitched(MainWindow))
 		
+
+		self.cvf3cwlabel = QtWidgets.QLabel(self.tab)
+		self.cvf3cwlabel.setObjectName("cvf3cwlabel")		
+		self.tabLayout_1.addWidget(self.cvf3cwlabel, 5, 0, 2, 5)
+		self.cvf3cw = QtWidgets.QLineEdit(self.tab)
+		self.cvf3cw.setObjectName("cvf3cw")
+		self.tabLayout_1.addWidget(self.cvf3cw, 5, 5, 2, 5)	
+		#self.cvf3cwlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+		self.cvf3cw.editingFinished.connect(lambda: self.updateSliders(MainWindow, 'cvf3cw'))
+
+		self.cvf3cwlabel.setStyleSheet("background-color: yellow")
+		#self.cvf3cw.setStyleSheet("background-color: yellow")		
+
+		self.cvf3cwSlider = QSlider(Qt.Horizontal, self.tab)
+		self.cvf3cwSlider.setMinimum(-200)#0)
+		self.cvf3cwSlider.setMaximum(800)
+		self.cvf3cwSlider.setValue(0)
+		self.cvf3cwSlider.setTickPosition(QSlider.TicksBelow)
+		self.cvf3cwSlider.setTickInterval(100)
+		self.cvf3cwSlider.setObjectName('cvf3cwSlider')
+		self.tabLayout_1.addWidget(self.cvf3cwSlider, 7, 0, 2, 10)
+		self.cvf3cwSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow, 'cvf3cw'))	
+
+		#self.cvf3cwSlider.setStyleSheet("background-color: yellow")
+
+
 		#Internal flow control line edits
 		#self.flowlabels = ['cvfx0label','cvfx2label','cvfx3label','cvfx4label']
 		self.flowedit = ['cvfx0','cvfx2','cvfx3','cvfx4']
@@ -220,12 +246,12 @@ class Ui_MainWindow(QObject):
 		for i in range(0,len(self.flowedit)):
 			tmpobject = QtWidgets.QLabel(self.tab)
 			tmpobject.setObjectName(self.flowedit[i]+'label')
-			self.tabLayout_1.addWidget(tmpobject, 5+4*i, 0, 2, 5)
+			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 0, 2, 5)
 			#tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 			
 			tmpobject = QtWidgets.QLineEdit(self.tab)
 			tmpobject.setObjectName(self.flowedit[i])
-			self.tabLayout_1.addWidget(tmpobject, 5+4*i, 5, 2, 5)
+			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 5, 2, 5)
 			tmpobject.editingFinished.connect(lambda i=i: self.updateSliders(MainWindow, self.flowedit[i]))
 		
 			sliderMin = 0
@@ -239,27 +265,8 @@ class Ui_MainWindow(QObject):
 			tmpobject.setTickPosition(QSlider.TicksBelow)
 			tmpobject.setTickInterval(sliderDiv)#10)
 			tmpobject.setObjectName(self.flowedit[i]+'Slider')
-			self.tabLayout_1.addWidget(tmpobject, 7+4*i, 0, 2, 10)
+			self.tabLayout_1.addWidget(tmpobject, 11+4*i, 0, 2, 10)
 			tmpobject.valueChanged.connect(lambda new, i=i: self.syncSliders(MainWindow, self.flowedit[i]))
-
-		self.cvf3cwlabel = QtWidgets.QLabel(self.tab)
-		self.cvf3cwlabel.setObjectName("cvf3cwlabel")		
-		self.tabLayout_1.addWidget(self.cvf3cwlabel, 21, 0, 2, 5)
-		self.cvf3cw = QtWidgets.QLineEdit(self.tab)
-		self.cvf3cw.setObjectName("cvf3cw")
-		self.tabLayout_1.addWidget(self.cvf3cw, 21, 5, 2, 5)	
-		#self.cvf3cwlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-		self.cvf3cw.editingFinished.connect(lambda: self.updateSliders(MainWindow, 'cvf3cw'))		
-
-		self.cvf3cwSlider = QSlider(Qt.Horizontal, self.tab)
-		self.cvf3cwSlider.setMinimum(-200)#0)
-		self.cvf3cwSlider.setMaximum(800)
-		self.cvf3cwSlider.setValue(0)
-		self.cvf3cwSlider.setTickPosition(QSlider.TicksBelow)
-		self.cvf3cwSlider.setTickInterval(100)
-		self.cvf3cwSlider.setObjectName('cvf3cwSlider')
-		self.tabLayout_1.addWidget(self.cvf3cwSlider, 23, 0, 2, 10)
-		self.cvf3cwSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow, 'cvf3cw'))	
 
 		#Preflight checklist
 		self.preflightButton = QtWidgets.QPushButton(self.tab)
@@ -274,17 +281,17 @@ class Ui_MainWindow(QObject):
 		#Dropdown lists for selecting data for first plot
 		self.commonNoteDropdown = QtWidgets.QComboBox(self.tab)
 		self.commonNoteDropdown.setObjectName("commonNoteDropdown")
-		self.tabLayout_1.addWidget(self.commonNoteDropdown, 22, 10, 3, 20)
+		self.tabLayout_1.addWidget(self.commonNoteDropdown, 23, 10, 2, 20)
 		#self.commonNoteDropdown.setDisabled(True)
 		
-		self.commonNotes = ["Common Notes","Approaching Cloud", "In Cloud", "Exited Cloud"]
+		self.commonNotes = ["Common Notes","Approaching Cloud", "In Cloud", "Exited Cloud","Taxi","Takeoff","Heaters ON","Landed"]
 		self.commonNoteDropdown.addItems(self.commonNotes)
 		self.commonNoteDropdown.activated.connect(lambda: self.addCommonNote(MainWindow))
 		
 		#Push to add custom note?
 		self.customNoteButton = QtWidgets.QPushButton(self.tab)
 		self.customNoteButton.setObjectName("customNoteButton")
-		self.tabLayout_1.addWidget(self.customNoteButton, 22, 30, 3, 10)
+		self.tabLayout_1.addWidget(self.customNoteButton, 23, 30, 2, 10)
 		self.customNoteButton.setStyleSheet("background-color: lightblue")
 		self.customNoteButton.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 		#self.customNoteButton.setDisabled(True)
@@ -299,13 +306,15 @@ class Ui_MainWindow(QObject):
 		self.currentfile.setObjectName("currentfile")
 		self.tabLayout_1.addWidget(self.currentfile, 25, 10, 2, 30)
 		self.currentfile.setDisabled(True)		
+		self.currentfile.setStyleSheet("QLineEdit:disabled {color:black; background-color: lightblue}")
+
 					
 		#Status indicator for instructional display and current operation of instrument
 		self.mainstatus = QtWidgets.QTextBrowser()#QTextEdit()
 		self.mainstatus.setObjectName("mainstatus")
 		self.mainstatus.setAlignment(Qt.AlignTop)
 		self.mainstatus.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
-		self.tabLayout_1.addWidget(self.mainstatus, 4, 11, 18, 28)
+		self.tabLayout_1.addWidget(self.mainstatus, 4, 11, 19, 28)
 		self.mainstatus.verticalScrollBar().setValue(self.mainstatus.verticalScrollBar().maximum())
 		#self.mainstatus.ensureCursorVisible()
 				
@@ -387,16 +396,18 @@ class Ui_MainWindow(QObject):
 		
 		#Linking of two separately scaling lines in the first plot
 		self.CVIplotline2 = ViewBox()
-		self.CVIplot.showAxis('right')
+		#self.CVIplot.showAxis('right')
 		self.CVIplot.scene().addItem(self.CVIplotline2)
 		self.CVIplot.getAxis('right').linkToView(self.CVIplotline2)
 		self.CVIplotline2.setXLink(self.CVIplot)
-		self.CVIplot.getAxis('right').setLabel('Y2', color = '#0000ff')
+		#self.CVIplot.getAxis('right').setLabel('Y2', color = (255,150,255))#'#0000ff')
+
+		#OLD PURPLISH COLOR  = (150,150,255)
 		
 		#Coloring of first plot axis items
 		self.CVIplot.getAxis('left').setPen(pyqtgraph.mkPen(color=(255,255,255), width=3))
 		self.CVIplot.getAxis('bottom').setPen(pyqtgraph.mkPen(color=(255,255,255), width=3))
-		self.CVIplot.getAxis('right').setPen(pyqtgraph.mkPen(color=(150,150,255), width=3))
+		self.CVIplot.getAxis('right').setPen(pyqtgraph.mkPen(color=(0,255,0), width=3))
 
 		#Second Plotting Widget
 		self.CVIplot2 = PlotWidget(self.tab)
@@ -408,22 +419,23 @@ class Ui_MainWindow(QObject):
 		
 		#Linking of two separately scaling lines in the second plot 
 		self.CVIplot2line2 = ViewBox()
-		self.CVIplot2.showAxis('right')
+		#self.CVIplot2.showAxis('right')
 		self.CVIplot2.scene().addItem(self.CVIplot2line2)
 		self.CVIplot2.getAxis('right').linkToView(self.CVIplot2line2)
 		self.CVIplot2line2.setXLink(self.CVIplot2)
-		self.CVIplot2.getAxis('right').setLabel('Y2', color = '#0000ff')
+		#self.CVIplot2.getAxis('right').setLabel('Y2', color = (150,150,255))#'#0000ff')
 		
 		#Coloring of second plot axis items
 		self.CVIplot2.getAxis('left').setPen(pyqtgraph.mkPen(color=(255,255,255), width=3))
 		self.CVIplot2.getAxis('bottom').setPen(pyqtgraph.mkPen(color=(255,255,255), width=3))
-		self.CVIplot2.getAxis('right').setPen(pyqtgraph.mkPen(color=(150,150,255), width=3))
+		self.CVIplot2.getAxis('right').setPen(pyqtgraph.mkPen(color=(0,255,0), width=3))
 		
 		
 		#Dropdown lists for selecting data for first plot
 		self.dropdownlist = QtWidgets.QComboBox(self.tab)
 		self.dropdownlist.setObjectName("dropdownlist")
 		self.tabLayout_1.addWidget(self.dropdownlist, 0, 40, 2, 30)
+
 		self.dropdownlistline2 = QtWidgets.QComboBox(self.tab)
 		self.dropdownlistline2.setObjectName("dropdownlistline2")
 		self.tabLayout_1.addWidget(self.dropdownlistline2, 0, 70, 2, 30)
@@ -447,18 +459,23 @@ class Ui_MainWindow(QObject):
 		self.ipaddress = QtWidgets.QLineEdit(self.tab_2)
 		self.ipaddress.setObjectName("ipaddress")
 		self.tabLayout_2.addWidget(self.ipaddress, 2, 0, 2, 10)
+		self.ipaddress.setDisabled(True)
+
 		self.portinlabel = QtWidgets.QLabel(self.tab_2)
 		self.portinlabel.setObjectName("portinlabel")
 		self.tabLayout_2.addWidget(self.portinlabel, 4, 0, 2, 10)
 		self.portin = QtWidgets.QLineEdit(self.tab_2)
 		self.portin.setObjectName("portin")
 		self.tabLayout_2.addWidget(self.portin, 6, 0, 2, 10)
+		self.portin.setDisabled(True)
+
 		self.portoutlabel = QtWidgets.QLabel(self.tab_2)
 		self.portoutlabel.setObjectName("portoutlabel")
 		self.tabLayout_2.addWidget(self.portoutlabel, 8, 0, 2, 10)
 		self.portout = QtWidgets.QLineEdit(self.tab_2)
 		self.portout.setObjectName("portout")
 		self.tabLayout_2.addWidget(self.portout, 10, 0, 2, 10)
+		self.portout.setDisabled(True)
 		
 		#Base File Path
 		self.basedirlabel = QtWidgets.QLabel(self.tab_2)
@@ -987,7 +1004,7 @@ class Ui_MainWindow(QObject):
 		self.delay.setText(_translate("MainWindow", "1"))
 		self.offsetlabel.setText(_translate("MainWindow","Flow Offset"))
 		self.offset.setText(_translate("MainWindow", "3"))
-		self.cvf3cwlabel.setText(_translate("MainWindow", "cvf3c"))#"Counterflow Excess"))
+		self.cvf3cwlabel.setText(_translate("MainWindow", "CF_Excess"))#"Counterflow Excess"))
 		self.cvf3cw.setText(_translate("MainWindow", "0.5"))
 				
 		#Auxiliary device labels
@@ -1039,8 +1056,10 @@ class Ui_MainWindow(QObject):
 		#self.ylabels = ['Concentration (g/m^3)','Pressure (mbar)','Temperature (C)','y','y','y','y','y','y','y']
 		self.ylabels = ['Concentration (g/m^3)','Pressure (mbar)','Temperature (C)','y','y','y','y','y','y','y','y','y','y','y','y']
 		self.dropdownlist.addItems(self.plottitles)
+		self.dropdownlist.setCurrentIndex(7)
 		self.dropdownlistline2.addItems([""]+self.plottitles)
 		self.dropdownlist2.addItems(self.plottitles)
+		self.dropdownlist2.setCurrentIndex(5)
 		self.dropdownlist2line2.addItems([""]+self.plottitles)
 		
 		#Labeling Tabs on screen
@@ -1154,6 +1173,10 @@ class Ui_MainWindow(QObject):
 		self.dataFile = time.strftime("%y%m%d%H.%Mq")
 		self.errorFile = self.dataFile + '_errorlog'
 		self.logFile = self.dataFile + '_log'
+
+		self.dataFile+= '_CVI.dat'
+		self.errorFile+= '_CVI.dat'
+		self.logFile+= '_CVI.dat'
 		
 		self.preflightPrefix = ''
 						
@@ -1347,7 +1370,8 @@ class Ui_MainWindow(QObject):
 			with open(newDir,'a') as f:
 				f.write(data)
 			
-		self.currentfile.setText(str(newDir))
+		if saveCode == 0:
+			self.currentfile.setText(str(newDir))
 
 
 	def syncSliders(self, MainWindow, widget = None):
@@ -1383,7 +1407,8 @@ class Ui_MainWindow(QObject):
 		#	If found, the program begins loading parameters, otherwise it creates a template
 		#	file and displays an error message
 		if not os.path.isfile(ui.basedir+ui.programdefaults):
-			self.errorLog(self.mainerrorlist[2])
+			#self.errorLog(self.mainerrorlist[2])
+			self.errorSignal.emit(self.mainerrorlist[2])
 			
 			#Template default file that is saved if file is not found
 			inputstring = ('#\tProgram Defaults for Python Code\r\n'
@@ -1777,7 +1802,8 @@ class Ui_MainWindow(QObject):
 			
 		#Exception throws error message and instructions to the front panel
 		except:
-			self.errorLog(self.mainerrorlist[1])
+			#self.errorLog(self.mainerrorlist[1])
+			self.errorSignal.emit(self.mainerrorlist[1])
 
 	def deleteCalibrations(self, MainWindow):
 		_translate = QtCore.QCoreApplication.translate
@@ -1832,7 +1858,8 @@ class Ui_MainWindow(QObject):
 			
 			#Exception throws error message and instructions to the front panel
 			except:
-				self.errorLog(self.mainerrorlist[1])
+				#self.errorLog(self.mainerrorlist[1])
+				self.errorSignal.emit(self.mainerrorlist[1])
 
 			self.readcalsfromfiles(MainWindow)
 			
@@ -2079,11 +2106,15 @@ class Ui_MainWindow(QObject):
 
 		#Form dual lines on each plot if opted for
 		if (self.dropdownlistline2.currentIndex() != 0) : 
+			self.CVIplot.showAxis('right')
 			self.CVIplot.setTitle(self.plottitles[self.dropdownlist.currentIndex()]+' & '+self.plottitles[self.dropdownlistline2.currentIndex()-1])
 			self.CVIplot.getAxis('right').setLabel(self.ylabels[self.dropdownlistline2.currentIndex()-1])#, color = (150,150,255))#'#0000ff')
+		else: self.CVIplot.hideAxis('right')
 		if (self.dropdownlist2line2.currentIndex() != 0) : 
+			self.CVIplot2.showAxis('right')
 			self.CVIplot2.setTitle(self.plottitles[self.dropdownlist2.currentIndex()]+' & '+self.plottitles[self.dropdownlist2line2.currentIndex()-1])
 			self.CVIplot2.getAxis('right').setLabel(self.ylabels[self.dropdownlist2line2.currentIndex()-1])#, color = (150,150,255))#'#0000ff')
+		else: self.CVIplot2.hideAxis('right')
 		
 		
 		try:
@@ -2095,9 +2126,9 @@ class Ui_MainWindow(QObject):
 		
 			#Form dual lines on each plot if opted for
 			if (self.dropdownlistline2.currentIndex() != 0) : 
-				self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlistline2.currentIndex(),:],clear = True,pen=pyqtgraph.mkPen(color=(150,150,255), width=1)))#,clear=True))
+				self.CVIplotline2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlistline2.currentIndex(),:],clear = True,pen=pyqtgraph.mkPen(color=(0,255,0), width=1)))#,clear=True))
 			if (self.dropdownlist2line2.currentIndex() != 0) : 
-				self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex(),:],clear=True,pen=pyqtgraph.mkPen(color=(150,150,255), width=1)))#,pen='b',clear=True))
+				self.CVIplot2line2.addItem(pyqtgraph.PlotCurveItem(self.plotdata[0,:], self.plotdata[self.dropdownlist2line2.currentIndex(),:],clear=True,pen=pyqtgraph.mkPen(color=(0,255,0), width=1)))#,pen='b',clear=True))
 		except: pass
 		
 		#Force GUI to update display
