@@ -5,7 +5,7 @@
 Base Directory: ~/CVI/
 #
 #	A directory name which contains project data
-Project Name: Testing
+Project Name: ARISTO2017
 #
 #	A directory name which contains calibration data
 Calibration Directory: Calibrations
@@ -23,7 +23,7 @@ Outgoing Port: 30006
 Default Valves: 0, 0, 0, 0
 #
 #	Default flows for cvfx0, cvfx2, cvfx3, cvfx4
-Default Flows: 0.0, 2.0, 5.0, 0.05
+Default Flows: 2.0, 1.5, 3.0, 0.05
 #
 #	Valve source (0: User controlled (testing), 1: Program controlled)
 Valve Source: 1
@@ -32,7 +32,7 @@ Valve Source: 1
 Flow Source: 1
 #
 #	Excess flow amount to avoid pulling cabin air
-counterflow excess: 0.5
+counterflow excess: 0.3
 #
 #	Flow offset amount before beginning instrument add/remove routine
 flow increase amount: 3.0
@@ -55,4 +55,4 @@ cvfx8options: cvfx8, 0, 3.00, 0, 1, 20.00
 #	Default nulls for voiding channels from flow (or other calculations) in the order:
 #		cvf1, cvfx0, cvfx1, cvfx2, cvfx3, cvfx4, cvfx5, cvfx6, cvfx7, cvfx8
 #		ccvpcn, cvtt, cvtp, cvts, cvtcn, cvtai
-nulls: 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0
+nulls: 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0
