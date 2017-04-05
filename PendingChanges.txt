@@ -100,6 +100,8 @@ COMPLETE * User Notes to add: Taxi, Takeoff, Heaters ON, Landed
               'cvrhoo_tdl','opcc','opcco','cvfx5R','cvfx5c','cvts','cvtai','cvcfact'
 	to  [g m-3, mb, C, vlpm (or slpm?), # cm-3, # cm-3, g m-3, g m-3, # cm-3, # cm-3, slpm, vlpm, C, C, unitless]
 
+* Look into the rollover values for TDL (do we want it to send an error message whenever data is lost and then regained, but not every second?)
+
 
 Error Events:
 	Error in calculation
