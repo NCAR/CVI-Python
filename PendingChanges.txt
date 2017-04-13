@@ -103,6 +103,34 @@ COMPLETE * User Notes to add: Taxi, Takeoff, Heaters ON, Landed
 * Look into the rollover values for TDL (do we want it to send an error message whenever data is lost and then regained, but not every second?)
 
 
+* Begin writing TDL calibration automation routine.
+	Will need to write real flow to cvfx2wr, while reading cvfx2 and all of the H2O return parameters
+	Will need to write cvfx3wr for dew point generator and read the return.
+	Choices:
+		Comma delimited steps field
+		Minimum time between steps before checking for stability. (Maximum time before moving on?.... timeout)
+	Plot the return signals as it goes
+	Create a plot for the setpoint mixing ratio with the returned mixing ratio.
+	Second plot for the returned tdl mixing ratio
+	Create tab delimited save file with all of the above data.
+	Implementation:
+		Create the various widgets
+		Start and Cancel button (cancel greyed until started, and start greyed once started.)
+		Once start is pressed, all other tabs locked, flow turned on, cvfx2 set to what is on new screen.
+		Once flow return has settled, begin set point ramps and grey out everything except cancel.
+		Add check in processData for if TDL cals occuring, emit signal each time data comes
+			in for plotting, saving, analyzing, etc.
+	Unsure of how to handle cvfx3 so it can be seen using raw voltage.
+		
+		
+		
+		
+* There is a potentially LARGE issue that if the client is severed forcibly, it may crash the python code.
+	
+
+
+
+
 Error Events:
 	Error in calculation
 
