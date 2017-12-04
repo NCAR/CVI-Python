@@ -225,7 +225,17 @@ Traceback (most recent call last):
   File "CVI_Interface.py", line 2195, in <listcomp>
     input = [float(i) for i in input]
 ValueError: could not convert string to float: '-99.9960001.5'
-	
+
+
+
+SOCRATES Specific changes:
+
+ * Change calibration parameters to use scientific notation .6E
+ * Create rolling indicator of values that are being rolled from before
+ 	* Apply color scheme (yellow box indicates rollover)
+ * Divide up more error handling in computations
+ * Depending on error handling exception, proceed through calculations anyways
+ * Change labeling for ancillary instrumentation (Buttons need to match labels)
 		
 		
 		

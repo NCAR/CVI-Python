@@ -2420,36 +2420,36 @@ class Ui_MainWindow(QObject):
 			for j in range(0, len(self.caltablecolumnlabels)):
 				item = self.caltableWidget.item(i,j)
 				try:
-					item.setText(_translate("MainWindow",str(self.calvalues[i,j,self.calversionlist.currentIndex()])))# = float(item.text())
+					item.setText(_translate("MainWindow","{:.5E}".format(self.calvalues[i,j,self.calversionlist.currentIndex()])))# = float(item.text())
 				except ValueError:
-					item.setText(_translate("MainWindow",str(0.0)))
+					item.setText(_translate("MainWindow","{:.5E}".format(0.0)))
 		
 		#Updates calibration tables for the extra parameters
 		#	RHOD, CVTBL, CVTBR, CVOFF1, LTip
 		for i in range(0,len(self.morecaltablecolumnlabels)):
 			item = self.morecaltableWidget.item(0,i)
 			try:
-				item.setText(_translate("MainWindow",str(self.calvalues[len(self.caltablerowlabels)+i,0,self.calversionlist.currentIndex()])))# = float(item.text())
+				item.setText(_translate("MainWindow","{:.5E}".format(self.calvalues[len(self.caltablerowlabels)+i,0,self.calversionlist.currentIndex()])))# = float(item.text())
 			except ValueError:
-				item.setText(_translate("MainWindow",str(0.0)))
+				item.setText(_translate("MainWindow","{:.5E}".format(0.0)))
 				
 		#Updates calibration tables for the TDL Coefficients
 		for i in range(0, len(self.tdlcaltablerowlabels)):
 			for j in range(0,len(self.tdlcaltablecolumnlabels)):
 				item = self.tdlcaltableWidget.item(i,j)
 				try:
-					item.setText(_translate("MainWindow",str(self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels),j,self.calversionlist.currentIndex()])))# = float(item.text())
+					item.setText(_translate("MainWindow","{:.5E}".format(self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels),j,self.calversionlist.currentIndex()])))# = float(item.text())
 				except ValueError:
-					item.setText(_translate("MainWindow",str(0.0)))
+					item.setText(_translate("MainWindow","{:.5E}".format(0.0)))
 			
 		#Updates calibration table for the OPC Pressure calibrations
 		for i in range(0, len(self.opccaltablerowlabels)):
 			for j in range(0,len(self.opccaltablecolumnlabels)):
 				item = self.opccaltableWidget.item(i,j)
 				try:
-					item.setText(_translate("MainWindow",str(self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels)+len(self.tdlcaltablecolumnlabels),j,self.calversionlist.currentIndex()])))# = float(item.text())
+					item.setText(_translate("MainWindow","{:.5E}".format(self.calvalues[i+len(self.caltablerowlabels)+len(self.morecaltablecolumnlabels)+len(self.tdlcaltablecolumnlabels),j,self.calversionlist.currentIndex()])))# = float(item.text())
 				except ValueError:
-					item.setText(_translate("MainWindow",str(0.0)))
+					item.setText(_translate("MainWindow","{:.5E}".format(0.0)))
 			
 	#Function for updating (appending) NIDAS calibration files based on what exists
 	#	within the tables on the graphical display.
@@ -2503,7 +2503,7 @@ class Ui_MainWindow(QObject):
 			#Iterates through the calibration files, formats the data
 			#	And appends to each NIDAS file
 			for i in range(0,len(self.calarray)):
-				caloutput = [ "{:.6f}".format(x) for x in self.calvalues[i,:,self.calversionlist.currentIndex()] ]
+				caloutput = [ "{:.5E}".format(x) for x in self.calvalues[i,:,self.calversionlist.currentIndex()] ]
 				caloutput = '\t'.join(caloutput)
 				caloutput = '\n\n# '+ str(calupdatetext) + '\n' + caltimestamp+'\t'+caloutput
 				if not os.path.isfile(self.calpath+self.calarray[i]+'.dat'):
