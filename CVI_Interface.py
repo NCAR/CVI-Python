@@ -980,8 +980,8 @@ class Ui_MainWindow(QObject):
 		self.tdlCalFlow.setObjectName("tdlCalFlow")
 		self.tabLayout_4.addWidget(self.tdlCalFlow, 5, 10, 2, 10)	
 
-		self.tdlCalFlowLabel.setText("TDL Flow (SLM)")
-		self.tdlCalFlow.setText('0.5')
+		self.tdlCalFlowLabel.setText("TDL Flow (Volts)")
+		self.tdlCalFlow.setText('0.08')
 		
 		self.tdlCalRampToggle = QtWidgets.QPushButton(self.tab_4)
 		self.tabLayout_4.addWidget(self.tdlCalRampToggle, 7, 0, 3, 20)
@@ -999,19 +999,19 @@ class Ui_MainWindow(QObject):
 		
 		self.tdlCalRampMinLabel = QtWidgets.QLabel(self.tab_4)
 		self.tabLayout_4.addWidget(self.tdlCalRampMinLabel, 10, 0, 2, 10)
-		self.tdlCalRampMinLabel.setText("Minimum")
+		self.tdlCalRampMinLabel.setText("Initial Dew Point")
 		self.tdlCalRampMin = QtWidgets.QLineEdit(self.tab_4)
 		self.tabLayout_4.addWidget(self.tdlCalRampMin, 10, 10, 2, 10)
-		self.tdlCalRampMin.setText("0.0")
+		self.tdlCalRampMin.setText("20")
 		self.tdlCalRampMin.editingFinished.connect(lambda: self.tdlCalUpdateGUI(MainWindow))
 
 		
 		self.tdlCalRampMaxLabel = QtWidgets.QLabel(self.tab_4)
 		self.tabLayout_4.addWidget(self.tdlCalRampMaxLabel, 12, 0, 2, 10)
-		self.tdlCalRampMaxLabel.setText("Maximum")
+		self.tdlCalRampMaxLabel.setText("Final Dew Point")
 		self.tdlCalRampMax = QtWidgets.QLineEdit(self.tab_4)
 		self.tabLayout_4.addWidget(self.tdlCalRampMax, 12, 10, 2, 10)
-		self.tdlCalRampMax.setText("20.0")
+		self.tdlCalRampMax.setText("0.5")
 		self.tdlCalRampMax.editingFinished.connect(lambda: self.tdlCalUpdateGUI(MainWindow))
 		
 		self.tdlCalRampStepsLabel = QtWidgets.QLabel(self.tab_4)
@@ -1019,7 +1019,7 @@ class Ui_MainWindow(QObject):
 		self.tdlCalRampStepsLabel.setText("# of Steps")
 		self.tdlCalRampSteps = QtWidgets.QLineEdit(self.tab_4)
 		self.tabLayout_4.addWidget(self.tdlCalRampSteps, 14, 10, 2, 10)
-		self.tdlCalRampSteps.setText("11")		
+		self.tdlCalRampSteps.setText("7")		
 		self.tdlCalRampSteps.editingFinished.connect(lambda: self.tdlCalUpdateGUI(MainWindow))
 		
 		self.tdlCalRampDivToggle = QtWidgets.QPushButton(self.tab_4)
@@ -1052,7 +1052,8 @@ class Ui_MainWindow(QObject):
 		self.tabLayout_4.addWidget(self.tdlCalRampVariation, 23, 10, 2, 10)
 		self.tdlCalRampVariation.setText("0.01")
 		self.tdlCalRampVariation.editingFinished.connect(lambda: self.tdlCalUpdateGUI(MainWindow))
-			
+		self.tdlCalRampVariation.setDisabled(True)
+	
 		#Status indicator for instructional display and current operation of instrument
 		self.tdlCalRamp = QtWidgets.QTextBrowser(self.tab_4)#QTextEdit()
 		self.tdlCalRamp.setObjectName("tdlCalRamp")
@@ -1074,7 +1075,8 @@ class Ui_MainWindow(QObject):
 		self.tdlCalSave.setText("Click to Transfer Coefficients to CVI Cal Files")
 		self.tdlCalSave.setObjectName("tdlCalSave")
 		self.tdlCalSave.clicked.connect(lambda: self.tdlCalUpdateGUI(MainWindow,"tdlCalSave"))
-	
+		self.tdlCalSave.setDisabled(True)
+
 		
 		self.tdlCalTableDerived = QtWidgets.QTableWidget(self.tab_4)
 		self.tdlCalTableDerived.setObjectName("tdlCalTableDerived")
@@ -1134,7 +1136,7 @@ class Ui_MainWindow(QObject):
 		self.tdlCalPlot2.setObjectName("tdlCalPlot2")
 		self.tabLayout_4.addWidget(self.tdlCalPlot2, 25, 40, 25, 60)
 		self.tdlCalPlot2.show()
-		self.tdlCalPlot2.setTitle("TDL Signal",color='w')
+		self.tdlCalPlot2.setTitle("TDL Signal (white), Pressure (green)",color='w')
 		self.tdlCalPlot2.setLabel('bottom',text = 'Time (seconds)')
 		self.tdlCalPlot2.setLabel('left',text = 'Y')
 		self.tdlCalPlot2.setLabel('right',text = 'Y2')
@@ -1583,13 +1585,18 @@ class Ui_MainWindow(QObject):
 				tmparray = []
 				if widget.isChecked(): 
 					widget.setText('Ramp: Exponential')
-					if min < 1:
-						min = 1
-						steps = steps-1
-						tmparray = ['0.0']
+					#if min <= 0:
+					#	min = 1
+					#	steps = steps-1
+					#	tmparray = ['0.0']
+					#if max <= 0:
+					#	max = 1
+					#	steps = steps-1
 					coef = np.polyfit([0,1],np.log([min,max]), 1)
 					for i in np.linspace(0,1,steps):#np.arange(0,1,1/(steps-1)):
 						tmparray.append(str(np.round(float(np.exp(coef[1])*np.exp(i*coef[0])),3)))
+					#if max == 1:
+					#	tmparray.append('0.0')
 					self.tdlCalRamp.setText(', '.join(tmparray))
 				else: 
 					widget.setText('Ramp: Linear')
@@ -1608,6 +1615,9 @@ class Ui_MainWindow(QObject):
 
 	def startTDLCal(self,MainWindow):
 		self.tdlCalArray = self.tdlCalRamp.toPlainText().replace(' ','').split(',')
+
+		#self.tdlCalArray = list(reversed(self.tdlCalArray)) #For reversing order of array
+
 		try: self.tdlCalArray = [float(x)/10.0 for x in self.tdlCalArray]
 		except: return
 		
@@ -1626,7 +1636,8 @@ class Ui_MainWindow(QObject):
 		#float(MainWindow.findChild(QtWidgets.QSlider, self.flowedit[i]+'Slider')\
 		#				.value()/100.0)
 		
-		self.tdlCalArray.extend(self.tdlCalArray[::-1])
+		#self.tdlCalArray.extend(self.tdlCalArray[::-1]) #For appending backwards array onto end. Requires double :: for reversing
+		self.tdlCalArray.extend([self.tdlCalArray[0]]) #For going back to initial step....
 		self.tdlCalArraySize = len(self.tdlCalArray)
 		self.tdlCalInProgress = True
 		
@@ -1646,7 +1657,11 @@ class Ui_MainWindow(QObject):
 		
 		#ALSO DISABLE OTHER TABS
 		
-		
+	def continueTDLCal(self,MainWindow):
+		self.tdlCalStart.setText("Begin TDL Ramps")
+		self.tdlCalIndex = 0
+		self.tdlCalStart.setDisabled(True)
+	
 	def stopTDLCal(self,MainWindow):
 		#Revert parameters to defaults
 		self.tdlCalInProgress = False
@@ -1657,6 +1672,13 @@ class Ui_MainWindow(QObject):
 		self.tdlTime = ''
 		
 		self.tdlCalUpdateGUI(MainWindow)
+	
+		if (self.tdlCalIndex == self.tdlCalArraySize - 1):
+			self.tdlCalRampTimeStep.setText(str(float(self.tdlCalRampTimeStep.text())/2.0))
+	
+		self.tdlCalStart.setText("Begin TDL Ramps")
+		self.tdlCalStart.disconnect()
+		self.tdlCalStart.clicked.connect(lambda: self.startTDLCal(MainWindow))
 		
 		self.tdlCalStart.setDisabled(False)
 		self.tdlCalFlow.setDisabled(False)
@@ -1671,32 +1693,50 @@ class Ui_MainWindow(QObject):
 	def processTDLCal(self, input):
 		if self.tdlTime == '':
 			self.tdlTime = time.time()
-		if (time.time() - self.tdlTime) >= float(self.tdlCalRampTimeStep.text())*60.0:
+
+		if (time.time() - self.tdlTime) >= float(self.tdlCalRampTimeStep.text())*60.0 and self.tdlCalStart.text() != "Continue TDL Cal":#self.tdlCalIndex != self.tdlCalArraySize:
 			#Compute deviation of previous however many points
 			#Potentially make it to where it only moves on once the standard deviation of given points does not grow?
-			if self.tdlCalDeviation < float(self.tdlCalRampVariation.text()):
+			if 1==1:#self.tdlCalDeviation < float(self.tdlCalRampVariation.text()):
 				self.tdlCalIndex+=1
 				self.tdlTime = ''
 		
+			#Make larger time step
+			if (self.tdlCalIndex == self.tdlCalArraySize - 1):
+				self.tdlCalRampTimeStep.setText(str(float(self.tdlCalRampTimeStep.text())*2.0))
+
+			#For reverting back to smaller time step
 			if self.tdlCalIndex == self.tdlCalArraySize:
+				self.tdlCalRampTimeStep.setText(str(float(self.tdlCalRampTimeStep.text())/2.0))
 				#self.tdlCalInProgress = False
 				
 				#Query the to press continue or cancel for if they want to set a new pressure
 				reply = QtGui.QMessageBox.warning(MainWindow, 'WARNING', \
-                     "Would you like to change to a new pressure? If so, change the pressure BEFORE responding", \
+                     "Would you like to change to a new pressure? If so, click yes, monitor pressure on plot, and then press continue", \
 					 QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)#, QtGui.QMessageBox.Warning)
 
 				if reply == QtGui.QMessageBox.Yes:	
 					self.tdlCalIndex = 0
+					self.tdlCalStart.setText("Continue TDL Cal")
+					self.tdlCalStart.setDisabled(False)
+					self.tdlCalStart.disconnect()
+					self.tdlCalStart.clicked.connect(lambda: self.continueTDLCal(MainWindow))
 				else:
 					#If cancelled, know what to do, if 
 					self.stopTDLCal(MainWindow)#self.tdlCalInProgress = False
-			
+
+		if self.tdlCalStart.text() == "Continue TDL Cal":
+			self.tdlTime = ''
+
 		if 	len(self.tdlData)==0:
 			self.tdlData = input
 		else:
 			self.tdlData = np.c_[self.tdlData,input]
-			
+			#try:
+			self.tdlData = np.c_[self.tdlData[:,-899:], input]
+			#except:
+			#	self.tdlData = np.c_[self.tdlData, newdata]
+	
 		tdlHeader = 'dsmtime, cvfx2wr, cvfx2R,  cvfx2wrc, cvfx2C, dewPointSet(V), dewPointRead (V), dewPointSet (C), dewPoint (C), H2O_TDL, pTDL, tTDL, TDLsignalL, TDLlaser, TDLline, TDLzero, TTDLencl, TTDLtec,TDLtrans, opcc, opcco, opcnts, opcflow, opcc_Pcor, opcco_Pcor, opcc_pres_mb'#, H2O_PIC_cvrtd, 180, HDO' #REMOVED Picarro headers
 		tdlHeader += '\n'	
 		
@@ -1730,7 +1770,6 @@ class Ui_MainWindow(QObject):
 #			self.tdlCalPlot2.setTitle(self.plottitles[self.dropdownlist2.currentIndex()]+' & '+self.plottitles[self.dropdownlist2line2.currentIndex()-1])
 #			self.tdlCalPlot2.getAxis('right').setLabel(self.ylabels[self.dropdownlist2line2.currentIndex()-1])#, color = (150,150,255))#'#0000ff')
 		#self.tdlCalPlot2.hideAxis('right')
-		
 		
 		try:
 			#Update base plots based on first dropdown list positions
@@ -1769,10 +1808,10 @@ class Ui_MainWindow(QObject):
 		for i in range(0, len(self.tdlcaltablerowlabels)):
 			for j in range(0,len(self.tdlcaltablecolumnlabels)):
 				item = self.tdlCalTableDerived.item(i,j)
-				try:
-					item.setText(_translate("MainWindow",str(m[i,j])))# = float(item.text())
-				except:# ValueError:
-					item.setText(_translate("MainWindow",str(0.0)))
+				#try:
+				#	item.setText(_translate("MainWindow",str(m[i,j])))# = float(item.text())
+				#except:# ValueError:
+				#	item.setText(_translate("MainWindow",str(0.0)))
 				try:
 					#print(tdlData[10,:])
 					if len(computedDewPoint)==0:
@@ -1787,7 +1826,8 @@ class Ui_MainWindow(QObject):
 				
 		try: 
 			#self.tdlCalPlotline2.addItem(pyqtgraph.PlotCurveItem(self.tdlData[0,:], self.tdlData[8,:],clear = True,pen=pyqtgraph.mkPen(color=(0,255,0), width=1)))#,clear=True))
-			self.tdlCalPlot2line2.addItem(pyqtgraph.PlotCurveItem(self.tdlData[0,:], computedDewPoint,clear=True,pen=pyqtgraph.mkPen(color=(0,255,0), width=1)))#,pen='b',clear=True))
+			#self.tdlCalPlot2line2.addItem(pyqtgraph.PlotCurveItem(self.tdlData[0,:], computedDewPoint,clear=True,pen=pyqtgraph.mkPen(color=(0,255,0), width=1)))#,pen='b',clear=True))
+			self.tdlCalPlot2line2.addItem(pyqtgraph.PlotCurveItem(self.tdlData[0,:], self.tdlData[10,:],clear=True,pen=pyqtgraph.mkPen(color=(0,255,0), width=1)))#,pen='b',clear=True))
 		except: pass
 		
 		#Force GUI to update display
@@ -3105,14 +3145,16 @@ class Ui_MainWindow(QObject):
 			
 						
 			if self.tdlCalInProgress:
-				dataout[1:3] = 0.000
-				dataout[4] = self.tdlCalArray[self.tdlCalIndex]#0.000#setpoint
+				dataout[1] = 0.000
+				dataout[2] = float(self.tdlCalFlow.text())
+				dataout[3] = self.tdlCalArray[self.tdlCalIndex]#0.000#setpoint
+				dataout[4] = 0.000
 				dataout[5] = 0.000
 				dataout[6:13] = 0
 				dataout[13:] = 0.000
 				#ui.processTDLCal.emit(datain, self.tcpOut)
-				ui.tdlReturn.emit(np.r_[input[0],dataout[3],input[6],self.internalFlows[2],
-					calibrated[3],dataout[4],input[7],dataout[4]*10.0,input[7]*10.0,input[19:29]])
+				ui.tdlReturn.emit(np.r_[input[0],dataout[2],input[6],self.internalFlows[2],
+					calibrated[3],dataout[3],input[7],dataout[3]*10.0,input[7]*10.0,input[19:29]])
 					
 	
 			self.rawInOutData = (np.c_[input, input])
