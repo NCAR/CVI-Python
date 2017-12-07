@@ -3077,6 +3077,11 @@ class Ui_MainWindow(QObject):
 				cfexcess_cor=self.cfexcess*(calibrated[10]/1013.25)*294.26/(calibrated[14]+273.15)
 				cfsummed=cfexcess_cor + summedflow + calcoeffs[21]# - calibrated[5]  #cvoff1 is equivalent to calcoeffs[21]
 				cvf1wr=( cfsummed - calcoeffs[0])/calcoeffs[1]
+				if calcoeffs[2] != 0 :
+					cvf1wr = -(np.sqrt(-4*calcoeffs[2]*calcoeffs[0] + 4*calcoeffs[2]*cfsummed + calcoeffs[1]*calcoeffs[1]) + calcoeffs[1])/(2*calcoeffs[2])
+					if cvf1wr < 0 or cvf1wr > 5:
+						cvf1wr = (np.sqrt(-4*calcoeffs[2]*calcoeffs[0] + 4*calcoeffs[2]*cfsummed + calcoeffs[1]*calcoeffs[1]) - calcoeffs[1])/(2*calcoeffs[2])
+						#print(cvf1wr)	
 			else: cvf1wr = 0.0
 
 			#Checks to make sure counterflow voltage is not greater than 5

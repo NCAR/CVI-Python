@@ -236,9 +236,11 @@ SOCRATES Specific changes:
  * Divide up more error handling in computations
  * Depending on error handling exception, proceed through calculations anyways
  * Change labeling for ancillary instrumentation (Buttons need to match labels)
-		
-		
-		
+ * Need a flag when instruments not updating. (both DSM and ancillary)
+ * Temperature flag when exceeds limits..
+ * Add units to variables on screen (in file?)	
+ * Change raw input/output labeling to change when slider moves to maxes
+ * Add quadratic inversion for flow outputs		
 		
 		
 		
