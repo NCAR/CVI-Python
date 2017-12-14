@@ -347,7 +347,7 @@ class Ui_MainWindow(QObject):
 		#Create table for viewing uncorrected,corrected, and calibrated inputs on first tab
 		self.tablerowlabels = ['cvf1','cvfx0','cvfx1','cvfx2','cvfx3','cvfx4',
 			'cvfx5','cvfx6','cvfx7','cvfx8','cvpcn','cvtt','cvtp','cvts','cvtcn','cvtai']
-		self.tablecolumnlabels = ['raw','calibrated','crunched','Last Received']
+		self.tablecolumnlabels = ['raw','calibrated','crunched','Last Received (s)']
 		self.tableWidget.setColumnCount(len(self.tablecolumnlabels))
 		self.tableWidget.setRowCount(len(self.tablerowlabels))
 		for i in range(0,len(self.tablerowlabels)):
@@ -364,7 +364,7 @@ class Ui_MainWindow(QObject):
 		#self.plotdata = np.c_[[-9999]*(self.dropdownlist.count()+1)]#np.c_[[np.nan]*4]
 
 		#table for raw input output parameters
-		self.rawtablecolumnlabels = ['Input','Output']
+		self.rawtablecolumnlabels = ['Input','Last Received (s)']
 		self.rawtablerowlabels = ['time', 'cvtas', 'counts', 'cvf1', 'cvfx0', 
 			'cvfx1', 'cvfx2', 'cvfx3', 'cvfx4', 'cvfx5', 'cvfx6', 'cvfx7', 'cvfx8',
 			 'cvpcn', 'cvtt', 'cvtp', 'cvts', 'cvtcn', 'cvtai', 'H2OR', 'ptdlR', 
@@ -1528,7 +1528,7 @@ class Ui_MainWindow(QObject):
 	
 
 		self.flashTimer = QTimer()
-		self.flashTimer.timeout.connect(self.flashing)
+		self.flashTimer.timeout.connect(lambda: self.flashing(MainWindow))
 		self.flashTimer.start(500)	
 
 		self.connectFlash = True
@@ -1560,13 +1560,27 @@ class Ui_MainWindow(QObject):
 		#Create server loop
 		#self.server_loop = asyncio.get_event_loop()
 	
-	def flashing(self):
+	def flashing(self, MainWindow):
 		if self.timerPosition:
 			if self.connectFlash:	self.connect.setStyleSheet("background-color: lightgreen")
 			self.timerPosition = False
+
+			for i in range(0,len(self.rawtablerowlabels)):
+				if self.rawTableErrorTracker[i,1] == 2:
+					ui.rawtableWidget.item(i,0).setBackground(QtGui.QColor(255,0,0))
+					ui.rawtableWidget.item(i,1).setBackground(QtGui.QColor(255,0,0))
+					#ui.rawtableWidget.item(i,1).setText(_translate("MainWindow",str(self.rawInOutData[i,1])))
+					ui.rawtableWidget.verticalHeaderItem(i).setBackground(QtGui.QColor(255,0,0))
+
 		else:
 			self.connect.setStyleSheet("background-color: lightblue")
 			self.timerPosition = True
+
+			for i in range(0,len(self.rawtablerowlabels)):
+				if self.rawTableErrorTracker[i,1] == 2:
+					ui.rawtableWidget.item(i,0).setBackground(QtGui.QColor(1,125,125))
+					ui.rawtableWidget.item(i,1).setBackground(QtGui.QColor(1,125,125))
+					ui.rawtableWidget.verticalHeaderItem(i).setBackground(QtGui.QColor(1,125,125))
 
 	
 	def tdlCalUpdateGUI(self, MainWindow, widget = ''):
@@ -2682,10 +2696,13 @@ class Ui_MainWindow(QObject):
 				item.setText(_translate("MainWindow",str(self.tabledata[i,1])))
 				item = ui.tableWidget.item(i, 2)
 				item.setText(_translate("MainWindow",str(self.tabledata[i,2])))
+				item = ui.tableWidget.item(i, 3)
+				item.setText(_translate("MainWindow",str(self.tableErrorTracker[i,0])))
 
 			for i in range(0,len(self.rawtablerowlabels)):
 				ui.rawtableWidget.item(i,0).setText(_translate("MainWindow",str(self.rawInOutData[i,0])))
-				ui.rawtableWidget.item(i,1).setText(_translate("MainWindow",str(self.rawInOutData[i,1])))
+				ui.rawtableWidget.item(i,1).setText(_translate("MainWindow",str(self.rawTableErrorTracker[i,0])))
+				#ui.rawtableWidget.item(i,1).setText(_translate("MainWindow",str(self.rawInOutData[i,1])))
 		except: pass
 				
 		#Set appropriate titles and axes labels
@@ -2817,16 +2834,45 @@ class Ui_MainWindow(QObject):
 			#Conditional checks for "bad" data. If data is "bad",
 			#	it is replaced with the rollover data
 			for i in range(3,19):
-				if input[i] <= -99: input[i] = (rolloverinput[i])
+				if input[i] <= -99: 
+					input[i] = (rolloverinput[i])
+					self.tableErrorTracker[i-3,0] += 1
+					self.tableErrorTracker[i-3,1] = 1
+					self.rawTableErrorTracker[i,0] += 1
+					self.rawTableErrorTracker[i,1] = 1
+				else:
+					self.tableErrorTracker[i-3,0] = 0
+					self.tableErrorTracker[i-3,1] = 0
+					self.rawTableErrorTracker[i,0] = 0
+					self.rawTableErrorTracker[i,1] = 0
 			#if tdl_data <= -1, use stored value from before, except for TDLzero which if equal to -99.99, use stored value.
 			#	TDL_ZERO is index 6 (index 25 of input)
 			for i in [19,20,21,22,23,24,26,27,28] :
-				if input[i] <= -1: input[i] = (rolloverinput[i])
-			if input[25] == -99.99: input[25] = (rolloverinput[25])
+				if input[i] <= -1: 
+					input[i] = (rolloverinput[i])
+					self.rawTableErrorTracker[i,0] += 1
+					self.rawTableErrorTracker[i,1] = 1
+				else:
+					self.rawTableErrorTracker[i,0] = 0
+					self.rawTableErrorTracker[i,1] = 0
+			if input[25] == -99.99: 
+				input[25] = (rolloverinput[25])
+				self.rawTableErrorTracker[25,0] += 1
+				self.rawTableErrorTracker[25,1] = 1
+			else:
+				self.rawTableErrorTracker[25,0] = 0
+				self.rawTableErrorTracker[25,1] = 0
 			
 			#Windspeed (WSPD) overwrite
 			if input[1] < 4 or input[1] > 300 :
 				input[1] = rolloverinput[1]
+				self.rawTableErrorTracker[1,0] += 1
+				self.rawTableErrorTracker[1,1] = 1
+				if self.rawTableErrorTracker[1,0] >= 5:
+					self.rawTableErrorTracker[1,1] = 2
+			else:
+				self.rawTableErrorTracker[0,0] = 0
+				self.rawTableErrorTracker[0,1] = 0
 			#Formatting corrected new data into string to be ready to 
 			#	overwrite as new rollover data for future use
 			rolloverinput = input
