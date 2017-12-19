@@ -1513,7 +1513,17 @@ class Ui_MainWindow(QObject):
 		self.saveCals.clicked.connect(lambda: self.savecalibrations(MainWindow))
 		self.deleteCals.clicked.connect(lambda: self.deleteCalibrations(MainWindow))
 		self.refreshCals.clicked.connect(lambda: self.readcalsfromfiles(MainWindow))
-			
+		
+
+		self.cvpcnRunAvgArr = [np.nan]*10
+		self.cvtcnRunAvgArr = [np.nan]*10
+		
+
+		self.cvpcnRunAvg = np.nan
+		self.cvtcnRunAvg = np.nan
+
+
+	
 		#User Defined Signals
 		self.dataReceived.connect(self.processData)
 		self.errorSignal.connect(self.errorLog)
@@ -2985,7 +2995,8 @@ class Ui_MainWindow(QObject):
 			#Perform default calibration of flows, pressures, temps, etc.
 			calibrated = [0]*16	
 			for i in range(0,16): calibrated[i] = C0[i] + C1[i]*data[i] + C2[i]*data[i]**2
-		
+
+	
 			#cvfxtemp ~ default temps; #cvfxtempsource ~ 1 is cnt1, 0 usrinput; 
 			#	cvfsw ~ is instrument connected; cvfxmode ~ 1 is calculated, 0 is usrinput;  
 			#	cvfxdatatype ~ 0 is Mass, 1 is Volume; #cvfxalt ~ USER INPUT FLOWS		
@@ -3040,16 +3051,33 @@ class Ui_MainWindow(QObject):
 			self.errorSignal.emit("Fatal error in separating input data")
 			return
 
+		try:
+			self.cvpcnRunAvgArr = np.roll(self.cvpcnRunAvgArr,1)
+			self.cvpcnRunAvgArr[0] = calibrated[10]
+			self.cvpcnRunAvg = np.nanmean(self.cvpcnRunAvgArr)
 
+			self.cvtcnRunAvgArr = np.roll(self.cvtcnRunAvgArr,1)
+			self.cvtcnRunAvgArr[0] = calibrated[14]
+			self.cvtcnRunAvg = np.nanmean(self.cvtcnRunAvgArr)
+
+			#print(self.cvpcnRunAvgArr, self.cvtcnRunAvgArr)
+		except:
+			self.errorSignal.emit("NonFatal error in pressure and temperature running averages")
+			self.cvpcnRunAvg = calibrated[10]
+			self.cvtcnRunAvg = calibrated[14]
+
+		
 		try:
 			#Iteration of flows to correct for pressure and temperature
 			#	IF the pressure is reported correctly.
 			#	ALSO performs the flow summations.
 			for i in range(1,10):
 				if calibrated[10] > 0 : 
-					zerocorrectedflows[i] = ( calibrated[i]*(1013.25/calibrated[10])*((calibrated[14]+273.15)/294.26))
+					#zerocorrectedflows[i] = ( calibrated[i]*(1013.25/calibrated[10])*((calibrated[14]+273.15)/294.26))
+					zerocorrectedflows[i] = ( calibrated[i]*(1013.25/cvpcnRunAvg)*((cvtcnRunAvg+273.15)/294.26))
 				else : 
-					zerocorrectedflows[i] = ( calibrated[i]*(1013.25/0.0001)*((calibrated[14]+273.15)/294.26))
+					#zerocorrectedflows[i] = ( calibrated[i]*(1013.25/0.0001)*((calibrated[14]+273.15)/294.26))
+					zerocorrectedflows[i] = ( calibrated[i]*(1013.25/0.0001)*((cvtcnRunAvg+273.15)/294.26))
 					self.errorSignal.emit("Pressure reading invalid")
 				if zerocorrectedflows[i] < 0 : zerocorrectedflows[i] = 0.0001
 				summedflow = summedflow + calibrated[i]
@@ -3062,8 +3090,10 @@ class Ui_MainWindow(QObject):
 
 			#IF the pressure is greater than 0,
 			#	THEN perform calculation of cvftc, otherwise use 0.0001 for pressure
-			if calibrated[10] > 0 : cvftc = summedzerocorrectedflow - ( calcoeffs[21]*(1013.25/calibrated[10])*((calibrated[14]+273.15)/294.26))
-			else : cvftc = summedzerocorrectedflow - ( calcoeffs[21]*(1013.25/0.0001)*((calibrated[14]+273.15)/294.26))
+			#if calibrated[10] > 0 : cvftc = summedzerocorrectedflow - ( calcoeffs[21]*(1013.25/calibrated[10])*((calibrated[14]+273.15)/294.26))
+			if calibrated[10] > 0 : cvftc = summedzerocorrectedflow - ( calcoeffs[21]*(1013.25/cvpcnRunAvg)*((cvtcnRunAvg+273.15)/294.26))
+			else : cvftc = summedzerocorrectedflow - ( calcoeffs[21]*(1013.25/0.0001)*((cvtcnRunAvg+273.15)/294.26))
+			#else : cvftc = summedzerocorrectedflow - ( calcoeffs[21]*(1013.25/0.0001)*((calibrated[14]+273.15)/294.26))
 			
 		except: 
 			self.errorSignal.emit("Fatal error in calibrated flow calculations")
@@ -3220,19 +3250,22 @@ class Ui_MainWindow(QObject):
 
 				#print(self.internalFlows)
 				if (zerocorrectedflows[1] > (self.internalFlows[0] + 0.05)) or (zerocorrectedflows[1] < (self.internalFlows[0] - 0.05)) :
-					cvfxnw = self.internalFlows[0]*(calibrated[10]/1013.25)*(294.26/(calibrated[14]+273.15))
+					#cvfxnw = self.internalFlows[0]*(calibrated[10]/1013.25)*(294.26/(calibrated[14]+273.15))
+					cvfxnw = self.internalFlows[0]*(cvpcnRunAvg/1013.25)*(294.26/(cvtcnRunAvg+273.15))
 					self.internalflowsetpts[0] = (cvfxnw-calcoeffs[3])/calcoeffs[4] #will be 6 and 7 on next iteration.
 				#else: #cvfxwr[0] = 0.0 #Needs to be left as older value. #Nothing is done so flow is as before.
 				#Starting at cvfx2 to cvfx4 (index 2 to 3 on calibrated)
 				for i in range(1,3) : # int i = 1 ; i < 4; i++ ) {
 					if (zerocorrectedflows[i+2] > self.internalFlows[i] + 0.05) or (zerocorrectedflows[i+2] < self.internalFlows[i] - 0.05) :
-						cvfxnw = self.internalFlows[i] * (calibrated[10]/1013.25)*(294.26/(calibrated[14] + 273.15))
+						#cvfxnw = self.internalFlows[i] * (calibrated[10]/1013.25)*(294.26/(calibrated[14] + 273.15))
+						cvfxnw = self.internalFlows[i] * (cvpcnRunAvg/1013.25)*(294.26/(cvtcnRunAvg + 273.15))
 						#cvfx0wr = ( cvfxnw – c0cvfx0) / c1cvfx0;
 						self.internalflowsetpts[i] = ( cvfxnw - calcoeffs[(i+2)*3] ) / calcoeffs[(i+2)*3+1] #will be 9 (12) and 10 (13) on next iteration.			
 					#else : 	#cvfxwr[i] = 0.0; #REPLACE WITH OLDER VALUE
 	
 				if (zerocorrectedflows[5] > self.internalFlows[3] + 0.01) or (zerocorrectedflows[5] < self.internalFlows[3] - 0.01) :
-					cvfxnw = self.internalFlows[3] * (calibrated[10]/1013.25)*(294.26/(calibrated[14] + 273.15))
+					#cvfxnw = self.internalFlows[3] * (calibrated[10]/1013.25)*(294.26/(calibrated[14] + 273.15))
+					cvfxnw = self.internalFlows[3] * (cvpcnRunAvg/1013.25)*(294.26/(cvtcnRunAvg + 273.15))
 					#cvfx0wr = ( cvfxnw – c0cvfx0) / c1cvfx0;
 					self.internalflowsetpts[3] = ( cvfxnw - calcoeffs[(5)*3] ) / calcoeffs[(5)*3+1] #will be 9 (12) and 10 (13) on next iteration.			
 				#else : 	#cvfxwr[i] = 0.0; #REPLACE WITH OLDER VALUE
@@ -3243,7 +3276,8 @@ class Ui_MainWindow(QObject):
 	
 			#CVI MODE AND FLOW ON/OFF OPTIONS
 			if self.flowio.isChecked() and not self.cvimode.isChecked() :
-				cfexcess_cor=self.cfexcess*(calibrated[10]/1013.25)*294.26/(calibrated[14]+273.15)
+				#cfexcess_cor=self.cfexcess*(calibrated[10]/1013.25)*294.26/(calibrated[14]+273.15)
+				cfexcess_cor=self.cfexcess*(cvpcnRunAvg/1013.25)*294.26/(cvtcnRunAvg+273.15)
 				cfsummed=cfexcess_cor + summedflow + calcoeffs[21]# - calibrated[5]  #cvoff1 is equivalent to calcoeffs[21]
 				cvf1wr=( cfsummed - calcoeffs[0])/calcoeffs[1]
 				if calcoeffs[2] != 0 :
