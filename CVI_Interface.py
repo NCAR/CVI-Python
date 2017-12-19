@@ -141,6 +141,15 @@ class Ui_MainWindow(QObject):
 		self.subTabLayout_1.setSpacing(10)
 		'''
 		
+		#Create Third Tab
+		self.tab_3 = QtWidgets.QWidget()
+		self.tab_3.setObjectName("tab_3")
+		self.tabWidget.addTab(self.tab_3, "Connect Auxiliary Instruments")
+		self.tabLayout_3 = QtWidgets.QGridLayout(self.tab_3)
+		self.tabLayout_3.setContentsMargins(10, 10, 10, 10)
+		self.tabLayout_3.setObjectName("tabLayout_3")
+		self.tabLayout_3.setSpacing(5)
+		
 		#Create Second Tab
 		self.tab_2 = QtWidgets.QWidget()
 		self.tab_2.setObjectName("tab_2")
@@ -150,14 +159,6 @@ class Ui_MainWindow(QObject):
 		self.tabLayout_2.setObjectName("tabLayout_2")	
 		self.tabLayout_2.setSpacing(5)
 
-		#Create Third Tab
-		self.tab_3 = QtWidgets.QWidget()
-		self.tab_3.setObjectName("tab_3")
-		self.tabWidget.addTab(self.tab_3, "Connect Auxiliary Instruments")
-		self.tabLayout_3 = QtWidgets.QGridLayout(self.tab_3)
-		self.tabLayout_3.setContentsMargins(10, 10, 10, 10)
-		self.tabLayout_3.setObjectName("tabLayout_3")
-		self.tabLayout_3.setSpacing(5)
 		
 		#Create Fourth Tab
 		self.tab_4 = QtWidgets.QWidget()
@@ -233,7 +234,7 @@ class Ui_MainWindow(QObject):
 		#Flow on/off toggle
 		self.flowio = QtWidgets.QPushButton(self.tab)
 		self.flowio.setObjectName("flowio")
-		self.tabLayout_1.addWidget(self.flowio, 2, 10, 2, 10)
+		self.tabLayout_1.addWidget(self.flowio, 2, 20, 2, 10)
 		self.flowio.setCheckable(True)
 		self.flowio.setStyleSheet("background-color: red")
 		#self.flowio.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
@@ -241,7 +242,7 @@ class Ui_MainWindow(QObject):
 		#CVI Mode toggle for CVI/Total option
 		self.cvimode = QtWidgets.QPushButton(self.tab)
 		self.cvimode.setObjectName("cvimode")
-		self.tabLayout_1.addWidget(self.cvimode, 2, 20, 2, 10)
+		self.tabLayout_1.addWidget(self.cvimode, 2, 30, 2, 10)
 		self.cvimode.setCheckable(True)
 		
 		#Autopilot Mode toggle
@@ -252,14 +253,38 @@ class Ui_MainWindow(QObject):
 		#self.autopilot.setDisabled(True)
 		self.autopilot.setText("Autopilot: OFF")
 		self.autopilot.clicked.connect(lambda: self.toggleswitched(MainWindow))
-		
+		self.autopilot.setVisible(False)#hide()	
+
+
+		tmpobject = QtWidgets.QLabel(self.tab)
+		tmpobject.setText("Set")
+		self.tabLayout_1.addWidget(tmpobject, 3, 10, 2, 5)
+		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)	
+
+		tmpobject = QtWidgets.QLabel(self.tab)
+		tmpobject.setText("Return")
+		self.tabLayout_1.addWidget(tmpobject, 3, 15, 2, 5)
+		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)	
+
 
 		self.cvf3cwlabel = QtWidgets.QLabel(self.tab)
 		self.cvf3cwlabel.setObjectName("cvf3cwlabel")		
-		self.tabLayout_1.addWidget(self.cvf3cwlabel, 5, 0, 2, 5)
+		self.tabLayout_1.addWidget(self.cvf3cwlabel, 5, 0, 2, 6)
 		self.cvf3cw = QtWidgets.QLineEdit(self.tab)
 		self.cvf3cw.setObjectName("cvf3cw")
-		self.tabLayout_1.addWidget(self.cvf3cw, 5, 5, 2, 5)	
+		self.tabLayout_1.addWidget(self.cvf3cw, 5, 10, 2, 5)	
+
+		self.cvf3cwUnitsLabel = QtWidgets.QLabel(self.tab)
+		self.cvf3cwUnitsLabel.setText("VLPM")
+		self.tabLayout_1.addWidget(self.cvf3cwUnitsLabel, 5, 6, 2, 4)
+		self.cvf3cwUnitsLabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)	
+
+
+		self.cvf3cwReturn = QtWidgets.QLineEdit(self.tab)
+		self.cvf3cwReturn.setObjectName("cvf3cwReturn")
+		self.tabLayout_1.addWidget(self.cvf3cwReturn, 5, 15, 2, 5)
+		self.cvf3cwReturn.setDisabled(True)
+
 		#self.cvf3cwlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
 		self.cvf3cw.editingFinished.connect(lambda: self.updateSliders(MainWindow, 'cvf3cw'))
 
@@ -273,7 +298,7 @@ class Ui_MainWindow(QObject):
 		self.cvf3cwSlider.setTickPosition(QSlider.TicksBelow)
 		self.cvf3cwSlider.setTickInterval(100)
 		self.cvf3cwSlider.setObjectName('cvf3cwSlider')
-		self.tabLayout_1.addWidget(self.cvf3cwSlider, 7, 0, 2, 10)
+		self.tabLayout_1.addWidget(self.cvf3cwSlider, 7, 0, 2, 20)
 		self.cvf3cwSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow, 'cvf3cw'))	
 
 		#self.cvf3cwSlider.setStyleSheet("background-color: yellow")
@@ -286,14 +311,24 @@ class Ui_MainWindow(QObject):
 		for i in range(0,len(self.flowedit)):
 			tmpobject = QtWidgets.QLabel(self.tab)
 			tmpobject.setObjectName(self.flowedit[i]+'label')
-			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 0, 2, 5)
+			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 0, 2, 6)
 			#tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 			
+			tmpobject = QtWidgets.QLabel(self.tab)
+			tmpobject.setText("VLPM")
+			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 6, 2, 4)
+			tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)	
+		
 			tmpobject = QtWidgets.QLineEdit(self.tab)
 			tmpobject.setObjectName(self.flowedit[i])
-			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 5, 2, 5)
+			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 10, 2, 5)
 			tmpobject.editingFinished.connect(lambda i=i: self.updateSliders(MainWindow, self.flowedit[i]))
 		
+			tmpobject = QtWidgets.QLineEdit(self.tab)
+			tmpobject.setObjectName(self.flowedit[i]+"Return")
+			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 15, 2, 5)
+			tmpobject.setDisabled(True)
+
 			sliderMin = 0
 			sliderMax = 600
 			sliderDiv = 100
@@ -305,7 +340,7 @@ class Ui_MainWindow(QObject):
 			tmpobject.setTickPosition(QSlider.TicksBelow)
 			tmpobject.setTickInterval(sliderDiv)#10)
 			tmpobject.setObjectName(self.flowedit[i]+'Slider')
-			self.tabLayout_1.addWidget(tmpobject, 11+4*i, 0, 2, 10)
+			self.tabLayout_1.addWidget(tmpobject, 11+4*i, 0, 2, 20)
 			tmpobject.valueChanged.connect(lambda new, i=i: self.syncSliders(MainWindow, self.flowedit[i]))
 
 		#Preflight checklist
@@ -321,7 +356,7 @@ class Ui_MainWindow(QObject):
 		#Dropdown lists for selecting data for first plot
 		self.commonNoteDropdown = QtWidgets.QComboBox(self.tab)
 		self.commonNoteDropdown.setObjectName("commonNoteDropdown")
-		self.tabLayout_1.addWidget(self.commonNoteDropdown, 23, 10, 2, 20)
+		self.tabLayout_1.addWidget(self.commonNoteDropdown, 23, 20, 2, 20)
 		#self.commonNoteDropdown.setDisabled(True)
 		
 		self.commonNotes = ["Common Notes","Approaching Cloud", "In Cloud", "Exited Cloud","Taxi","Takeoff","Heaters ON","Landed"]
@@ -354,7 +389,7 @@ class Ui_MainWindow(QObject):
 		self.mainstatus.setObjectName("mainstatus")
 		self.mainstatus.setAlignment(Qt.AlignTop)
 		self.mainstatus.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
-		self.tabLayout_1.addWidget(self.mainstatus, 4, 11, 19, 28)
+		self.tabLayout_1.addWidget(self.mainstatus, 4, 21, 19, 18)
 		self.mainstatus.verticalScrollBar().setValue(self.mainstatus.verticalScrollBar().maximum())
 		#self.mainstatus.ensureCursorVisible()
 				
@@ -1263,7 +1298,7 @@ class Ui_MainWindow(QObject):
 		self.delay.setText(_translate("MainWindow", "1"))
 		self.offsetlabel.setText(_translate("MainWindow","Flow Offset"))
 		self.offset.setText(_translate("MainWindow", "3"))
-		self.cvf3cwlabel.setText(_translate("MainWindow", "CF_Excess"))#"Counterflow Excess"))
+		self.cvf3cwlabel.setText(_translate("MainWindow", "CF_EXCESS"))#"Counterflow Excess"))
 		self.cvf3cw.setText(_translate("MainWindow", "0.5"))
 				
 		#Auxiliary device labels
@@ -1297,7 +1332,7 @@ class Ui_MainWindow(QObject):
 		#Initializing default internal device flow values
 		#self.flowvalues = [0.00,2.00,5.00,2.00]
 		for i in range(0,len(self.flowedit)):
-			MainWindow.findChild(QtWidgets.QLabel,self.flowedit[i]+'label').setText(_translate("MainWindow",str(self.flowedit[i])+'c'))
+			MainWindow.findChild(QtWidgets.QLabel,self.flowedit[i]+'label').setText(_translate("MainWindow",str(self.flowedit[i]).upper()+'C'))
 		#	MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[i]).setText(_translate("MainWindow",str(self.flowvalues[i])))
 		#	self.updateSliders(MainWindow)
 		
@@ -3029,6 +3064,7 @@ class Ui_MainWindow(QObject):
 		#	opc_cnts, opc_flow_raw, opc_pres_raw, ext1
 	
 		#zerocorrectedflows are the pressure and temperature corrected flows of the form.
+		#THIS APPEARS TO HAVE BEEN CHANGED TO PUT cvf1Z AT BEGINNING OF ARRAY
 		#	cvfx0c, cvfx1c, cvfx2c, cvfx3c, cvfx4c, 
 		#	cvfx5c, cvfx6c, cvfx7c, cvfx8c, cvf1Z
 		'''
@@ -3103,6 +3139,10 @@ class Ui_MainWindow(QObject):
 			#Zero Corrected Flows are the flows that have been corrected for
 			#	Temp and Pres AND have been filtered for values less than 0.
 			zerocorrectedflows = [0]*10
+
+
+			
+
 	
 			#Initialization of flow summing parameters
 			summedzerocorrectedflow = 0; summedflow = 0	
@@ -3142,7 +3182,18 @@ class Ui_MainWindow(QObject):
 				if zerocorrectedflows[i] < 0 : zerocorrectedflows[i] = 0.0001
 				summedflow = summedflow + calibrated[i]
 				summedzerocorrectedflow = summedzerocorrectedflow + zerocorrectedflows[i]	
-		
+
+			#for i in range(0, len(self.flowedit)):
+			#for i in range(0, len(self.flowedit)):
+			#	self.internalFlows[i] = float(MainWindow.findChild(QtWidgets.QSlider, self.flowedit[i]+'Slider')\
+			#		.value()/100.0)
+			MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[0]+'Return').setText("{:.3f}".format(zerocorrectedflows[1]))	
+			MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[1]+'Return').setText("{:.3f}".format(zerocorrectedflows[3]))	
+			MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[2]+'Return').setText("{:.3f}".format(zerocorrectedflows[4]))	
+			MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[3]+'Return').setText("{:.3f}".format(zerocorrectedflows[5]))	
+			MainWindow.findChild(QtWidgets.QLineEdit, 'cvf3cwReturn').setText("{:.3f}".format(zerocorrectedflows[0] - summedzerocorrectedflow))	
+
+
 			#Shift in index to place cvf1c at the beginning
 			#	DOES NOT REQUIRE PRESSURE AND TEMP CORRECTION
 			zerocorrectedflows[0] = calibrated[0]
