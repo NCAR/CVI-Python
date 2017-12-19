@@ -29,6 +29,30 @@ from pyqtgraph import PlotWidget, ViewBox
 import numpy as np
 from numpy.polynomial import polynomial
 
+'''
+Color codes are as follows:
+white
+black
+cyan
+darkCyan
+red
+darkRed
+magenta
+darkMagenta
+green
+darkGreen
+yellow
+darkYellow
+blue
+darkBlue
+gray
+darkGray
+lightGray
+'''
+
+
+
+
 ####IF PROGRAM FAILS, RUN COMMAND "lsof -i" and kill the pid associated with python####
 
 class Ui_MainWindow(QObject):
@@ -1541,6 +1565,8 @@ class Ui_MainWindow(QObject):
 		self.flashTimer.timeout.connect(lambda: self.flashing(MainWindow))
 		self.flashTimer.start(500)	
 
+		self.lastReceivedThreshold = 5
+
 		self.connectFlash = True
 
 		self.timerPosition = False
@@ -1575,22 +1601,45 @@ class Ui_MainWindow(QObject):
 			if self.connectFlash:	self.connect.setStyleSheet("background-color: lightgreen")
 			self.timerPosition = False
 
+			for i in range(0,len(self.tablerowlabels)):
+				for j in range(0,len(self.tablecolumnlabels)):
+					if self.tableErrorTracker[i,1] == 2:
+						ui.tableWidget.item(i,j).setBackground(QtGui.QColor("lightyellow"))
+						ui.tableWidget.horizontalHeaderItem(j).setBackground(QtGui.QColor("lightyellow"))
+						ui.tableWidget.verticalHeaderItem(i).setBackground(QtGui.QColor("lightyellow"))#255,0,0))
+					else:
+						ui.tableWidget.item(i,j).setBackground(QtGui.QColor("white"))
+						ui.tableWidget.horizontalHeaderItem(j).setBackground(QtGui.QColor("lightgrey"))		
+						ui.tableWidget.verticalHeaderItem(i).setBackground(QtGui.QColor("lightgrey"))#255,0,0))
+	
 			for i in range(0,len(self.rawtablerowlabels)):
-				if self.rawTableErrorTracker[i,1] == 2:
-					ui.rawtableWidget.item(i,0).setBackground(QtGui.QColor(255,0,0))
-					ui.rawtableWidget.item(i,1).setBackground(QtGui.QColor(255,0,0))
-					#ui.rawtableWidget.item(i,1).setText(_translate("MainWindow",str(self.rawInOutData[i,1])))
-					ui.rawtableWidget.verticalHeaderItem(i).setBackground(QtGui.QColor(255,0,0))
+				for j in range(0,len(self.rawtablecolumnlabels)):
+					if self.rawTableErrorTracker[i,1] == 2:
+						ui.rawtableWidget.item(i,j).setBackground(QtGui.QColor("lightyellow"))#(255,0,0))
+						ui.rawtableWidget.horizontalHeaderItem(j).setBackground(QtGui.QColor("lightyellow"))		
+						ui.rawtableWidget.verticalHeaderItem(i).setBackground(QtGui.QColor("lightyellow"))#255,0,0))
+					else:
+						ui.rawtableWidget.item(i,j).setBackground(QtGui.QColor("white"))#255,0,0))
+						ui.rawtableWidget.horizontalHeaderItem(j).setBackground(QtGui.QColor("lightgrey"))		
+						ui.rawtableWidget.verticalHeaderItem(i).setBackground(QtGui.QColor("lightgrey"))#255,0,0))
 
 		else:
-			self.connect.setStyleSheet("background-color: lightblue")
+			self.connect.setStyleSheet("background-color: none")#lightblue")
 			self.timerPosition = True
 
+			for i in range(0,len(self.tablerowlabels)):
+				for j in range(0,len(self.tablecolumnlabels)):
+					if self.tableErrorTracker[i,1] == 2:
+						ui.tableWidget.item(i,j).setBackground(QtGui.QColor("white"))#1,125,125))
+						ui.tableWidget.horizontalHeaderItem(j).setBackground(QtGui.QColor("white"))		
+						ui.tableWidget.verticalHeaderItem(i).setBackground(QtGui.QColor("white"))#1,125,125))
+			
 			for i in range(0,len(self.rawtablerowlabels)):
-				if self.rawTableErrorTracker[i,1] == 2:
-					ui.rawtableWidget.item(i,0).setBackground(QtGui.QColor(1,125,125))
-					ui.rawtableWidget.item(i,1).setBackground(QtGui.QColor(1,125,125))
-					ui.rawtableWidget.verticalHeaderItem(i).setBackground(QtGui.QColor(1,125,125))
+				for j in range(0,len(self.rawtablecolumnlabels)):
+					if self.rawTableErrorTracker[i,1] == 2:
+						ui.rawtableWidget.item(i,j).setBackground(QtGui.QColor("white"))#1,125,125))
+						ui.rawtableWidget.horizontalHeaderItem(j).setBackground(QtGui.QColor("white"))		
+						ui.rawtableWidget.verticalHeaderItem(i).setBackground(QtGui.QColor("white"))#1,125,125))
 
 	
 	def tdlCalUpdateGUI(self, MainWindow, widget = ''):
@@ -2878,8 +2927,6 @@ class Ui_MainWindow(QObject):
 				input[1] = rolloverinput[1]
 				self.rawTableErrorTracker[1,0] += 1
 				self.rawTableErrorTracker[1,1] = 1
-				if self.rawTableErrorTracker[1,0] >= 5:
-					self.rawTableErrorTracker[1,1] = 2
 			else:
 				self.rawTableErrorTracker[0,0] = 0
 				self.rawTableErrorTracker[0,1] = 0
@@ -2897,7 +2944,19 @@ class Ui_MainWindow(QObject):
 			#Potentially add removal of old rollowver data to refresh
 			self.errorSignal.emit("Fatal error in parsing rollover data")
 			return	
-			
+		
+		try:
+			for i in range(0,len(self.rawtablerowlabels)):
+				if self.rawTableErrorTracker[i,0] >= self.lastReceivedThreshold:
+					self.rawTableErrorTracker[i,1] = 2
+			for i in range(0,len(self.tablerowlabels)):
+				if self.tableErrorTracker[i,0] >= self.lastReceivedThreshold:
+					self.tableErrorTracker[i,1] = 2
+		except:
+			self.errorSignal.emit("NonFatal error in timing last received data")
+
+				
+
 		'''
 		Code just in case we want to add a timestamp to the rollover data.
 		tmptimestamp = 	time.strftime("%Y %b %d %H:%M:%S",time.gmtime())
