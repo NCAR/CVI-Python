@@ -141,15 +141,6 @@ class Ui_MainWindow(QObject):
 		self.subTabLayout_1.setSpacing(10)
 		'''
 		
-		#Create Third Tab
-		self.tab_3 = QtWidgets.QWidget()
-		self.tab_3.setObjectName("tab_3")
-		self.tabWidget.addTab(self.tab_3, "Connect Auxiliary Instruments")
-		self.tabLayout_3 = QtWidgets.QGridLayout(self.tab_3)
-		self.tabLayout_3.setContentsMargins(10, 10, 10, 10)
-		self.tabLayout_3.setObjectName("tabLayout_3")
-		self.tabLayout_3.setSpacing(5)
-		
 		#Create Second Tab
 		self.tab_2 = QtWidgets.QWidget()
 		self.tab_2.setObjectName("tab_2")
@@ -159,6 +150,15 @@ class Ui_MainWindow(QObject):
 		self.tabLayout_2.setObjectName("tabLayout_2")	
 		self.tabLayout_2.setSpacing(5)
 
+		#Create Third Tab
+		self.tab_3 = QtWidgets.QWidget()
+		self.tab_3.setObjectName("tab_3")
+		self.tabWidget.addTab(self.tab_3, "Connect Auxiliary Instruments")
+		self.tabLayout_3 = QtWidgets.QGridLayout(self.tab_3)
+		self.tabLayout_3.setContentsMargins(10, 10, 10, 10)
+		self.tabLayout_3.setObjectName("tabLayout_3")
+		self.tabLayout_3.setSpacing(5)
+		
 		
 		#Create Fourth Tab
 		self.tab_4 = QtWidgets.QWidget()
