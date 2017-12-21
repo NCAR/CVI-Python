@@ -140,6 +140,15 @@ class Ui_MainWindow(QObject):
 		self.subTabLayout_1.setObjectName("subTabLayout_1")
 		self.subTabLayout_1.setSpacing(10)
 		'''
+		#Create Third Tab
+		self.tab_3 = QtWidgets.QWidget()
+		self.tab_3.setObjectName("tab_3")
+		self.tabWidget.addTab(self.tab_3, "Connect Auxiliary Instruments")
+		self.tabLayout_3 = QtWidgets.QGridLayout(self.tab_3)
+		self.tabLayout_3.setContentsMargins(10, 10, 10, 10)
+		self.tabLayout_3.setObjectName("tabLayout_3")
+		self.tabLayout_3.setSpacing(5)
+		
 		
 		#Create Second Tab
 		self.tab_2 = QtWidgets.QWidget()
@@ -150,15 +159,6 @@ class Ui_MainWindow(QObject):
 		self.tabLayout_2.setObjectName("tabLayout_2")	
 		self.tabLayout_2.setSpacing(5)
 
-		#Create Third Tab
-		self.tab_3 = QtWidgets.QWidget()
-		self.tab_3.setObjectName("tab_3")
-		self.tabWidget.addTab(self.tab_3, "Connect Auxiliary Instruments")
-		self.tabLayout_3 = QtWidgets.QGridLayout(self.tab_3)
-		self.tabLayout_3.setContentsMargins(10, 10, 10, 10)
-		self.tabLayout_3.setObjectName("tabLayout_3")
-		self.tabLayout_3.setSpacing(5)
-		
 		
 		#Create Fourth Tab
 		self.tab_4 = QtWidgets.QWidget()
@@ -223,18 +223,32 @@ class Ui_MainWindow(QObject):
 		#tmpobject.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
 		#self.tabLayout_1.addWidget(tmpobject, 2, 0, 1, 40)
 					
-		#Creation of arbitrary label
+		
+
 		tmpobject = QtWidgets.QLabel(self.tab)
-		tmpobject.setObjectName("flowoptionslabel")
-		self.tabLayout_1.addWidget(tmpobject, 2, 0, 2, 10)
-		tmpobject.setText("FLOW OPTIONS")
-		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)	
-		tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))						
-					
+		self.tabLayout_1.addWidget(tmpobject, 2, 20, 2, 5)
+		tmpobject.setText("CVPCN")
+		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+
+		self.cvpcnIndicator = QtWidgets.QLineEdit(self.tab)
+		self.cvpcnIndicator.setObjectName("cvpcnIndicator")
+		self.tabLayout_1.addWidget(self.cvpcnIndicator, 2, 25, 2, 5)
+		self.cvpcnIndicator.setDisabled(True)
+
+		tmpobject = QtWidgets.QLabel(self.tab)
+		self.tabLayout_1.addWidget(tmpobject, 2, 30, 2, 5)
+		tmpobject.setText("CVTCN")
+		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
+
+		self.cvtcnIndicator = QtWidgets.QLineEdit(self.tab)
+		self.cvtcnIndicator.setObjectName("cvtcnIndicator")
+		self.tabLayout_1.addWidget(self.cvtcnIndicator, 2, 35, 2, 5)	
+		self.cvtcnIndicator.setDisabled(True)
+		
 		#Flow on/off toggle
 		self.flowio = QtWidgets.QPushButton(self.tab)
 		self.flowio.setObjectName("flowio")
-		self.tabLayout_1.addWidget(self.flowio, 2, 20, 2, 10)
+		self.tabLayout_1.addWidget(self.flowio, 4, 20, 2, 10)
 		self.flowio.setCheckable(True)
 		self.flowio.setStyleSheet("background-color: red")
 		#self.flowio.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
@@ -242,13 +256,13 @@ class Ui_MainWindow(QObject):
 		#CVI Mode toggle for CVI/Total option
 		self.cvimode = QtWidgets.QPushButton(self.tab)
 		self.cvimode.setObjectName("cvimode")
-		self.tabLayout_1.addWidget(self.cvimode, 2, 30, 2, 10)
+		self.tabLayout_1.addWidget(self.cvimode, 4, 30, 2, 10)
 		self.cvimode.setCheckable(True)
 		
 		#Autopilot Mode toggle
 		self.autopilot = QtWidgets.QPushButton(self.tab)
 		self.autopilot.setObjectName("autopilot")
-		self.tabLayout_1.addWidget(self.autopilot, 2, 30, 2, 10)
+		self.tabLayout_1.addWidget(self.autopilot, 4, 30, 2, 10)
 		self.autopilot.setCheckable(True)	
 		#self.autopilot.setDisabled(True)
 		self.autopilot.setText("Autopilot: OFF")
@@ -256,33 +270,58 @@ class Ui_MainWindow(QObject):
 		self.autopilot.setVisible(False)#hide()	
 
 
+
+		#Device Connection/Disconnection Shortcuts
+		self.devConnectShortcut = QtWidgets.QPushButton(self.tab)
+		self.devConnectShortcut.setObjectName("devConnectShortcut")
+		self.tabLayout_1.addWidget(self.devConnectShortcut, 6, 20, 2, 10)
+		self.devConnectShortcut.clicked.connect(lambda: self.devChangeRoutineShortcut(True))#MainWindow))
+		self.devConnectShortcut.setText("Add Devices")
+
+		self.devDisconnectShortcut = QtWidgets.QPushButton(self.tab)
+		self.devDisconnectShortcut.setObjectName("devDisconnectShortcut")
+		self.tabLayout_1.addWidget(self.devDisconnectShortcut, 6, 30, 2, 10) 
+		self.devDisconnectShortcut.clicked.connect(lambda: self.devChangeRoutineShortcut(False))#MainWindow))
+		self.devDisconnectShortcut.setText("Remove Devices")
+
+
+
+
+		#Creation of arbitrary label
 		tmpobject = QtWidgets.QLabel(self.tab)
-		tmpobject.setText("Set")
-		self.tabLayout_1.addWidget(tmpobject, 3, 10, 2, 5)
+		tmpobject.setObjectName("flowoptionslabel")
+		self.tabLayout_1.addWidget(tmpobject, 2, 0, 2, 10)
+		tmpobject.setText("FLOW OPTIONS")
+		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)	
+		#tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))						
+
+		tmpobject = QtWidgets.QLabel(self.tab)
+		tmpobject.setText("SETPT")
+		self.tabLayout_1.addWidget(tmpobject, 2, 10, 2, 5)
 		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)	
 
 		tmpobject = QtWidgets.QLabel(self.tab)
-		tmpobject.setText("Return")
-		self.tabLayout_1.addWidget(tmpobject, 3, 15, 2, 5)
+		tmpobject.setText("RETURN")
+		self.tabLayout_1.addWidget(tmpobject, 2, 15, 2, 5)
 		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)	
 
 
 		self.cvf3cwlabel = QtWidgets.QLabel(self.tab)
 		self.cvf3cwlabel.setObjectName("cvf3cwlabel")		
-		self.tabLayout_1.addWidget(self.cvf3cwlabel, 5, 0, 2, 6)
+		self.tabLayout_1.addWidget(self.cvf3cwlabel, 4, 0, 2, 6)
 		self.cvf3cw = QtWidgets.QLineEdit(self.tab)
 		self.cvf3cw.setObjectName("cvf3cw")
-		self.tabLayout_1.addWidget(self.cvf3cw, 5, 10, 2, 5)	
+		self.tabLayout_1.addWidget(self.cvf3cw, 4, 10, 2, 5)	
 
 		self.cvf3cwUnitsLabel = QtWidgets.QLabel(self.tab)
 		self.cvf3cwUnitsLabel.setText("VLPM")
-		self.tabLayout_1.addWidget(self.cvf3cwUnitsLabel, 5, 6, 2, 4)
+		self.tabLayout_1.addWidget(self.cvf3cwUnitsLabel, 4, 6, 2, 4)
 		self.cvf3cwUnitsLabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)	
 
 
 		self.cvf3cwReturn = QtWidgets.QLineEdit(self.tab)
 		self.cvf3cwReturn.setObjectName("cvf3cwReturn")
-		self.tabLayout_1.addWidget(self.cvf3cwReturn, 5, 15, 2, 5)
+		self.tabLayout_1.addWidget(self.cvf3cwReturn, 4, 15, 2, 5)
 		self.cvf3cwReturn.setDisabled(True)
 
 		#self.cvf3cwlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
@@ -298,7 +337,7 @@ class Ui_MainWindow(QObject):
 		self.cvf3cwSlider.setTickPosition(QSlider.TicksBelow)
 		self.cvf3cwSlider.setTickInterval(100)
 		self.cvf3cwSlider.setObjectName('cvf3cwSlider')
-		self.tabLayout_1.addWidget(self.cvf3cwSlider, 7, 0, 2, 20)
+		self.tabLayout_1.addWidget(self.cvf3cwSlider, 6, 0, 2, 20)
 		self.cvf3cwSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow, 'cvf3cw'))	
 
 		#self.cvf3cwSlider.setStyleSheet("background-color: yellow")
@@ -311,22 +350,22 @@ class Ui_MainWindow(QObject):
 		for i in range(0,len(self.flowedit)):
 			tmpobject = QtWidgets.QLabel(self.tab)
 			tmpobject.setObjectName(self.flowedit[i]+'label')
-			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 0, 2, 6)
+			self.tabLayout_1.addWidget(tmpobject, 8+4*i, 0, 2, 6)
 			#tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 			
 			tmpobject = QtWidgets.QLabel(self.tab)
 			tmpobject.setText("VLPM")
-			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 6, 2, 4)
+			self.tabLayout_1.addWidget(tmpobject, 8+4*i, 6, 2, 4)
 			tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)	
 		
 			tmpobject = QtWidgets.QLineEdit(self.tab)
 			tmpobject.setObjectName(self.flowedit[i])
-			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 10, 2, 5)
+			self.tabLayout_1.addWidget(tmpobject, 8+4*i, 10, 2, 5)
 			tmpobject.editingFinished.connect(lambda i=i: self.updateSliders(MainWindow, self.flowedit[i]))
 		
 			tmpobject = QtWidgets.QLineEdit(self.tab)
 			tmpobject.setObjectName(self.flowedit[i]+"Return")
-			self.tabLayout_1.addWidget(tmpobject, 9+4*i, 15, 2, 5)
+			self.tabLayout_1.addWidget(tmpobject, 8+4*i, 15, 2, 5)
 			tmpobject.setDisabled(True)
 
 			sliderMin = 0
@@ -340,13 +379,13 @@ class Ui_MainWindow(QObject):
 			tmpobject.setTickPosition(QSlider.TicksBelow)
 			tmpobject.setTickInterval(sliderDiv)#10)
 			tmpobject.setObjectName(self.flowedit[i]+'Slider')
-			self.tabLayout_1.addWidget(tmpobject, 11+4*i, 0, 2, 20)
+			self.tabLayout_1.addWidget(tmpobject, 10+4*i, 0, 2, 20)
 			tmpobject.valueChanged.connect(lambda new, i=i: self.syncSliders(MainWindow, self.flowedit[i]))
 
 		#Preflight checklist
 		self.preflightButton = QtWidgets.QPushButton(self.tab)
 		self.preflightButton.setObjectName("preflightButton")
-		self.tabLayout_1.addWidget(self.preflightButton, 25, 0, 2, 10)
+		self.tabLayout_1.addWidget(self.preflightButton, 26, 0, 2, 10)
 		self.preflightButton.setStyleSheet("background-color: lightblue")
 		self.preflightButton.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 		#self.preflightButton.setDisabled(True)
@@ -356,7 +395,7 @@ class Ui_MainWindow(QObject):
 		#Dropdown lists for selecting data for first plot
 		self.commonNoteDropdown = QtWidgets.QComboBox(self.tab)
 		self.commonNoteDropdown.setObjectName("commonNoteDropdown")
-		self.tabLayout_1.addWidget(self.commonNoteDropdown, 23, 20, 2, 20)
+		self.tabLayout_1.addWidget(self.commonNoteDropdown, 24, 0, 2, 30)
 		#self.commonNoteDropdown.setDisabled(True)
 		
 		self.commonNotes = ["Common Notes","Approaching Cloud", "In Cloud", "Exited Cloud","Taxi","Takeoff","Heaters ON","Landed"]
@@ -366,7 +405,7 @@ class Ui_MainWindow(QObject):
 		#Push to add custom note?
 		self.customNoteButton = QtWidgets.QPushButton(self.tab)
 		self.customNoteButton.setObjectName("customNoteButton")
-		self.tabLayout_1.addWidget(self.customNoteButton, 23, 30, 2, 10)
+		self.tabLayout_1.addWidget(self.customNoteButton, 24, 30, 2, 10)
 		self.customNoteButton.setStyleSheet("background-color: lightblue")
 		self.customNoteButton.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 		#self.customNoteButton.setDisabled(True)
@@ -379,7 +418,7 @@ class Ui_MainWindow(QObject):
 		#self.tabLayout_1.addWidget(self.currentfilelabel, 25, 0, 2, 10)
 		self.currentfile = QtWidgets.QLineEdit(self.tab)
 		self.currentfile.setObjectName("currentfile")
-		self.tabLayout_1.addWidget(self.currentfile, 25, 10, 2, 30)
+		self.tabLayout_1.addWidget(self.currentfile, 26, 10, 2, 30)
 		self.currentfile.setDisabled(True)		
 		self.currentfile.setStyleSheet("QLineEdit:disabled {color:black; background-color: lightblue}")
 
@@ -389,19 +428,19 @@ class Ui_MainWindow(QObject):
 		self.mainstatus.setObjectName("mainstatus")
 		self.mainstatus.setAlignment(Qt.AlignTop)
 		self.mainstatus.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))
-		self.tabLayout_1.addWidget(self.mainstatus, 4, 21, 19, 18)
+		self.tabLayout_1.addWidget(self.mainstatus, 8, 21, 16, 18)
 		self.mainstatus.verticalScrollBar().setValue(self.mainstatus.verticalScrollBar().maximum())
 		#self.mainstatus.ensureCursorVisible()
 				
 		#Create Table for Viewing uncorrected, corrected, and calibrated flows
 		self.tableWidget = QtWidgets.QTableWidget(self.tab)
 		self.tableWidget.setObjectName("tableWidget")
-		self.tabLayout_1.addWidget(self.tableWidget, 27, 0, 18, 23)
+		self.tabLayout_1.addWidget(self.tableWidget, 28, 0, 18, 27)
 		
 		#Create Table for viewing raw input and output data
 		self.rawtableWidget = QtWidgets.QTableWidget(self.tab)
 		self.rawtableWidget.setObjectName("rawtablewidget")
-		self.tabLayout_1.addWidget(self.rawtableWidget, 27, 23, 18, 17)
+		self.tabLayout_1.addWidget(self.rawtableWidget, 28, 27, 18, 13)
 		
 		#Create table for viewing uncorrected,corrected, and calibrated inputs on first tab
 		self.tablerowlabels = ['cvf1','cvfx0','cvfx1','cvfx2','cvfx3','cvfx4',
@@ -428,7 +467,7 @@ class Ui_MainWindow(QObject):
 			'cvfx1', 'cvfx2', 'cvfx3', 'cvfx4', 'cvfx5', 'cvfx6', 'cvfx7', 'cvfx8',
 			 'cvpcn', 'cvtt', 'cvtp', 'cvts', 'cvtcn', 'cvtai', 'H2OR', 'ptdlR', 
 			'ttdlR', 'TDLsignal', 'TDLlaser', 'TDLline', 'TDLzero', 'TTDLencl', 
-			'TTDLtec', 'TDLtrans', 'opc_cnts', 'opc_flow_raw', 'opc_pres_raw', 
+			'TTDLtec', 'TDLtrans', 'opc_cnts', 'opc flow', 'opc pres', 
 			'ext1', 'ext2', 'H2O-PIC', '18O', 'HDO']
 		self.rawOutputTableRowLabels = ['']
 		self.rawtableWidget.setColumnCount(len(self.rawtablecolumnlabels))
@@ -457,7 +496,7 @@ class Ui_MainWindow(QObject):
 		self.errorstatus.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
 		self.errorstatus.setMinimumSize(1,1)
 		#self.errorstatus.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Expanding)
-		self.tabLayout_1.addWidget(self.errorstatus,45,0,5,40)
+		self.tabLayout_1.addWidget(self.errorstatus,46,0,4,40)
 		self.errorstatus.verticalScrollBar().setValue(self.mainstatus.verticalScrollBar().maximum())
 
 
@@ -819,10 +858,10 @@ class Ui_MainWindow(QObject):
 		#Push buttons for connecting or disconnecting instruments
 		self.devconnect = QtWidgets.QPushButton(self.tab_3)
 		self.devconnect.setObjectName("devconnect")
-		self.tabLayout_3.addWidget(self.devconnect, 0, 6, 3, 14)
+		self.tabLayout_3.addWidget(self.devconnect, 9, 6, 3, 14)
 		self.devdisconnect = QtWidgets.QPushButton(self.tab_3)
 		self.devdisconnect.setObjectName("devdisconnect")
-		self.tabLayout_3.addWidget(self.devdisconnect, 0, 20, 3, 14)
+		self.tabLayout_3.addWidget(self.devdisconnect, 9, 20, 3, 14)
 		
 		#Text Box for displaying instructions for instrument connections
 		self.devinstruct = QtWidgets.QTextBrowser(self.tab_3)#QtWidgets.QLabel(self.tab_3)
@@ -840,22 +879,22 @@ class Ui_MainWindow(QObject):
 		#Button for continuing addition/subtraction of instruments
 		self.devcontinue = QtWidgets.QPushButton(self.tab_3)
 		self.devcontinue.setObjectName("devcontinue")
-		self.tabLayout_3.addWidget(self.devcontinue, 0, 6, 3, 14)
+		self.tabLayout_3.addWidget(self.devcontinue, 9, 6, 3, 14)
 		self.devcontinue.hide()
 		
 		#Button for cancelling addition/subtraction of instruments
 		self.devcancel = QtWidgets.QPushButton(self.tab_3)
 		self.devcancel.setObjectName("devcancel")
-		self.tabLayout_3.addWidget(self.devcancel, 0, 20, 3, 14)
+		self.tabLayout_3.addWidget(self.devcancel, 9, 20, 3, 14)
 		self.devcancel.hide()
 					
 		#USER INPUTS FOR DELAY, OFFSET, and CVF3CW
 		self.delaylabel = QtWidgets.QLabel(self.tab_3)
 		self.delaylabel.setObjectName("delaylabel")		
-		self.tabLayout_3.addWidget(self.delaylabel, 3, 6, 2, 8)
+		self.tabLayout_3.addWidget(self.delaylabel, 0, 6, 2, 8)
 		self.delay = QtWidgets.QLineEdit(self.tab_3)
 		self.delay.setObjectName("delay")
-		self.tabLayout_3.addWidget(self.delay, 5, 6, 2, 8)
+		self.tabLayout_3.addWidget(self.delay, 2, 6, 2, 8)
 		self.delaylabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
 		self.delay.editingFinished.connect(lambda: self.updateSliders(MainWindow, 'delay'))
 
@@ -866,17 +905,17 @@ class Ui_MainWindow(QObject):
 		self.delaySlider.setTickPosition(QSlider.TicksBelow)
 		self.delaySlider.setTickInterval(100)
 		self.delaySlider.setObjectName('delaySlider')
-		self.tabLayout_3.addWidget(self.delaySlider, 7, 6, 2, 8)
+		self.tabLayout_3.addWidget(self.delaySlider, 4, 6, 2, 8)
 		self.delaySlider.valueChanged.connect(lambda: self.syncSliders(MainWindow, 'delay'))
 		#tmpobject.setTracking(False)
 					
 		
 		self.offsetlabel = QtWidgets.QLabel(self.tab_3)
 		self.offsetlabel.setObjectName("offsetlabel")		
-		self.tabLayout_3.addWidget(self.offsetlabel, 3, 14, 2, 8)
+		self.tabLayout_3.addWidget(self.offsetlabel, 0, 14, 2, 8)
 		self.offset = QtWidgets.QLineEdit(self.tab_3)
 		self.offset.setObjectName("offset")
-		self.tabLayout_3.addWidget(self.offset, 5, 14, 2, 8)
+		self.tabLayout_3.addWidget(self.offset, 2, 14, 2, 8)
 		self.offsetlabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
 		self.offset.editingFinished.connect(lambda: self.updateSliders(MainWindow, 'offset'))	
 
@@ -887,25 +926,25 @@ class Ui_MainWindow(QObject):
 		self.offsetSlider.setTickPosition(QSlider.TicksBelow)
 		self.offsetSlider.setTickInterval(100)
 		self.offsetSlider.setObjectName('offsetSlider')
-		self.tabLayout_3.addWidget(self.offsetSlider, 7, 14, 2, 8)	
+		self.tabLayout_3.addWidget(self.offsetSlider, 4, 14, 2, 8)	
 		self.offsetSlider.valueChanged.connect(lambda: self.syncSliders(MainWindow, 'offset'))	
 
 		self.cvf3cwIndicatorLabel = QtWidgets.QLabel(self.tab_3)
 		self.cvf3cwIndicatorLabel.setObjectName("cvf3cwIndicatorLabel")
 		self.cvf3cwIndicatorLabel.setText("Counterflow Excess")
 		self.cvf3cwIndicatorLabel.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-		self.tabLayout_3.addWidget(self.cvf3cwIndicatorLabel, 3, 22, 2, 12)
+		self.tabLayout_3.addWidget(self.cvf3cwIndicatorLabel, 0, 22, 2, 12)
 		
 		self.cvf3cwIndicator = QtWidgets.QLineEdit(self.tab_3)
 		self.cvf3cwIndicator.setObjectName("cvf3cwIndicator")
-		self.tabLayout_3.addWidget(self.cvf3cwIndicator, 5, 22, 2, 12)	
+		self.tabLayout_3.addWidget(self.cvf3cwIndicator, 2, 22, 2, 12)	
 		self.cvf3cwIndicator.setDisabled(True)
 		#self.cvf3cw.editingFinished.connect(lambda: self.updateSliders(MainWindow, 'cvf3cw'))	
 
 		tmpobject = QtWidgets.QLabel(self.tab_3)
 		tmpobject.setText("From Operations Tab")
 		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)
-		self.tabLayout_3.addWidget(tmpobject, 7, 22, 2, 12)
+		self.tabLayout_3.addWidget(tmpobject, 4, 22, 2, 12)
 
 		'''
 		self.cvf3cwlabel = QtWidgets.QLabel(self.tab_3)
@@ -931,9 +970,11 @@ class Ui_MainWindow(QObject):
 		for i in range(1,5):
 			tmpobject = QtWidgets.QPushButton(self.tab_3)
 			tmpobject.setObjectName("auxdev"+str(i))
-			self.tabLayout_3.addWidget(tmpobject,9,6+(i-1)*7,3,7)
-			tmpobject.setStyleSheet("QPushButton {color:black; background-color:red}"
-				"QPushButton:checked {color:black; background-color: lightgreen}")
+			self.tabLayout_3.addWidget(tmpobject,6,6+(i-1)*7,3,7)
+			tmpobject.setStyleSheet("QPushButton:!checked:!disabled {color:black; background-color:red}"
+				"QPushButton:checked:!disabled {color:black; background-color: lightgreen}"
+				"QPushButton:!checked:disabled {background-color: darkred}"
+				"QPushButton:checked:disabled {background-color: green}")
 			tmpobject.setCheckable(True)
 
 		'''
@@ -964,14 +1005,14 @@ class Ui_MainWindow(QObject):
 		self.tabLayout_3.addWidget(tmpobject, 0, 40, 3, 10)
 		tmpobject.setText("NULL SIGNALS")
 		tmpobject.setAlignment(QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter)		
-		tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
+		#tmpobject.setFont(QtGui.QFont("Times",8,QtGui.QFont.Bold))
 		for i in range(0,len(self.signalnulls)):
 			tmpobject = QtWidgets.QLabel(self.tab_3)
 			tmpobject.setObjectName("NullLabel"+str(i))
-			self.tabLayout_3.addWidget(tmpobject, 3+3*i, 40, 3, 5)	
+			self.tabLayout_3.addWidget(tmpobject, 3+3*i, 38, 3, 7)	
 			tmpobject = QtWidgets.QPushButton(self.tab_3)
 			tmpobject.setObjectName("Null"+str(i))
-			self.tabLayout_3.addWidget(tmpobject, 3+3*i, 45, 3, 5)
+			self.tabLayout_3.addWidget(tmpobject, 3+3*i, 45, 3, 7)
 			tmpobject.setCheckable(True)			
 		
 		#Label for device configurations
@@ -1603,6 +1644,8 @@ class Ui_MainWindow(QObject):
 		self.lastReceivedThreshold = 5
 
 		self.connectFlash = True
+		self.devContinueFlash = True
+
 
 		self.timerPosition = False
 
@@ -1634,7 +1677,9 @@ class Ui_MainWindow(QObject):
 	def flashing(self, MainWindow):
 		if self.timerPosition:
 			if self.connectFlash:	self.connect.setStyleSheet("background-color: lightgreen")
+			if self.devContinueFlash: self.devcontinue.setStyleSheet("background-color: yellow")
 			self.timerPosition = False
+			
 
 			for i in range(0,len(self.tablerowlabels)):
 				for j in range(0,len(self.tablecolumnlabels)):
@@ -1660,6 +1705,7 @@ class Ui_MainWindow(QObject):
 
 		else:
 			self.connect.setStyleSheet("background-color: none")#lightblue")
+			self.devcontinue.setStyleSheet("background-color: none")		
 			self.timerPosition = True
 
 			for i in range(0,len(self.tablerowlabels)):
@@ -2217,6 +2263,24 @@ class Ui_MainWindow(QObject):
 			for i in range(0, len(self.signalnulls)):
 				MainWindow.findChild(QtWidgets.QPushButton,"Null"+str(i))\
 					.setChecked(int(programdefaultstrings[17].split(',')[i]))
+
+			for i in range(1,5):
+				tmpobject = self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i))
+				tmpobject.setChecked(self.MainWindow.findChild(QtWidgets.QPushButton,'valve'+str(i)).isChecked())
+				tmpobject.setText(self.MainWindow.findChild(QtWidgets.QLineEdit,'cvfx'+str(i+4)+'Label').text())
+				tmpobject.setDisabled(True)
+
+				#if tmpobject.isChecked(): tmpobject.setStyleSheet("background-color: green")
+				#else:	tmpobject.setStyleSheet("background-color: red")
+
+	def devChangeRoutineShortcut(self, conn):
+		#Change tab
+		self.tabWidget.setCurrentIndex(1)
+		if conn:
+			self.devconnect.click()
+		else:
+			self.devdisconnect.click()
+				
 	
 	def devChangeRoutine(self, conn,  stage = 0, canc = False):
 			
@@ -2234,7 +2298,8 @@ class Ui_MainWindow(QObject):
 		
 			#Disables other tabs to prevent interference
 			self.tabWidget.setTabEnabled(0, False)
-			self.tabWidget.setTabEnabled(1, False)
+			self.tabWidget.setTabEnabled(2, False)
+			self.tabWidget.setTabEnabled(3, False)
 			
 			#Updates temporary instrument i/o buttons with actual states, labels and colors
 			for i in range(1,5):
@@ -2327,8 +2392,9 @@ class Ui_MainWindow(QObject):
 				for i in range(0,4):
 					self.MainWindow.findChild(QtWidgets.QPushButton,'valve'+str(i+1))\
 						.setChecked(self.initialValvePositions[i])
-					#self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i+1))\
-					#	.setChecked(self.initialValvePositions[i])
+					self.MainWindow.findChild(QtWidgets.QPushButton,'auxdev'+str(i+1))\
+						.setChecked(self.initialValvePositions[i])
+					
 
 				time.sleep(3)
 				self.devinstruct.setText("The valves have been reverted to their original state")
@@ -2365,7 +2431,7 @@ class Ui_MainWindow(QObject):
 			
 				#Update instructional interface with new flow step
 				#	Force gui update and pause to allow instrument response
-				self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+str(self.cfexcess)+"\n  Goal: "+str(self.initialcfexcess))
+				self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+"{:.3f}".format((self.cfexcess))+"\n  Goal: "+"{:.3f}".format((self.initialcfexcess)))
 				app.processEvents()
 				time.sleep(2)
 		
@@ -2377,7 +2443,7 @@ class Ui_MainWindow(QObject):
 
 				#Update instructional interface with new flow step
 				#	Force gui update and pause to allow instrument response
-				self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+str(self.cfexcess)+"\n  Goal: "+str(self.initialcfexcess))
+				self.devinstruct.setText("Flow is returning to normal. \n\nDO NOT PRESS ANY BUTTONS \n  Current Flow: "+"{:.3f}".format((self.cfexcess))+"\n  Goal: "+"{:.3f}".format((self.initialcfexcess)))
 				app.processEvents()
 				time.sleep(2)		
 		
@@ -2393,8 +2459,10 @@ class Ui_MainWindow(QObject):
 			ui.logSignal.emit('Ancillary valve change routine complete')
 		
 			#Re-enable tabs and reset buttons to original states
+			self.tabWidget.setCurrentIndex(0)
 			self.tabWidget.setTabEnabled(0, True)
-			self.tabWidget.setTabEnabled(1, True)
+			self.tabWidget.setTabEnabled(2, True)
+			self.tabWidget.setTabEnabled(3, True)
 			self.devcontinue.hide()
 			self.devcancel.hide()	
 			self.devconnect.show()
@@ -3152,12 +3220,17 @@ class Ui_MainWindow(QObject):
 
 		try:
 			self.cvpcnRunAvgArr = np.roll(self.cvpcnRunAvgArr,1)
-			if calibrated[10] > -99 : self.cvpcnRunAvgArr[0] = calibrated[10]
+			if calibrated[10] > -99: self.cvpcnRunAvgArr[0] = calibrated[10]
 			self.cvpcnRunAvg = np.nanmean(self.cvpcnRunAvgArr)
+			if(np.isnan(self.cvpcnRunAvg)): raise
+			self.cvpcnIndicator.setText(str("{:.3f}".format(self.cvpcnRunAvg)))
 
 			self.cvtcnRunAvgArr = np.roll(self.cvtcnRunAvgArr,1)
-			if calibrated[14] > -99: self.cvtcnRunAvgArr[0] = calibrated[14]
+			if calibrated[14] > -99 and calibrated[14] < 40.0 and calibrated[14] > 10.0: self.cvtcnRunAvgArr[0] = calibrated[14]
+			else: self.errorSignal.emit("Nonfatal error in CVTCN reporting, using values between 10C to 40C")
 			self.cvtcnRunAvg = np.nanmean(self.cvtcnRunAvgArr)
+			if(np.isnan(self.cvtcnRunAvg)): raise
+			self.cvtcnIndicator.setText(str("{:.3f}".format(self.cvtcnRunAvg)))
 
 			#print(self.cvpcnRunAvgArr, self.cvtcnRunAvgArr)
 		except:
