@@ -3226,15 +3226,22 @@ class Ui_MainWindow(QObject):
 			self.cvpcnIndicator.setText(str("{:.3f}".format(self.cvpcnRunAvg)))
 
 			self.cvtcnRunAvgArr = np.roll(self.cvtcnRunAvgArr,1)
-			if calibrated[14] > -99 and calibrated[14] < 40.0 and calibrated[14] > 10.0: self.cvtcnRunAvgArr[0] = calibrated[14]
-			else: self.errorSignal.emit("Nonfatal error in CVTCN reporting, using values between 10C to 40C")
+			if calibrated[14] > -99 and calibrated[14] < 40.0 and calibrated[14] > 10.0: 
+				self.cvtcnRunAvgArr[0] = calibrated[14]
+				self.cvtcnIndicator.setStyleSheet("color:none; background-color:none")
+			else: 
+				self.cvtcnIndicator.setStyleSheet("color: black; background-color:orange")
+				self.errorSignal.emit("Nonfatal error in CVTCN reporting, using values between 10C to 40C")
 			self.cvtcnRunAvg = np.nanmean(self.cvtcnRunAvgArr)
 			if(np.isnan(self.cvtcnRunAvg)): raise
 			self.cvtcnIndicator.setText(str("{:.3f}".format(self.cvtcnRunAvg)))
+			
+
 
 			#print(self.cvpcnRunAvgArr, self.cvtcnRunAvgArr)
 		except:
 			self.errorSignal.emit("NonFatal error in pressure and temperature running averages")
+			self.cvtcnIndicator.setStyleSheet("color: black; background-color:orange")
 			self.cvpcnRunAvg = calibrated[10]
 			self.cvtcnRunAvg = calibrated[14]	
 
