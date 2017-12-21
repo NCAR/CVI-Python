@@ -872,7 +872,7 @@ class Ui_MainWindow(QObject):
 		#	border-radius: 10px; background-color: white; color: #545454; }""")
 		self.devinstruct.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 		self.devinstruct.setAlignment(Qt.AlignTop)		
-		self.devinstruct.setFont(QtGui.QFont("Times",10,QtGui.QFont.Bold))	
+		self.devinstruct.setFont(QtGui.QFont("Times",16,QtGui.QFont.Bold))	
 		self.defaultdevinstruct = "The connection and disconnection routine above is used to add or remove instrumentation from the flow. Upon either button press, counterflow will be raised and an instructional sequence will be displayed"
 		self.devinstruct.setText(self.defaultdevinstruct)
 		
