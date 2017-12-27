@@ -3250,7 +3250,7 @@ class Ui_MainWindow(QObject):
 			#Iteration of flows to correct for pressure and temperature
 			#	IF the pressure is reported correctly.
 			#	ALSO performs the flow summations.
-			for i in range(1,10):
+			for i in range(0,10):
 				#if calibrated[10] > 0 : 
 				if self.cvpcnRunAvg > 0 : 
 					#zerocorrectedflows[i] = ( calibrated[i]*(1013.25/calibrated[10])*((calibrated[14]+273.15)/294.26))
@@ -3260,9 +3260,15 @@ class Ui_MainWindow(QObject):
 					zerocorrectedflows[i] = ( calibrated[i]*(1013.25/0.0001)*((self.cvtcnRunAvg+273.15)/294.26))
 					self.errorSignal.emit("Pressure reading invalid")
 				if zerocorrectedflows[i] < 0 : zerocorrectedflows[i] = 0.0001
-				summedflow = summedflow + calibrated[i]
-				summedzerocorrectedflow = summedzerocorrectedflow + zerocorrectedflows[i]	
+				if i != 0:
+					summedflow = summedflow + calibrated[i]
+					summedzerocorrectedflow = summedzerocorrectedflow + zerocorrectedflows[i]	
 
+			#Shift in index to place cvf1c at the beginning
+			#	DOES NOT REQUIRE PRESSURE AND TEMP CORRECTION
+			#zerocorrectedflows[0] = calibrated[0]
+			#if zerocorrectedflows[0] < 0 : zerocorrectedflows[0] = 0.0001
+			
 			#for i in range(0, len(self.flowedit)):
 			#for i in range(0, len(self.flowedit)):
 			#	self.internalFlows[i] = float(MainWindow.findChild(QtWidgets.QSlider, self.flowedit[i]+'Slider')\
@@ -3271,13 +3277,11 @@ class Ui_MainWindow(QObject):
 			MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[1]+'Return').setText("{:.3f}".format(zerocorrectedflows[3]))	
 			MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[2]+'Return').setText("{:.3f}".format(zerocorrectedflows[4]))	
 			MainWindow.findChild(QtWidgets.QLineEdit, self.flowedit[3]+'Return').setText("{:.3f}".format(zerocorrectedflows[5]))	
+
+
+
 			MainWindow.findChild(QtWidgets.QLineEdit, 'cvf3cwReturn').setText("{:.3f}".format(zerocorrectedflows[0] - summedzerocorrectedflow))	
-
-
-			#Shift in index to place cvf1c at the beginning
-			#	DOES NOT REQUIRE PRESSURE AND TEMP CORRECTION
-			zerocorrectedflows[0] = calibrated[0]
-			if zerocorrectedflows[0] < 0 : zerocorrectedflows[0] = 0.0001
+			
 
 			#IF the pressure is greater than 0,
 			#	THEN perform calculation of cvftc, otherwise use 0.0001 for pressure
