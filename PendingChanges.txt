@@ -230,20 +230,28 @@ ValueError: could not convert string to float: '-99.9960001.5'
 
 SOCRATES Specific changes:
 
- * Change calibration parameters to use scientific notation .6E
- * Create rolling indicator of values that are being rolled from before
- 	* Apply color scheme (yellow box indicates rollover)
- * Divide up more error handling in computations
- * Depending on error handling exception, proceed through calculations anyways
- * Change labeling for ancillary instrumentation (Buttons need to match labels)
- * Need a flag when instruments not updating. (both DSM and ancillary)
- * Temperature flag when exceeds limits..
- * Add units to variables on screen (in file?)	
- * Change raw input/output labeling to change when slider moves to maxes
- * Add quadratic inversion for flow outputs		
+COMPLETE * Change calibration parameters to use scientific notation .6E
+COMPLETE * Create rolling indicator of values that are being rolled from before
+ 	COMPLETE * Apply color scheme (yellow box indicates rollover)
+COMPLETE * Divide up more error handling in computations
+COMPLETE * Depending on error handling exception, proceed through calculations anyways
+COMPLETE * Change labeling for ancillary instrumentation (Buttons need to match labels)
+COMPLETE * Need a flag when instruments not updating. (both DSM and ancillary)
+COMPLETE * Temperature flag when exceeds limits..
+COMPLETE * Add units to variables on screen (in file?)	
+CANCELLED * Change raw input/output labeling to change when slider moves to maxes
+COMPLETE * Add quadratic inversion for flow outputs		
 		
-		
-		
+COMPLETE * .dat files to .csv
+DELAYED * Manual airspeed injector button
+ * Physical manual vs auto button for plotting
+COMPLETE * Add precision to plotting values
+COMPLETE * Either move flow button or add sanity check
+COMPLETE * Double check flow excess units
+COMPLETE * Check cvf3
+COMPLETE * Maybe revert to linear cals?
+COMPLETE * Actual counterflow excess on ancillary instrument screen		
+COMPLETE * Adjust dimension to show time elapsed indicator for raw table	
 		
 
 

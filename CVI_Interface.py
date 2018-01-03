@@ -435,12 +435,12 @@ class Ui_MainWindow(QObject):
 		#Create Table for Viewing uncorrected, corrected, and calibrated flows
 		self.tableWidget = QtWidgets.QTableWidget(self.tab)
 		self.tableWidget.setObjectName("tableWidget")
-		self.tabLayout_1.addWidget(self.tableWidget, 28, 0, 18, 27)
+		self.tabLayout_1.addWidget(self.tableWidget, 28, 0, 18, 26)
 		
 		#Create Table for viewing raw input and output data
 		self.rawtableWidget = QtWidgets.QTableWidget(self.tab)
 		self.rawtableWidget.setObjectName("rawtablewidget")
-		self.tabLayout_1.addWidget(self.rawtableWidget, 28, 27, 18, 13)
+		self.tabLayout_1.addWidget(self.rawtableWidget, 28, 26, 18, 14)
 		
 		#Create table for viewing uncorrected,corrected, and calibrated inputs on first tab
 		self.tablerowlabels = ['cvf1','cvfx0','cvfx1','cvfx2','cvfx3','cvfx4',
@@ -508,7 +508,7 @@ class Ui_MainWindow(QObject):
 		#First Plotting Widget
 		self.CVIplot = PlotWidget(self.tab)
 		self.CVIplot.setObjectName("CVIplot")
-		self.tabLayout_1.addWidget(self.CVIplot, 2, 40, 23, 60)
+		self.tabLayout_1.addWidget(self.CVIplot, 2, 40, 23, 54)
 		self.CVIplot.show()
 		self.CVIplot.setTitle("CVI Data",color='w')
 		self.CVIplot.setLabel('bottom',text = 'Time (seconds)')
@@ -532,7 +532,7 @@ class Ui_MainWindow(QObject):
 		#Second Plotting Widget
 		self.CVIplot2 = PlotWidget(self.tab)
 		self.CVIplot2.setObjectName("CVIplot")
-		self.tabLayout_1.addWidget(self.CVIplot2, 27, 40, 23, 60)
+		self.tabLayout_1.addWidget(self.CVIplot2, 27, 40, 23, 54)
 		self.CVIplot2.setTitle("CVI Data",color='w')
 		self.CVIplot2.setLabel('bottom',text = 'Time (seconds)')
 		self.CVIplot2.setLabel('left',text = 'Y1')
@@ -545,7 +545,7 @@ class Ui_MainWindow(QObject):
 		self.CVIplot2line2.setXLink(self.CVIplot2)
 		#self.CVIplot2.getAxis('right').setLabel('Y2', color = (150,150,255))#'#0000ff')
 		
-		#Coloring of second plot axis items
+		#Col		self.oring of second plot axis items
 		self.CVIplot2.getAxis('left').setPen(pyqtgraph.mkPen(color=(255,255,255), width=3))
 		self.CVIplot2.getAxis('bottom').setPen(pyqtgraph.mkPen(color=(255,255,255), width=3))
 		self.CVIplot2.getAxis('right').setPen(pyqtgraph.mkPen(color=(0,255,0), width=3))
@@ -554,20 +554,60 @@ class Ui_MainWindow(QObject):
 		#Dropdown lists for selecting data for first plot
 		self.dropdownlist = QtWidgets.QComboBox(self.tab)
 		self.dropdownlist.setObjectName("dropdownlist")
-		self.tabLayout_1.addWidget(self.dropdownlist, 0, 40, 2, 30)
+		self.tabLayout_1.addWidget(self.dropdownlist, 0, 40, 2, 27)
 
 		self.dropdownlistline2 = QtWidgets.QComboBox(self.tab)
 		self.dropdownlistline2.setObjectName("dropdownlistline2")
-		self.tabLayout_1.addWidget(self.dropdownlistline2, 0, 70, 2, 30)
+		self.tabLayout_1.addWidget(self.dropdownlistline2, 0, 67, 2, 27)
 		
 		#Dropdown lists for selecting data for second plot
 		self.dropdownlist2 = QtWidgets.QComboBox(self.tab)
 		self.dropdownlist2.setObjectName("dropdownlist2")
-		self.tabLayout_1.addWidget(self.dropdownlist2, 25, 40, 2, 30)
+		self.tabLayout_1.addWidget(self.dropdownlist2, 25, 40, 2, 27)
 		self.dropdownlist2line2 = QtWidgets.QComboBox(self.tab)
 		self.dropdownlist2line2.setObjectName("dropdownlist2line2")
-		self.tabLayout_1.addWidget(self.dropdownlist2line2, 25, 70, 2, 30)	
+		self.tabLayout_1.addWidget(self.dropdownlist2line2, 25, 67, 2, 27)	
+
+
+		self.CVIplotResetAuto = QtWidgets.QPushButton(self.tab)
+		self.CVIplotResetAuto.setObjectName("CVIplotResetAuto")
+		self.tabLayout_1.addWidget(self.CVIplotResetAuto, 0, 94, 9, 6)
+		self.CVIplotResetAuto.setText("AutoScale")
+
+		self.CVIplotSetYMin = QtWidgets.QPushButton(self.tab)
+		self.CVIplotSetYMin.setObjectName("CVIplotSetYMin")
+		self.tabLayout_1.addWidget(self.CVIplotSetYMin, 9, 94, 8, 6)
+		self.CVIplotSetYMin.setText("Set Min")
 		
+		self.CVIplotSetYMax = QtWidgets.QPushButton(self.tab)
+		self.CVIplotSetYMax.setObjectName("CVIplotSetYMax")
+		self.tabLayout_1.addWidget(self.CVIplotSetYMax, 17, 94, 8, 6)
+		self.CVIplotSetYMax.setText("Set Max")
+		
+		self.CVIplot2ResetAuto = QtWidgets.QPushButton(self.tab)
+		self.CVIplot2ResetAuto.setObjectName("CVIplot2ResetAuto")
+		self.tabLayout_1.addWidget(self.CVIplot2ResetAuto, 25, 94, 9, 6)
+		self.CVIplot2ResetAuto.setText("AutoScale")
+
+		self.CVIplot2SetYMin = QtWidgets.QPushButton(self.tab)
+		self.CVIplot2SetYMin.setObjectName("CVIplot2SetYMin")
+		self.tabLayout_1.addWidget(self.CVIplot2SetYMin, 34, 94, 8, 6)
+		self.CVIplot2SetYMin.setText("Set Min")
+		
+		self.CVIplot2SetYMax = QtWidgets.QPushButton(self.tab)
+		self.CVIplot2SetYMax.setObjectName("CVIplot2SetYMax")
+		self.tabLayout_1.addWidget(self.CVIplot2SetYMax, 42, 94, 8, 6)
+		self.CVIplot2SetYMax.setText("Set Max")
+		
+
+		self.CVIplotResetAuto.clicked.connect(lambda: self.CVIAxesUpdate(MainWindow,1,0))
+		self.CVIplot2ResetAuto.clicked.connect(lambda: self.CVIAxesUpdate(MainWindow,2,0))
+		self.CVIplotSetYMin.clicked.connect(lambda: self.CVIAxesUpdate(MainWindow,1,1))
+		self.CVIplotSetYMax.clicked.connect(lambda: self.CVIAxesUpdate(MainWindow,1,2))
+		self.CVIplot2SetYMin.clicked.connect(lambda: self.CVIAxesUpdate(MainWindow,2,1))
+		self.CVIplot2SetYMax.clicked.connect(lambda: self.CVIAxesUpdate(MainWindow,2,2))
+				
+
 		###############################################################################
 		###############################################################################		
 		
@@ -1511,11 +1551,11 @@ class Ui_MainWindow(QObject):
 		
 		self.tdlFile = self.dataFile + '_tdlCal'
 
-		self.dataFile+= '_CVI.dat'
-		self.errorFile+= '_CVI.dat'
-		self.logFile+= '_CVI.dat'
+		self.dataFile+= '_CVI.csv'
+		self.errorFile+= '_CVI.txt'
+		self.logFile+= '_CVI.txt'
 		
-		self.tdlFile+= '_CVI.dat'
+		self.tdlFile+= '_CVI.csv'
 		
 		self.preflightPrefix = ''
 						
@@ -1525,7 +1565,8 @@ class Ui_MainWindow(QObject):
 		
 		#connect the signals/slots
 		self.flowsource.clicked.connect(lambda: self.toggleswitched(MainWindow))
-		self.flowio.clicked.connect(lambda: self.toggleswitched(MainWindow))
+		#self.flowio.clicked.connect(lambda: self.toggleswitched(MainWindow))
+		self.flowio.clicked.connect(lambda: self.flowOffCheck(MainWindow))
 		self.cvimode.clicked.connect(lambda: self.toggleswitched(MainWindow))
 		self.valvesource.clicked.connect(lambda: self.toggleswitched(MainWindow))
 	
@@ -2125,9 +2166,13 @@ class Ui_MainWindow(QObject):
 				.value()/100.0))
 			self.cfexcess = MainWindow.findChild(QtWidgets.QSlider,widget+'Slider').value()/100.0
 
-			MainWindow.findChild(QtWidgets.QLineEdit,widget+'Indicator')\
-				.setText(str(MainWindow.findChild(QtWidgets.QSlider,widget+'Slider')\
-				.value()/100.0))
+			#MainWindow.findChild(QtWidgets.QLineEdit,widget+'Indicator')\
+			#	.setText(MainWindow.findChild(QtWidgets.QLineEdit,widget+'Return')\
+			#	.text())
+
+			#MainWindow.findChild(QtWidgets.QLineEdit,widget+'Indicator')\
+			#	.setText(str(MainWindow.findChild(QtWidgets.QSlider,widget+'Slider')\
+			#	.value()/100.0))
 
 				
 	def updateSliders(self, MainWindow, widget = None):
@@ -2731,7 +2776,19 @@ class Ui_MainWindow(QObject):
 						f.close()
 		
 		self.readcalsfromfiles(MainWindow)
-			
+
+	#Indicator for making sure the operator ACTUALLY wants to shut off the flow	
+	def flowOffCheck(self,MainWindow):
+		if not self.flowio.isChecked():
+			reply = QtGui.QMessageBox.warning(MainWindow, 'WARNING', 
+				"Are you sure you want to turn the flow off?", 
+				QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)#, QtGui.QMessageBox.Warning)
+			if reply == QtGui.QMessageBox.Yes:
+				self.flowio.setChecked(False)
+			else:
+				self.flowio.setChecked(True)
+		self.toggleswitched(MainWindow)
+		
 	#Global updating function for toggles. Various toggles have different text
 	#	depending on state of toggle. Therefore, whenever anything is toggled,
 	#	the text will be updated for all of the toggles to ensure accuracy
@@ -2751,8 +2808,15 @@ class Ui_MainWindow(QObject):
 			self.flowio.setText("Flow ON")
 			self.flowio.setStyleSheet("background-color: lightgreen")
 		else: 
+			#reply = QtGui.QMessageBox.warning(MainWindow, 'WARNING', 
+			#	"Are you sure you want to turn the flow off?", 
+			#	QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)#, QtGui.QMessageBox.Warning)
+			#if reply == QtGui.QMessageBox.Yes:
 			self.flowio.setText("Flow OFF")
 			self.flowio.setStyleSheet("background-color: red")
+			#else:
+			#	self.flowio.setChecked(True)
+
 		if self.cvimode.isChecked() : 
 			self.cvimode.setText("Mode: Total")
 		else: 
@@ -2833,6 +2897,43 @@ class Ui_MainWindow(QObject):
 		
 	#function for replotting the data based on which data
 	#selection has been chosen
+	def CVIAxesUpdate(self,MainWindow,plotNum,AxisCode):	
+		#enableAutoRange(axis=None, enable=True, x=None, y=None)
+		#viewRange => [[xmin,xmax],[ymin,ymax]]
+
+		try:
+			if AxisCode == 0:
+				if plotNum == 1: 
+					self.CVIplot.enableAutoRange(axis=ViewBox.YAxis)
+					self.CVIplot.setMouseEnabled(x=False, y = False)
+				else: 
+					self.CVIplot2.enableAutoRange(axis=ViewBox.YAxis)
+					self.CVIplot2.setMouseEnabled(x=False, y = False)
+			else:
+				if AxisCode == 1:
+					if plotNum == 1:
+						newMin, contupdate = QInputDialog.getDouble(MainWindow, 'Axis Minimum', 'Please enter new Y Axis Minimum', value = self.CVIplot.viewRange()[1][0], decimals=5)
+						if contupdate:
+							self.CVIplot.setYRange(newMin,self.CVIplot.viewRange()[1][1],padding=0)
+							self.CVIplot.setMouseEnabled(x=False, y = True)
+					else: 
+						newMin, contupdate = QInputDialog.getDouble(MainWindow, 'Axis Minimum', 'Please enter new Y Axis Minimum', value = self.CVIplot2.viewRange()[1][0], decimals=5)
+						if contupdate:
+							self.CVIplot2.setYRange(newMin, self.CVIplot2.viewRange()[1][1],padding=0)
+							self.CVIplot2.setMouseEnabled(x=False, y = True)
+				elif AxisCode == 2:
+					if plotNum == 1:
+						newMax, contupdate = QInputDialog.getDouble(MainWindow, 'Axis Maximum', 'Please enter new Y Axis Maximum', value = self.CVIplot.viewRange()[1][1], decimals=5)
+						if contupdate:
+							self.CVIplot.setYRange(self.CVIplot.viewRange()[1][0], newMax,padding=0)
+							self.CVIplot.setMouseEnabled(x=False, y = True)
+					else:
+						newMax, contupdate = QInputDialog.getDouble(MainWindow, 'Axis Maximum', 'Please enter new Y Axis Maximum', value = self.CVIplot2.viewRange()[1][1], decimals=5)
+						if contupdate:
+							self.CVIplot2.setYRange(self.CVIplot2.viewRange()[1][0], newMax,padding=0)
+							self.CVIplot2.setMouseEnabled(x=False, y = True)
+		except: self.errorSignal.emit("There was a problem with the plot scaling buttons")
+			
 	def CVIreplot(self):	
 		#Linking protocols for dual lines on each plot
 		self.CVIplotline2.setGeometry(self.CVIplot.plotItem.vb.sceneBoundingRect())
@@ -3282,6 +3383,7 @@ class Ui_MainWindow(QObject):
 
 			MainWindow.findChild(QtWidgets.QLineEdit, 'cvf3cwReturn').setText("{:.3f}".format(zerocorrectedflows[0] - summedzerocorrectedflow))	
 			
+			MainWindow.findChild(QtWidgets.QLineEdit, 'cvf3cwIndicator').setText("{:.3f}".format(zerocorrectedflows[0] - summedzerocorrectedflow))
 
 			#IF the pressure is greater than 0,
 			#	THEN perform calculation of cvftc, otherwise use 0.0001 for pressure
@@ -3680,7 +3782,7 @@ class Ui_MainWindow(QObject):
 			#New 2-24-17 	--- Added cvfx5r, cvfx5c, cvts, cvtai, cvcfact 
 			#		--- corresponding to input[9],cal[6],cal[13],cal[15], 
 			newdata = np.r_[input[0],input[19:22], extra[:],input[9],calibrated[6],calibrated[13],calibrated[15], cvcfact]
-			newdata = np.around(newdata,decimals=3)
+			newdata = np.around(newdata,decimals=5)
 			try:
 				try:
 					self.plotdata = np.c_[self.plotdata[:,-899:], newdata]
