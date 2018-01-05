@@ -1501,7 +1501,7 @@ class Ui_MainWindow(QObject):
 		self.opccaltableWidget.setSortingEnabled(False)
 		
 		#Button label for saving coefficients from tables
-		self.saveCals.setText(_translate("MainWindow", "Click here to SAVE new calibrations"))
+		self.saveCals.setText(_translate("MainWindow", "Click here to SAVE new calibrations, MAX: 20 Cals"))
 		self.refreshCals.setText(_translate("MainWindow","Reload Calibrations"))
 		self.deleteCals.setText(_translate("MainWindow","Delete Currently Selected Calibration"))
 		
@@ -3132,8 +3132,8 @@ class Ui_MainWindow(QObject):
 				self.rawTableErrorTracker[1,0] += 1
 				self.rawTableErrorTracker[1,1] = 1
 			else:
-				self.rawTableErrorTracker[0,0] = 0
-				self.rawTableErrorTracker[0,1] = 0
+				self.rawTableErrorTracker[1,0] = 0
+				self.rawTableErrorTracker[1,1] = 0
 			#Formatting corrected new data into string to be ready to 
 			#	overwrite as new rollover data for future use
 			rolloverinput = input
@@ -3780,8 +3780,13 @@ class Ui_MainWindow(QObject):
 			#When this is changed, also change the dropdown lists from above (~ line 1000, self.plottitles)
 			#H2O, ptdl, ttdl, cvf3, cvcnc1, cvcnc01, cvrho_tdl, cvrhoo_tdl, opcc, opcco
 			#New 2-24-17 	--- Added cvfx5r, cvfx5c, cvts, cvtai, cvcfact 
-			#		--- corresponding to input[9],cal[6],cal[13],cal[15], 
-			newdata = np.r_[input[0],input[19:22], extra[:],input[9],calibrated[6],calibrated[13],calibrated[15], cvcfact]
+			#		--- corresponding to input[9],cal[6],cal[13],cal[15],
+
+			# cvfx#c corresponds to volume flow NOT mass flow? 
+			#newdata = np.r_[input[0],input[19:22], extra[:],input[9],calibrated[6],calibrated[13],calibrated[15], cvcfact]
+			
+			#Changed calibrated[6] to zerocorrectedflows[6]
+			newdata = np.r_[input[0],input[19:22], extra[:],input[9],zerocorrectedflows[6],calibrated[13],calibrated[15], cvcfact]
 			newdata = np.around(newdata,decimals=5)
 			try:
 				try:
