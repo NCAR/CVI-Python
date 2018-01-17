@@ -1656,8 +1656,8 @@ class Ui_MainWindow(QObject):
 		self.refreshCals.clicked.connect(lambda: self.readcalsfromfiles(MainWindow))
 		
 
-		self.cvpcnRunAvgArr = [np.nan]*10
-		self.cvtcnRunAvgArr = [np.nan]*10
+		self.cvpcnRunAvgArr = [np.nan]*20
+		self.cvtcnRunAvgArr = [np.nan]*20
 		
 
 		self.cvpcnRunAvg = np.nan
@@ -2779,7 +2779,9 @@ class Ui_MainWindow(QObject):
 
 	#Indicator for making sure the operator ACTUALLY wants to shut off the flow	
 	def flowOffCheck(self,MainWindow):
-		if not self.flowio.isChecked():
+		flowCheckBool = self.flowio.isChecked()
+		if not flowCheckBool:
+			self.flowio.setChecked(True)
 			reply = QtGui.QMessageBox.warning(MainWindow, 'WARNING', 
 				"Are you sure you want to turn the flow off?", 
 				QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)#, QtGui.QMessageBox.Warning)
@@ -3274,6 +3276,7 @@ class Ui_MainWindow(QObject):
 				else:
 					if cvfxmode[i] == 1 : calibrated[i+6] = C0[i+6] + C1[i+6]*data[i+6] + C2[i+6]*data[i+6]**2
 					else: calibrated[i+6] = cvfxalt[i] #USER ENTERED FLOW
+					#if cvfxdatatype[i] == 1 : calibrated[i+6] = calibrated[i+6]*(calibrated[10]/1013.23)*(294.26/(cvfxtemp[i]+273.15)) #calibrated[10] is cvpcn				
 					if cvfxdatatype[i] == 1 : calibrated[i+6] = calibrated[i+6]*(calibrated[10]/1013.23)*(294.26/(cvfxtemp[i]+273.15)) #calibrated[10] is cvpcn				
 
 
@@ -3284,6 +3287,8 @@ class Ui_MainWindow(QObject):
 
 			calibrated[5] = C0[5]+C1[5]*data[5]+C2[5]*data[5]**2
 
+
+			#Removed np.round(val,3) in above line
 			#For nulling of signals
 			for i in range(0,16):
 				if nullsignals[i] == 1: calibrated[i] = 0
@@ -3596,7 +3601,12 @@ class Ui_MainWindow(QObject):
 		#	if( input[34] != -99.99 ) : input[34] = calibrated[10]/(calibrated[14]+273.15) * 0.000217 * input[34]
 		#except:	 self.errorSignal.emit("Size of array messed up")
 
+
 		try:			
+			#Overwrite cvpcn (calibrated[10]) and cvtcn (calibrated[14]) with self.cvpcnRunAvg and self.cvtcnRunAvg
+			calibrated[10] = self.cvpcnRunAvg
+			calibrated[14] = self.cvtcnRunAvg
+
 			#Creates large data array that will be later saved after minor updates
 			output = np.r_[input[0], 0, 0, 0, input[3:19], calibrated[10:16], zerocorrectedflows[:], #ENDS AT INDEX 35, next line is 36
 				cvl, cvrhoo_tdl, cvrho_tdl, cvrad, cvcfact_tdl,  #ENDS AT 40, next line 41
@@ -3625,12 +3635,16 @@ class Ui_MainWindow(QObject):
 			#	cvfxwr0 is at index 49, #opcc_Pcor is at index 69
 			flowbyte = (2*int(self.v1.isChecked()))**3+(2*int(self.v2.isChecked()))**2+(2*int(self.v3.isChecked()))**1+int(self.v4.isChecked())
 			output[2] = flowbyte
-		
+	
+
+			#output[39] is cvrad, output[45] is cvcfact, output[47/48] is cvrh, cvdp, output[37] is cvrhoo_tdl	
 			#FLOW OUTPUTS ARE DECIDED IN THE CONNECTION SEQUENCE
-			dataout = np.round(np.r_[ output[0], output[49:54], 
+			dataout = np.r_[ output[0], output[49:54], 
 				int(self.v1.isChecked()), int(self.v2.isChecked()), int(self.v3.isChecked()), int(self.v4.isChecked()), 
 				int(self.cvimode.isChecked()), flowbyte, self.numchanges, 
-				output[39], output[45], output[47:49], output[37] ],3)
+				output[39], output[45], output[47:49], output[37] ]#,3)
+			#Need to add self.cvtcnRunAvg to output string to DSM
+			#Removed np.round(val,3) in above line
 			
 			zerocorrectedflows = output[26:36]
 			#calibrated = np.r_[output[26:36], output[20:26]]
@@ -3693,7 +3707,8 @@ class Ui_MainWindow(QObject):
 		#	endline character
 		
 		try:	
-			dataout = [ "{:.3f}".format(x) for x in dataout ]
+			#dataout = [ "{:.3f}".format(x) for x in dataout ]
+			dataout = [ "{:g}".format(x) for x in dataout ]
 			dataout = ','.join(dataout)
 			dataout+='\n'			
 			dataout = bytes(dataout,'utf_8')			
