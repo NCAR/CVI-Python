@@ -60,6 +60,8 @@ class Ui_MainWindow(QObject):
 	dataReceived = pyqtSignal(object,object)
 	errorSignal = pyqtSignal(object)
 	logSignal = pyqtSignal(object)
+
+	connectionLost = pyqtSignal()#object)
 	
 	tdlReturn = pyqtSignal(object)
 	
@@ -1670,6 +1672,8 @@ class Ui_MainWindow(QObject):
 		self.errorSignal.connect(self.errorLog)
 		self.logSignal.connect(self.mainLog)
 		
+		self.connectionLost.connect(self.dsmConnectionLost)
+
 		self.tdlReturn.connect(self.processTDLCal)
 		
 		#self.errorSignal.emit(*arg)
@@ -1687,8 +1691,13 @@ class Ui_MainWindow(QObject):
 		self.connectFlash = True
 		self.devContinueFlash = True
 
-
 		self.timerPosition = False
+
+		self.dsmUpdateTimer = QTimer()
+		self.dsmUpdateTimer.timeout.connect(lambda: self.dsmLastUpdate(MainWindow))
+		self.dsmUpdateTimer.start(1000)
+		self.dsmTimeTracker = np.nan
+		self.laptopTimeTracker = np.nan
 
 		#Disabling buttons until Start button is pressed....
 		self.flowio.setDisabled(True)
@@ -1714,6 +1723,66 @@ class Ui_MainWindow(QObject):
 		
 		#Create server loop
 		#self.server_loop = asyncio.get_event_loop()
+
+	def dsmConnectionLost(self):
+		self.laptopTimeTracker = np.nan
+		reply = QtGui.QMessageBox.critical(MainWindow, 'WARNING',
+			"The DSM has disconnected!!\n"+
+			"Suggested action 1: Reboot DSM if data not updating (1 minute recovery)\n"+
+			"Suggested action 2: Do nothing\n"+
+			"Click OK anytime to clear this message")
+			#QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+		#if reply == QtGui.QMessageBox.Yes:
+		#	self.disconnect.click()
+		
+	def dsmLastUpdate(self, MainWindow):
+		#tmpLaptopTime = time.time()
+		elapsedTime = time.time() - self.laptopTimeTracker
+		#print(elapsedTime)
+		
+		if np.floor(elapsedTime) == 5 and not self.connectFlash:
+			self.errorSignal.emit("DSM has not sent any data for 5 seconds.")
+		elif np.floor(elapsedTime) == 10 and not self.connectFlash:
+			self.errorSignal.emit("DSM has not sent any data for 10 seconds.")
+		elif np.floor(elapsedTime) >= 15 and not self.connectFlash:
+			self.errorSignal.emit("DSM has not sent any data for over 15 seconds.")
+			self.laptopTimeTracker = np.nan
+			reply = QtGui.QMessageBox.critical(MainWindow, 'WARNING',
+				"Network Lost!!\n"+
+				"Suggested action 1: Check network connections (1 min recovery)\n"+
+				"Suggested action 2: Check that server is up\n"+
+				"Suggested action 3: Reboot DSM (1 min recovery)\n"+
+				"Suggested action 4: Do nothing\n"+
+				"Click OK anytime to clear this message")
+			#if reply == QtGui.QMessageBox.Yes:
+			#	self.disconnect.click()
+			
+		elif np.floor(elapsedTime) == 10 and self.connectFlash:
+			#print("DSM Taking too long to connect")
+			self.errorSignal.emit("DSM does not appear to be connecting.")
+			#self.laptopTimeTracker = time.time()
+		elif np.floor(elapsedTime) >= 20 and self.connectFlash:
+			self.errorSignal.emit("DSM has not connected for over 20 seconds.")
+			self.laptopTimeTracker = np.nan
+			reply = QtGui.QMessageBox.critical(MainWindow, 'WARNING',
+				"DSM is not connecting!!\n"+
+				"Suggested action 1: Check to see if DSM is on (1 minute startup)\n"+
+				"Suggested action 2: Check that server is up\n"+
+				"Suggested action 3: Reboot DSM (1 minute recovery)\n"+
+				"Suggested action 4: Reboot CVI Program or Laptop\n"+
+				"Suggested action 5: Continue waiting\n"+
+				"Click OK anytime to clear this message")
+			#if reply == QtGui.QMessageBox.Yes:
+			#	self.disconnect.click()
+				
+
+		#reply = QtGui.QMessageBox.warning(MainWindow, 'WARNING', 
+		#	"Are you sure you want to turn the flow off?", 
+		#	QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)#, QtGui.QMessageBox.Warning)
+		#if reply == QtGui.QMessageBox.Yes:
+		#	self.flowio.setChecked(False)
+		#else:
+		#	self.flowio.setChecked(True)
 	
 	def flashing(self, MainWindow):
 		if self.timerPosition:
@@ -2860,13 +2929,17 @@ class Ui_MainWindow(QObject):
 			if self.runconnection:
 				return
 		except: pass
-		
+
 		self.statusindicatorlabel.setText("Ensuring Disconnection . . . . . . . ")
 		self.statusindicatorlabel.setText("Initiating Connection . . . . . . . .")
 		self.runconnection = True
 		
+		self.laptopTimeTracker = time.time()
+		self.disconnect.setDisabled(False)
+	
 		self.CVI_Server = QServer(self.ipaddress.text(),int(self.portin.text()),int(self.portout.text()))
 		self.CVI_Server.start()
+
 	
 		#Update network status indicator
 		self.statusindicatorlabel.setText("Incoming data server has been established")	
@@ -2896,6 +2969,7 @@ class Ui_MainWindow(QObject):
 			self.disconnect.setDisabled(True)
 			self.connect.setDisabled(False)
 			self.connectFlash = True
+			self.laptopTimeTracker = np.nan
 		
 	#function for replotting the data based on which data
 	#selection has been chosen
@@ -3050,6 +3124,7 @@ class Ui_MainWindow(QObject):
 		try:
 			input = datain.replace(" ","").replace("\n","").replace("\r","").split(',')
 			input = [float(i) for i in input]
+			self.laptopTimeTracker = time.time()
 		except:
 			self.errorSignal.emit("Fatal error in tcp string")
 			return
@@ -3859,7 +3934,7 @@ class QServer(QThread):
 
 		# Create a TCP/IP socket
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		#self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+		self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		
 		# Bind the socket to the port
 		self.server_address = ('',self.portin)
@@ -3902,6 +3977,7 @@ class QServer(QThread):
 					else:
 						ui.logSignal.emit("Connection FROM CVI DSM was lost")
 						ui.errorSignal.emit("Connection FROM CVI DSM was lost")
+						ui.connectionLost.emit()
 						s.close()
 						read_list.remove(s)
 				if not self.sendSuccess:
