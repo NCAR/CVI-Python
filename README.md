@@ -1,4 +1,4 @@
-Pyhton based real-time display and control code for the EOL/RAF Counter-flow Virtual Impactor (CVI).
+Python based real-time display and control code for the EOL/RAF Counter-flow Virtual Impactor (CVI).
 
 Intrument description can be found here:
 
